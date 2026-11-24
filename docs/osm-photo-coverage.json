@@ -1,0 +1,14 @@
+{
+  "catalogPlaces": 55716,
+  "matchedPlaces": 182,
+  "directFileLinks": 2,
+  "wikidataLinks": 180,
+  "examinedPlaces": 22652,
+  "scannedCells": 16,
+  "totalCells": 769,
+  "errors": 18,
+  "license": "ODbL-1.0",
+  "source": "https://www.openstreetmap.org/copyright",
+  "endpoint": "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+  "generatedAt": "2026-11-24T17:42:31.389Z"
+}
