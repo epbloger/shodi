@@ -293,3 +293,15 @@
 [data-theme="dark"] .place-add { background: #263956; color: #c4d6ff; border-color: #41577d; }
 [data-theme="dark"] .place-add:hover:not(:disabled) { background: #354d71; }
 @media (prefers-reduced-motion: reduce) { .place-card { transition: none; } }
+
+.hero-mobile { display:none; }
+.description-source { font-size:.75rem; color:var(--accent); }
+@media(max-width:760px){
+ .guide-hero{grid-template-columns:minmax(0,1fr);min-height:0;}
+ .guide-hero-copy{padding:20px 20px 12px;}
+ .guide-hero .hero-desktop{display:none;}
+ .hero-mobile{display:block;width:100%;height:auto;max-height:170px;}
+ .guide-hero p{max-width:42ch;}
+ .place-footer{flex-wrap:wrap;gap:8px;}
+ .place-map{overflow-wrap:anywhere;}
+}

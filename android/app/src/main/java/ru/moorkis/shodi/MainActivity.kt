@@ -20,7 +20,6 @@ class MainActivity : Activity() {
     private lateinit var web: WebView
     private lateinit var ads: AdsController
     private lateinit var root: LinearLayout
-    private lateinit var share: Button
     private val handler = Handler(Looper.getMainLooper())
     private val prefs by lazy { getSharedPreferences("privacy", MODE_PRIVATE) }
     private var active = false
@@ -43,7 +42,6 @@ class MainActivity : Activity() {
                     val oldRoute = route
                     route = state.getBoolean(0)
                     editing = state.getBoolean(1)
-                    share.visibility = if (route && !editing) View.VISIBLE else View.GONE
                     ads.update(!route && !editing && !legalDialogOpen, oldRoute && !route && !editing && !legalDialogOpen)
                 }
             }
@@ -63,21 +61,6 @@ class MainActivity : Activity() {
                 insets.systemWindowInsetRight, insets.systemWindowInsetBottom)
             insets
         }
-        val bar = LinearLayout(this).apply {
-            gravity = android.view.Gravity.END
-            setPadding(8, 0, 8, 0)
-        }
-        share = Button(this).apply {
-            text = "Поделиться маршрутом"
-            visibility = View.GONE
-            setOnClickListener { shareRoute() }
-        }
-        bar.addView(share)
-        bar.addView(Button(this).apply {
-            text = "О приложении"
-            setOnClickListener { aboutDialog() }
-        })
-        root.addView(bar)
         web = WebView(this)
         root.addView(web, LinearLayout.LayoutParams(-1, 0, 1f))
         val adSlot = FrameLayout(this).apply { visibility = View.GONE }
@@ -119,6 +102,13 @@ class MainActivity : Activity() {
             }
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 if (request.url.toString().substringBefore('#') == local) return false
+                if (request.isForMainFrame && request.url.scheme == "https" && request.url.host == "appassets.androidplatform.net" && request.url.port == -1 && request.url.query == null && request.url.fragment == null && request.url.userInfo == null) {
+                    when (request.url.path) {
+                        "/action/about" -> if (ready && !legalDialogOpen) aboutDialog()
+                        "/action/share" -> if (ready && !legalDialogOpen) shareRoute()
+                    }
+                    return true
+                }
                 if (request.isForMainFrame && request.hasGesture() && request.url.scheme == "https") openExternal(request.url)
                 return true
             }
@@ -157,7 +147,7 @@ class MainActivity : Activity() {
         ads.update(false, false)
         val choices = arrayOf("Разработчик и поддержка", "Политика конфиденциальности",
             "Пользовательское соглашение", "Согласие на обработку данных для рекламы",
-            "Источники данных и лицензии", "Настройки рекламы", "Сайт проекта")
+            "Источники данных и лицензии", "Персональные данные и согласие", "Сайт проекта")
         val files = arrayOf("about.html", "privacy.html", "terms.html", "consent.html", "licenses.html")
         AlertDialog.Builder(this).setTitle("Сходи · " + BuildConfig.VERSION_NAME)
             .setItems(choices) { _, i ->
@@ -175,10 +165,10 @@ class MainActivity : Activity() {
     private fun privacyDialog() {
         legalDialogOpen = true
         ads.update(false, false)
-        AlertDialog.Builder(this).setTitle("Отдельное согласие на рекламу")
-            .setMessage("Разрешение добровольное. Все функции доступны без рекламы. Прежде чем дать согласие, ознакомьтесь с отдельным документом. Реклама использует SDK Яндекса и технические данные. Вы можете изменить выбор в разделе «О приложении».")
+        AlertDialog.Builder(this).setTitle("Обработка данных для рекламы")
+            .setMessage("Разрешение добровольное. Реклама является частью сервиса. При отказе от необходимой обработки данных объявления могут быть недоступны. Прежде чем дать согласие, ознакомьтесь с отдельным документом. Реклама использует SDK Яндекса и технические данные. Отозвать согласие можно в разделе «О приложении».")
             .setPositiveButton("Прочитать согласие") { _, _ -> consentDialog() }
-            .setNegativeButton("Без рекламы") { _, _ -> setAds(false) }
+            .setNegativeButton("Не даю согласия") { _, _ -> setAds(false) }
             .setNeutralButton("Политика") { _, _ -> showLegal("Политика конфиденциальности", "privacy.html") { privacyDialog() } }
             .setOnDismissListener { legalDialogOpen = false }
             .show()
@@ -196,7 +186,7 @@ class MainActivity : Activity() {
         AlertDialog.Builder(this).setTitle("Согласие на рекламную обработку данных")
             .setView(ScrollView(this).apply { addView(content) })
             .setPositiveButton("Разрешить рекламу") { _, _ -> setAds(true) }
-            .setNegativeButton("Без рекламы") { _, _ -> setAds(false) }
+            .setNegativeButton("Не даю согласия") { _, _ -> setAds(false) }
             .setOnDismissListener { legalDialogOpen = false }
             .show()
     }
@@ -209,9 +199,9 @@ class MainActivity : Activity() {
     }
 
     private fun shareRoute() {
-        if (!ready || !route || editing) return
+        if (!ready || editing || legalDialogOpen) return
         // Read only the selected route, and only in response to this explicit button.
-        web.evaluateJavascript("""(()=>{try{const b=JSON.parse(localStorage.getItem('weekend-atlas/v1'));const r=b.routes.find(x=>x.id===b.selected);return r?[r.name,r.city,r.note,...r.stops.map((s,i)=>(i+1)+'. '+s.name+(s.minutes?' · '+s.minutes+' мин':'')+(s.note?' — '+s.note:''))].filter(Boolean).join('\n'):''}catch{return ''}})()""") { result ->
+        web.evaluateJavascript("""(()=>{try{const b=JSON.parse(localStorage.getItem('weekend-atlas/v1'));if(location.hash!=='#route'||document.querySelector('dialog[open]'))return '';const r=b.routes.find(x=>x.id===b.selected);return r?[r.name,r.city,r.note,...r.stops.map((s,i)=>(i+1)+'. '+s.name+(s.minutes?' · '+s.minutes+' мин':'')+(s.note?' — '+s.note:''))].filter(Boolean).join('\n'):''}catch{return ''}})()""") { result ->
             val text = runCatching { org.json.JSONTokener(result).nextValue() as? String }.getOrNull()
             if (!text.isNullOrBlank()) startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"; putExtra(Intent.EXTRA_TEXT, text)

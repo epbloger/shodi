@@ -5,7 +5,8 @@ import {
 
 const byId = id => document.getElementById(id);
 const countLabel = new Intl.PluralRules("ru");
-const PAGE_SIZE = 36;
+const mobile = window.matchMedia("(max-width: 760px)");
+const pageSize = () => mobile.matches ? 10 : 36;
 
 export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   const cityInput = byId("guide-city");
@@ -21,7 +22,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   let city = cityById("spb");
   let category = "all";
   let selectedTarget;
-  let visibleLimit = PAGE_SIZE;
+  let visibleLimit = pageSize();
   const more = byId("guide-more");
 
   const cityChoices = document.createDocumentFragment();
@@ -53,7 +54,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     button.value = kind;
     button.addEventListener("click", () => {
       category = kind;
-      visibleLimit = PAGE_SIZE;
+      visibleLimit = pageSize();
       render();
     });
     categories.append(button);
@@ -74,8 +75,8 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     byId("guide-empty").hidden = places.length !== 0;
     const noCatalog = !places.length && !findPlaces({ cityId: city.id }).length;
     more.hidden = places.length <= visibleLimit;
-    more.textContent = "Показать ещё " + Math.min(PAGE_SIZE, Math.max(0, places.length - visibleLimit)) + " мест";
-    byId("guide-shown").hidden = places.length <= PAGE_SIZE;
+    more.textContent = "Показать ещё " + Math.min(pageSize(), Math.max(0, places.length - visibleLimit)) + " мест";
+    byId("guide-shown").hidden = places.length <= pageSize();
     byId("guide-shown").textContent = "Показано " + Math.min(visibleLimit, places.length) + " из " + places.length;
     byId("guide-empty-text").textContent = noCatalog
       ? "В подборке пока нет мест для этого города. Их можно поискать на карте."
@@ -106,8 +107,16 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
       rating.textContent = place.status === "open" ? "Действует по данным источника" : "Статус уточните на карте";
       rating.hidden = false;
       const description = card.querySelector(".place-description");
-      description.textContent = place.description;
-      description.hidden = !place.description || place.description === kind.name;
+      description.textContent = place.description || "Подтверждённое описание пока отсутствует.";
+      description.hidden = false;
+      if (place.descriptionSource) {
+        const source = document.createElement("a");
+        source.className = "description-source";
+        source.href = place.descriptionSource;
+        source.target = "_blank"; source.rel = "noopener noreferrer";
+        source.textContent = "Источник описания";
+        description.append(document.createElement("br"), source);
+      }
       const budget = card.querySelector(".place-budget");
       budget.hidden = place.budget.type === "unknown";
       budget.textContent = budget.hidden ? "" : budgetLabel(place.budget);
@@ -145,7 +154,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
 
   function resetSearch() {
     category = "all";
-    visibleLimit = PAGE_SIZE;
+    visibleLimit = pageSize();
     search.value = "";
     showFeedback("");
     render();
@@ -179,10 +188,10 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     render();
   });
   openButton.addEventListener("click", () => openRoute(target.value));
-  search.addEventListener("input", () => { visibleLimit = PAGE_SIZE; render(); });
+  search.addEventListener("input", () => { visibleLimit = pageSize(); render(); });
   more.addEventListener("click", () => {
     const firstNew = visibleLimit;
-    visibleLimit += PAGE_SIZE;
+    visibleLimit += pageSize();
     render();
     grid.children[firstNew]?.querySelector(".place-map")?.focus();
   });
@@ -190,5 +199,6 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     resetSearch();
     search.focus();
   });
+  mobile.addEventListener('change', () => { visibleLimit = pageSize(); render(); });
   return render;
 }
