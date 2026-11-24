@@ -103,7 +103,7 @@ class MainActivity : Activity() {
                     val api = u.host in setOf("www.wikidata.org", "commons.wikimedia.org") && u.path == "/w/api.php" &&
                         u.getQueryParameter("origin") == "*" && u.getQueryParameter("format") == "json" &&
                         ((u.host == "www.wikidata.org" && u.getQueryParameter("action") in setOf("wbsearchentities", "wbgetentities")) ||
-                         (u.host == "commons.wikimedia.org" && u.getQueryParameter("action") == "query" && u.getQueryParameter("prop") == "imageinfo"))
+                         (u.host == "commons.wikimedia.org" && u.getQueryParameter("action") == "query" && (u.getQueryParameter("prop") == "imageinfo" || (u.getQueryParameter("list") == "geosearch" && u.getQueryParameter("gsnamespace") == "6" && u.getQueryParameter("gsradius") == "100" && u.getQueryParameter("gslimit") == "20"))))
                     val image = u.host in setOf("upload.wikimedia.org", "thumb.wikimedia.org") &&
                         u.path?.startsWith("/wikipedia/commons/") == true && u.query == null
                     if (api || image) return null

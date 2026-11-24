@@ -144,10 +144,15 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
           const a = document.createElement("a"); a.href=url; a.textContent=text;
           a.target="_blank"; a.rel="noopener noreferrer"; return a;
         };
-        image.alt = place.name;
+        image.alt = photo.nearby === true ? "Окрестности: "+place.name : place.name;
         image.addEventListener("error", () => { figure.hidden = true; cover.hidden = false; }, {once:true});
         caption.replaceChildren(link(photo.source,photo.author+" · Wikimedia Commons")," · ",link(photo.licenseUrl,photo.license)," · уменьшенная копия");
         if(typeof photo.osmSource==="string"&&/^(node|way|relation)\/[1-9]\d*$/.test(photo.osmSource))caption.append(" · ",link("https://www.openstreetmap.org/"+photo.osmSource,"© OpenStreetMap contributors"));
+        if(photo.nearby===true) {
+          const note=document.createElement("strong");
+          note.textContent="Фото рядом с местом (не самого объекта)"+(Number.isInteger(photo.nearbyMeters)&&photo.nearbyMeters>=0&&photo.nearbyMeters<=100?" · около "+photo.nearbyMeters+" м":"");
+          caption.prepend(note,document.createElement("br"));
+        }
         cover.hidden = true;
         image.src = photo.data;
         figure.hidden = false;

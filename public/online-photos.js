@@ -83,7 +83,7 @@ async function getCommonsPhoto(filename){
   if(validatePhoto(photo))return photo;
   return null;
 }
-async function lookup(place){
+async function exactPhoto(place){
   for(const file of place.osmPhotoLink?.files||[]){
     const photo=await getCommonsPhoto(file);
     if(photo)return {...photo,osmSource:place.osmPhotoLink.osm[0]};
@@ -104,6 +104,24 @@ async function lookup(place){
     if(typeof filename!=="string"||filename.length>350||!/\.jpe?g$|\.png$|\.webp$/i.test(filename))continue;
     const photo=await getCommonsPhoto(filename);
     if(photo)return photo;
+  }
+  return null;
+}
+// Geotagged surroundings are explicitly not a verified photo of a business.
+export function nearbyPhotoCandidates(place,rows){
+  if(!Number.isFinite(place.lat)||!Number.isFinite(place.lon)||!Array.isArray(rows))return [];
+  return rows.filter(row=>row&&typeof row.title==="string"&&/^File:.{1,350}\.(jpe?g|png)$/i.test(row.title)&&Number.isFinite(row.lat)&&Number.isFinite(row.lon))
+    .map(row=>({filename:row.title.slice(5),meters:Math.round(Math.hypot((place.lat-row.lat)*111320,(place.lon-row.lon)*111320*Math.cos(place.lat*Math.PI/180)))}))
+    .filter(row=>row.meters<=100)
+    .sort((a,b)=>a.meters-b.meters||a.filename.localeCompare(b.filename)).slice(0,3);
+}
+async function lookup(place){
+  const exact=await exactPhoto(place);
+  if(exact)return exact;
+  const result=await request("commons.wikimedia.org",{action:"query",list:"geosearch",gscoord:place.lat.toFixed(5)+"|"+place.lon.toFixed(5),gsradius:"100",gsnamespace:"6",gsprimary:"all",gslimit:"20"});
+  for(const candidate of nearbyPhotoCandidates(place,result.query?.geosearch)){
+    const photo=await getCommonsPhoto(candidate.filename);
+    if(photo)return {...photo,nearby:true,nearbyMeters:candidate.meters};
   }
   return null;
 }
