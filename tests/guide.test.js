@@ -120,3 +120,11 @@ test("fresh catalog records preserve routes and do not invent reviews or prices"
     }
   }
 });
+
+test("active catalog excludes unverified historical fallback and closed statuses", () => {
+  for (const city of cities) {
+    const places = catalogPlacesForCity(city.id);
+    if (!catalogSource(city.id)) assert.equal(places.length, 0);
+    for (const place of places) assert.ok(["open", "unknown"].includes(place.status));
+  }
+});

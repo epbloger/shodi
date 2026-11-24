@@ -181,12 +181,12 @@ const freshIdCache = new Map();
 export function catalogPlacesForCity(cityId) {
   const city = citiesById.get(cityId);
   if (!city) return [];
-  if (!catalogSource(cityId)) return placesForCity(cityId);
+  if (!catalogSource(cityId)) return [];
   if (freshCityCache.has(cityId)) return freshCityCache.get(cityId);
-  const places = currentPlaces[cityId].map(([id, name, kind, address, lat, lon]) => ({
+  const places = currentPlaces[cityId].filter(row => !row[6] || ["open", "unknown"].includes(row[6])).map(([id, name, kind, address, lat, lon, status]) => ({
     id, name, kind, area: address || city.label, address, city: city.label,
     description: PLACE_CATEGORIES[kind].name, lat, lon, budget: { type: "unknown" },
-    source: currentCatalog.release,
+    source: currentCatalog.release, status: status ?? "unknown",
   }));
   freshCityCache.set(cityId, places);
   for (const place of places) freshIdCache.set(place.id, place);

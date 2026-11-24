@@ -87,10 +87,8 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     cityMap.href = mapLink({ name: mapQuery, city: city.label + " " + city.region });
     const source = catalogSource(city.id);
     byId("guide-price-note").textContent = source
-      ? "Источник: Overture Maps, выпуск " + source.release + ". Рейтинги и цены не предоставляются; часы работы уточняйте на карте."
-      : city.id.startsWith("ru-")
-        ? "Архивная подборка по отзывам 2023 года. Актуальные сведения проверьте на карте."
-        : "Архивная редакционная подборка; цены и сведения не подтверждены на 2026 год. Уточните их на карте.";
+      ? "Источник: Overture Maps, выпуск " + source.release + ". Данные не обновляются в реальном времени; статус и часы работы уточняйте на карте."
+      : "В свежем каталоге пока нет подтверждённых записей для этого города. Найдите места на карте или добавьте остановку вручную.";
     byId("current-attribution").hidden = !source;
     updateCategories(allPlaces);
 
@@ -105,8 +103,8 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
       card.querySelector(".place-name").textContent = place.name;
       card.querySelector(".place-area").textContent = place.area;
       const rating = card.querySelector(".place-rating");
-      rating.textContent = reviewLabel(place);
-      rating.hidden = !place.reviews;
+      rating.textContent = place.status === "open" ? "Действует по данным источника" : "Статус уточните на карте";
+      rating.hidden = false;
       const description = card.querySelector(".place-description");
       description.textContent = place.description;
       description.hidden = !place.description || place.description === kind.name;

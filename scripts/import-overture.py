@@ -14,11 +14,11 @@ RELEASE = "2026-11-18.0"
 CATEGORIES = {
     "museum": "museum history_museum art_museum science_museum",
     "gallery": "art_gallery art_center exhibition_center",
-    "theater": "theater performing_arts performing_arts_theater opera_house",
+    "theater": "theater theatre performing_arts performing_arts_theater performing_arts_theatre performing_arts_venue performing_arts_center performance_art_theatre drama_theater drama_theatre opera_house puppet_theater puppet_theatre ballet_theater musical_theater",
     "live": "concert_hall music_venue live_music_venue",
     "family": "zoo aquarium amusement_park water_park circus theme_park playground indoor_playground cinema movie_theater",
     "books": "bookstore book_store library",
-    "view": "observation_deck scenic_viewpoint viewpoint lookout scenic_overlook observation_tower",
+    "view": "observation_deck scenic_viewpoint viewpoint lookout scenic_overlook observation_tower scenic_lookout viewing_platform viewing_point observation_point scenic_view",
     "active": "ice_skating_rink skating_rink ski_resort climbing_gym go_kart stadium bowling_alley sports_complex swimming_pool skating",
     "park": "park botanical_garden garden national_park",
     "architecture": "monument historical_landmark historic_site historical_site castle memorial historic_building palace",
@@ -82,20 +82,32 @@ def permitted_sources(sources):
         recognized.update(labels)
     return bool(recognized)
 
+CLOSED_NAMES = re.compile(r"(?:больше не работает|закрыто навсегда|permanently closed|temporarily closed|временно закрыто)", re.I)
+THEATER_NAME = re.compile(r"\b(?:театр(?:а|е|ом|ы)?|театральная сцена|оперный театр|theatre|theater|opera house)\b", re.I)
+NOT_THEATER = re.compile(r"\b(?:кинотеатр|кинозал|школа|студия|кружок|магазин|ресторан|кафе|бар|билетная касса|музей|курсы|памятник|cinema|movie theater|school|shop|restaurant|cafe|museum)\b", re.I)
+VIEW_NAME = re.compile(r"\b(?:смотровая площадка|смотровая башня|смотровая терраса|observation deck|viewpoint|scenic overlook|scenic lookout|viewing platform)\b", re.I)
+
+def classify(name, basic, primary, hierarchy):
+    # The primary category is more specific than the basic category.
+    if VIEW_NAME.search(name):
+        return "view"
+    if THEATER_NAME.search(name) and not NOT_THEATER.search(name):
+        return "theater"
+    return next((CATEGORY_MAP[x] for x in [primary, *reversed(hierarchy or []), basic] if x in CATEGORY_MAP), None)
+
+def is_closed(status, name):
+    return status not in (None, "", "open") or bool(CLOSED_NAMES.search(name))
+
 def make_catalog(rows):
     cities, index = cities_index()
     groups = defaultdict(dict)
+    blocked = defaultdict(set)
     stats, rejected_sources, unmatched_cities = Counter(), Counter(), Counter()
-    for id, name, basic, primary, hierarchy, confidence, street, locality, lat, lon, sources in rows:
+    for id, name, basic, primary, hierarchy, confidence, street, locality, lat, lon, sources, status in rows:
         stats["input"] += 1
         name, street, locality = clean(name), clean(street), clean(locality)
         if not name or len(name.encode("utf-16-le")) // 2 > 80 or PRIVATE.search(name) or PRIVATE.search(street):
             stats["invalid_name_or_address"] += 1
-            continue
-        # Only documented permissive providers, excluding Apache/Foursquare inputs.
-        if not permitted_sources(sources):
-            stats["source_rejected"] += 1
-            rejected_sources.update(str((source or {}).get("dataset")) for source in sources or [])
             continue
         candidates = index.get(norm(locality), set()) | index.get(latin(locality), set())
         if len(candidates) != 1 or lat is None or lon is None or not math.isfinite(lat) or not math.isfinite(lon):
@@ -104,7 +116,21 @@ def make_catalog(rows):
             continue
         city_id = next(iter(candidates))
         city, region = cities[city_id]
-        kind = next((CATEGORY_MAP[x] for x in [basic, primary, *reversed(hierarchy or [])] if x in CATEGORY_MAP), None)
+        key = (norm(name), norm(street) or (round(lat, 4), round(lon, 4)))
+        if is_closed(status, name):
+            stats["closed_rejected"] += 1
+            if permitted_sources(sources):
+                blocked[city_id].add(key)
+            continue
+        # Only documented permissive providers, excluding Apache/Foursquare inputs.
+        if not permitted_sources(sources):
+            stats["source_rejected"] += 1
+            rejected_sources.update(str((source or {}).get("dataset")) for source in sources or [])
+            continue
+        if float(confidence or 0) < 0.65:
+            stats["low_confidence"] += 1
+            continue
+        kind = classify(name, basic, primary, hierarchy)
         if not kind:
             stats["category_rejected"] += 1
             continue
@@ -114,7 +140,7 @@ def make_catalog(rows):
             continue
         stats["accepted"] += 1
         digest = hashlib.sha256(str(id).encode()).hexdigest()[:12]
-        entry = [city_id + "-o" + digest, name, kind, address, round(lat, 6), round(lon, 6)]
+        entry = [city_id + "-o" + digest, name, kind, address, round(lat, 6), round(lon, 6), status or "unknown"]
         # Preserve distinct branches of the same chain, and deduplicate the same name/address.
         key = (norm(name), norm(street) or (round(lat, 4), round(lon, 4)))
         score = (float(confidence or 0), bool(street), str(id))
@@ -123,7 +149,9 @@ def make_catalog(rows):
             groups[city_id][key] = (score, entry)
     result = {}
     for city_id, entries in sorted(groups.items()):
-        ranked = sorted(entries.values(), key=lambda x: x[0], reverse=True)
+        ranked = sorted((value for key, value in entries.items() if key not in blocked[city_id]), key=lambda x: x[0], reverse=True)
+        if not ranked:
+            continue
         # Round-robin categories, so the first page is varied even in large cities.
         by_kind = defaultdict(list)
         for _, entry in ranked:
@@ -154,15 +182,15 @@ def main():
         cursor = connection.execute("""
             SELECT id, names.primary, basic_category, taxonomy.primary, taxonomy.hierarchy,
                    confidence, addresses[1].freeform, addresses[1].locality,
-                   bbox.ymin, bbox.xmin, sources
+                   bbox.ymin, bbox.xmin, sources, operating_status
             FROM read_parquet(?)
             WHERE upper(addresses[1].country) = 'RU'
               AND addresses[1].locality IS NOT NULL AND names.primary IS NOT NULL
               AND bbox.ymin BETWEEN 41 AND 82 AND bbox.xmin IS NOT NULL
-              AND coalesce(confidence, 0) >= 0.65
-              AND coalesce(operating_status, '') NOT IN ('permanently_closed', 'temporarily_closed')
+              AND (coalesce(confidence, 0) >= 0.65 OR coalesce(operating_status, '') NOT IN ('', 'open'))
               AND (basic_category IN (SELECT unnest(?)) OR taxonomy.primary IN (SELECT unnest(?))
-                   OR list_has_any(taxonomy.hierarchy, ?))
+                   OR list_has_any(taxonomy.hierarchy, ?)
+                   OR regexp_matches(lower(names.primary), 'театр|theatre|theater|opera house|смотровая (площадка|башня|терраса)|observation deck|viewpoint|scenic overlook|viewing platform|больше не работает|закрыто навсегда|permanently closed|temporarily closed|временно закрыто'))
         """, [source, list(CATEGORY_MAP), list(CATEGORY_MAP), list(CATEGORY_MAP)])
         def stream():
             while batch := cursor.fetchmany(10000):
@@ -175,6 +203,17 @@ def main():
     meta = {"release": args.release, "cities": len(catalog), "places": total, "source": "Overture Maps Foundation",
             "categories": dict(sorted(category_counts.items())), "saint_petersburg": len(catalog["spb"]),
             "saint_petersburg_categories": dict(Counter(entry[2] for entry in catalog["spb"]))}
+    city_rows, _ = cities_index()
+    coverage = []
+    for city_id, (city_name, region) in sorted(city_rows.items()):
+        counts = Counter(entry[2] for entry in catalog.get(city_id, []))
+        coverage.append({"id": city_id, "name": city_name, "region": region,
+                         "total": sum(counts.values()), "categories": {k: counts[k] for k in CATEGORIES}})
+    meta["all_city_count"] = len(coverage)
+    meta["cities_with_all_categories"] = sum(all(row["categories"].values()) for row in coverage)
+    meta["unknown_status"] = sum(entry[6] == "unknown" for entries in catalog.values() for entry in entries)
+    meta["open_status"] = total - meta["unknown_status"]
+    (ROOT / "docs/catalog-coverage.json").write_text(json.dumps(coverage, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if len(meta["saint_petersburg_categories"]) < 10:
         raise RuntimeError("Saint Petersburg has insufficient category diversity")
     def enc(obj):
@@ -188,7 +227,7 @@ def main():
     readme = ROOT / "README.md"
     text = readme.read_text(encoding="utf-8")
     text = re.sub(r"<!-- current-catalog -->.*?<!-- /current-catalog -->",
-                  f"<!-- current-catalog -->\n**Обновление {args.release}:** {len(catalog)} городов, {total} мест из Overture Maps. Для остальных городов доступна отдельно обозначенная архивная подборка или поиск на карте.\n<!-- /current-catalog -->", text, flags=re.S)
+                  f"<!-- current-catalog -->\n**Обновление {args.release}:** {len(catalog)} городов, {total} мест из Overture Maps. Для остальных городов доступен поиск на карте. [Покрытие по городам и категориям](docs/catalog-coverage.json).\n<!-- /current-catalog -->", text, flags=re.S)
     text = re.sub(r"(!\[Места\]\(https://img.shields.io/badge/Места-)\d+", r"\g<1>" + str(total), text)
     readme.write_text(text, encoding="utf-8")
 
