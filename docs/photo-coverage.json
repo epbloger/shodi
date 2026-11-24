@@ -1,16 +1,16 @@
 {
   "catalogPlaces": 55716,
-  "coveredPlaces": 260,
-  "candidateItems": 619,
+  "coveredPlaces": 261,
+  "candidateItems": 630,
   "photos": 250,
-  "retained": 100,
-  "added": 150,
+  "retained": 250,
+  "added": 0,
   "photoLimit": 250,
   "byteLimit": 12000000,
   "bytes": 7325671,
-  "attempts": 203,
-  "errors": 2,
-  "rejectedLicense": 51,
+  "attempts": 0,
+  "errors": 0,
+  "rejectedLicense": 0,
   "source": "Wikimedia Commons",
-  "generatedAt": "2026-11-24T19:38:38.106Z"
+  "generatedAt": "2026-11-24T20:07:57.986Z"
 }
