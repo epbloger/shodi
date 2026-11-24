@@ -131,7 +131,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         source.className = "description-source";
         source.href = place.descriptionSource;
         source.target = "_blank"; source.rel = "noopener noreferrer";
-        source.textContent = place.descriptionKind?.startsWith("wikipedia") ? "Википедия · "+place.descriptionTitle+" (сокращено)" : "Источник описания";
+        source.textContent = place.descriptionKind?.startsWith("wikipedia") ? "Википедия · "+place.descriptionTitle+" (сокращено)" : place.descriptionTitle ?? "Источник описания";
         description.append(document.createElement("br"), source);
         if(place.descriptionLicense){const a=document.createElement("a");a.href=place.descriptionLicense;a.className="description-source";a.target="_blank";a.rel="noopener noreferrer";a.textContent="CC BY-SA 4.0";description.append(" · ",a);}
       } else if (place.descriptionKind === "catalog") {
