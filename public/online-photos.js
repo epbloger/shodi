@@ -19,10 +19,11 @@ async function cacheRead(id){
     r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);
   });}catch{return null;}
 }
-async function cacheWrite(id,photo){
+const fingerprint=place=>JSON.stringify([place.name,place.lat,place.lon]);
+async function cacheWrite(place,photo){
   try{const d=await db();await new Promise((resolve,reject)=>{
     const tx=d.transaction("photos","readwrite"),store=tx.objectStore("photos");
-    store.put({id,photo,at:Date.now()});
+    store.put({id:place.id,fingerprint:fingerprint(place),photo,at:Date.now()});
     const r=store.getAll();
     r.onsuccess=()=>{const old=r.result.sort((a,b)=>a.at-b.at);for(const entry of old.slice(0,Math.max(0,old.length-CACHE_LIMIT)))store.delete(entry.id);};
     tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
@@ -98,17 +99,18 @@ async function lookup(place){
 }
 let queue=Promise.resolve();
 const inFlight=new Map(),negative=new Map();
-export async function loadPlacePhoto(place){
+export async function loadPlacePhoto(place,isCurrent=()=>true){
   if(location.origin!==ORIGIN||typeof place.id!=="string"||typeof place.name!=="string"||place.name.length>80||!Number.isFinite(place.lat)||!Number.isFinite(place.lon))return null;
-  const saved=await cacheRead(place.id);
+  const record=await cacheRead(place.id);
+  const saved=record?.fingerprint===fingerprint(place)?record:null;
   if(saved&&validatePhoto(saved.photo)&&(!navigator.onLine||Date.now()-saved.at<CACHE_TTL))return saved.photo;
   if(!navigator.onLine||Date.now()<cooldown||(negative.get(place.id)||0)>Date.now())return saved&&validatePhoto(saved.photo)?saved.photo:null;
   if(inFlight.has(place.id))return inFlight.get(place.id);
   if(inFlight.size>=20)return null;
   const promise=queue.then(async()=>{
-    if(!navigator.onLine||Date.now()<cooldown)return null;
+    if(!isCurrent()||!navigator.onLine||Date.now()<cooldown)return null;
     try{const photo=await lookup(place);
-      if(photo){await cacheWrite(place.id,photo);return photo;}
+      if(photo){await cacheWrite(place,photo);return photo;}
       if(negative.size>=1000)negative.clear();
       negative.set(place.id,Date.now()+3600000);
     }catch{negative.set(place.id,Date.now()+120000);}

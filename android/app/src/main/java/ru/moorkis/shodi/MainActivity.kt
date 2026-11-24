@@ -82,6 +82,7 @@ class MainActivity : Activity() {
             .build()
         WebView.setWebContentsDebuggingEnabled(false)
         web.settings.apply {
+            userAgentString = userAgentString + " SHODI/2.0 (https://github.com/epbloger/shodi)"
             javaScriptEnabled = true
             domStorageEnabled = true
             allowFileAccess = false

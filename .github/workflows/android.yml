@@ -58,6 +58,7 @@ jobs:
           node scripts/build-site.mjs
           node scripts/smoke.mjs
           node scripts/mobile-smoke.mjs
+          node scripts/online-photo-smoke.mjs
       - name: Audit npm dependencies
         run: npm audit --audit-level=high
       - run: gradle -p android :app:assembleDebug :app:lintDebug --no-daemon

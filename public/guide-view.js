@@ -25,6 +25,8 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   let selectedTarget;
   let visibleLimit = pageSize();
   const more = byId("guide-more");
+  let photoObserver;
+  let photoRenderVersion = 0;
 
   const cityChoices = document.createDocumentFragment();
   for (const entry of cities) {
@@ -62,6 +64,19 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   }
 
   function render() {
+    photoObserver?.disconnect();
+    const photoVersion = ++photoRenderVersion;
+    const photoTasks = new Map();
+    if(location.origin === "https://appassets.androidplatform.net") {
+      photoObserver = new IntersectionObserver(entries => {
+        for(const entry of entries) {
+          if(!entry.isIntersecting)continue;
+          photoObserver.unobserve(entry.target);
+          const task=photoTasks.get(entry.target);photoTasks.delete(entry.target);
+          task?.();
+        }
+      },{rootMargin:"100px"});
+    }
     const places = findPlaces({ cityId: city.id, category, query: search.value });
     const allPlaces = findPlaces({ cityId: city.id, query: search.value });
     const routes = getRoutes().filter(route => cityMatches(route.city, city.label));
@@ -133,13 +148,11 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         figure.hidden = false;
       };
       if(place.photo) renderPhoto(place.photo);
-      else if(location.origin==="https://appassets.androidplatform.net") {
-        const observer=new IntersectionObserver(entries=>{
-          if(!entries.some(entry=>entry.isIntersecting))return;
-          observer.disconnect();
-          loadPlacePhoto(place).then(photo=>{if(photo&&card.isConnected)renderPhoto(photo);}).catch(()=>{});
-        },{rootMargin:"100px"});
-        observer.observe(card);
+      else if(photoObserver) {
+        photoTasks.set(card,()=>{
+          const current=()=>card.isConnected&&photoVersion===photoRenderVersion;
+          loadPlacePhoto(place,current).then(photo=>{if(photo&&current())renderPhoto(photo);}).catch(()=>{});
+        });
       }
       const budget = card.querySelector(".place-budget");
       budget.hidden = place.budget.type === "unknown";
@@ -168,6 +181,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
       fragment.append(card);
     }
     grid.replaceChildren(fragment);
+    for(const card of photoTasks.keys())photoObserver.observe(card);
   }
 
   function showFeedback(message, error = false) {
@@ -224,5 +238,6 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     search.focus();
   });
   mobile.addEventListener('change', () => { visibleLimit = pageSize(); render(); });
+  window.addEventListener("online",render);
   return render;
 }
