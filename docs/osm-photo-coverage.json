@@ -3,12 +3,17 @@
   "matchedPlaces": 182,
   "directFileLinks": 2,
   "wikidataLinks": 180,
-  "examinedPlaces": 22652,
-  "scannedCells": 16,
+  "examinedPlaces": 2923,
+  "scannedCells": 1,
+  "newlyScannedCells": 1,
   "totalCells": 769,
-  "errors": 18,
+  "gridHash": "f85070edb8e1a8e914575811344d080eae2c37becb052006e6b73ffe0b0f420c",
+  "completedCells": [
+    "111,74"
+  ],
+  "errors": 7,
   "license": "ODbL-1.0",
   "source": "https://www.openstreetmap.org/copyright",
   "endpoint": "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
-  "generatedAt": "2026-11-24T17:42:31.389Z"
+  "generatedAt": "2026-11-24T20:24:23.428Z"
 }
