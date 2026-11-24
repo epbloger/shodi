@@ -1,0 +1,35 @@
+name: Enrich place descriptions
+on:
+  push:
+    branches: [android-v2]
+    paths: ['scripts/enrich-descriptions.mjs', '.github/workflows/enrich-descriptions.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: shodi-descriptions
+  cancel-in-progress: false
+jobs:
+  enrich:
+    if: github.ref == 'refs/heads/android-v2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Match catalog to Wikidata
+        run: node scripts/enrich-descriptions.mjs
+      - run: npm ci --ignore-scripts && npm test && npm run build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shodi-description-import
+          path: |
+            public/data/imported-descriptions.js
+            docs/description-coverage.json
+          if-no-files-found: error
+          retention-days: 7

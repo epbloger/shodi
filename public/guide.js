@@ -184,11 +184,14 @@ export function catalogPlacesForCity(cityId) {
   if (!city) return [];
   if (!catalogSource(cityId)) return [];
   if (freshCityCache.has(cityId)) return freshCityCache.get(cityId);
-  const places = currentPlaces[cityId].filter(row => !row[6] || ["open", "unknown"].includes(row[6])).map(([id, name, kind, address, lat, lon, status]) => ({
+  const places = currentPlaces[cityId].filter(row => !row[6] || ["open", "unknown"].includes(row[6])).map(([id, name, kind, address, lat, lon, status]) => {
+    const details = descriptionForPlace(name, lat, lon);
+    return ({
     id, name, kind, area: address || city.label, address, city: city.label,
-    description: descriptionForPlace(name, lat, lon)?.text ?? "", descriptionSource: descriptionForPlace(name, lat, lon)?.source, lat, lon, budget: { type: "unknown" },
+    description: details?.text ?? "", descriptionSource: details?.source, lat, lon, budget: { type: "unknown" },
     source: currentCatalog.release, status: status ?? "unknown",
-  }));
+    });
+  });
   freshCityCache.set(cityId, places);
   for (const place of places) freshIdCache.set(place.id, place);
   return places;

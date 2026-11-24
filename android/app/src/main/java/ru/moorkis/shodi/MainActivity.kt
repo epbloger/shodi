@@ -27,7 +27,8 @@ class MainActivity : Activity() {
     private var route = false
     private var editing = false
     private var destroyed = false
-    private var legalDialogOpen = false
+    private var legalDialogDepth = 0
+    private val legalDialogOpen get() = legalDialogDepth > 0
     private val consentRevision = "2026-11-24-draft-2"
     private val local = "https://appassets.androidplatform.net/assets/index.html"
     private val tick = object : Runnable {
@@ -95,14 +96,14 @@ class MainActivity : Activity() {
         web.webViewClient = object : WebViewClient() {
             override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
                 val u = request.url
-                if (u.scheme == "https" && u.host == "appassets.androidplatform.net" && u.path?.startsWith("/assets/") == true)
-                    return loader.shouldInterceptRequest(u)
+                if (u.scheme == "https" && u.host == "appassets.androidplatform.net" && u.port == -1 && u.userInfo == null && u.path == "/assets/index.html")
+                    loader.shouldInterceptRequest(u)?.let { return it }
                 if (u.scheme == "data") return null
                 return WebResourceResponse("text/plain", "UTF-8", 403, "Blocked", emptyMap(), java.io.ByteArrayInputStream(ByteArray(0)))
             }
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 if (request.url.toString().substringBefore('#') == local) return false
-                if (request.isForMainFrame && request.url.scheme == "https" && request.url.host == "appassets.androidplatform.net" && request.url.port == -1 && request.url.query == null && request.url.fragment == null && request.url.userInfo == null) {
+                if (request.isForMainFrame && request.method == "GET" && view.url?.substringBefore('#') == local && request.url.scheme == "https" && request.url.host == "appassets.androidplatform.net" && request.url.port == -1 && request.url.query == null && request.url.fragment == null && request.url.userInfo == null) {
                     when (request.url.path) {
                         "/action/about" -> if (ready && !legalDialogOpen) aboutDialog()
                         "/action/share" -> if (ready && !legalDialogOpen) shareRoute()
@@ -125,7 +126,7 @@ class MainActivity : Activity() {
     }
 
     private fun showLegal(title: String, filename: String, after: (() -> Unit)? = null) {
-        legalDialogOpen = true
+        legalDialogDepth++
         ads.update(false, false)
         val raw = assets.open(filename).bufferedReader(Charsets.UTF_8).use { it.readText() }
         val body = raw.substringAfter("<main>").substringBefore("<footer>")
@@ -138,12 +139,12 @@ class MainActivity : Activity() {
         AlertDialog.Builder(this).setTitle(title)
             .setView(ScrollView(this).apply { addView(content) })
             .setPositiveButton("Закрыть", null)
-            .setOnDismissListener { legalDialogOpen = false; after?.invoke() }
+            .setOnDismissListener { legalDialogDepth = (legalDialogDepth - 1).coerceAtLeast(0); after?.invoke() }
             .show()
     }
 
     private fun aboutDialog() {
-        legalDialogOpen = true
+        legalDialogDepth++
         ads.update(false, false)
         val choices = arrayOf("Разработчик и поддержка", "Политика конфиденциальности",
             "Пользовательское соглашение", "Согласие на обработку данных для рекламы",
@@ -158,24 +159,24 @@ class MainActivity : Activity() {
                 }
             }
             .setNegativeButton("Закрыть", null)
-            .setOnDismissListener { legalDialogOpen = false }
+            .setOnDismissListener { legalDialogDepth = (legalDialogDepth - 1).coerceAtLeast(0) }
             .show()
     }
 
     private fun privacyDialog() {
-        legalDialogOpen = true
+        legalDialogDepth++
         ads.update(false, false)
         AlertDialog.Builder(this).setTitle("Обработка данных для рекламы")
             .setMessage("Разрешение добровольное. Реклама является частью сервиса. При отказе от необходимой обработки данных объявления могут быть недоступны. Прежде чем дать согласие, ознакомьтесь с отдельным документом. Реклама использует SDK Яндекса и технические данные. Отозвать согласие можно в разделе «О приложении».")
             .setPositiveButton("Прочитать согласие") { _, _ -> consentDialog() }
             .setNegativeButton("Не даю согласия") { _, _ -> setAds(false) }
             .setNeutralButton("Политика") { _, _ -> showLegal("Политика конфиденциальности", "privacy.html") { privacyDialog() } }
-            .setOnDismissListener { legalDialogOpen = false }
+            .setOnDismissListener { legalDialogDepth = (legalDialogDepth - 1).coerceAtLeast(0) }
             .show()
     }
 
     private fun consentDialog() {
-        legalDialogOpen = true
+        legalDialogDepth++
         ads.update(false, false)
         val raw = assets.open("consent.html").bufferedReader(Charsets.UTF_8).use { it.readText() }
         val content = TextView(this).apply {
@@ -187,7 +188,7 @@ class MainActivity : Activity() {
             .setView(ScrollView(this).apply { addView(content) })
             .setPositiveButton("Разрешить рекламу") { _, _ -> setAds(true) }
             .setNegativeButton("Не даю согласия") { _, _ -> setAds(false) }
-            .setOnDismissListener { legalDialogOpen = false }
+            .setOnDismissListener { legalDialogDepth = (legalDialogDepth - 1).coerceAtLeast(0) }
             .show()
     }
 
@@ -199,7 +200,7 @@ class MainActivity : Activity() {
     }
 
     private fun shareRoute() {
-        if (!ready || editing || legalDialogOpen) return
+        if (!ready || legalDialogOpen) return
         // Read only the selected route, and only in response to this explicit button.
         web.evaluateJavascript("""(()=>{try{const b=JSON.parse(localStorage.getItem('weekend-atlas/v1'));if(location.hash!=='#route'||document.querySelector('dialog[open]'))return '';const r=b.routes.find(x=>x.id===b.selected);return r?[r.name,r.city,r.note,...r.stops.map((s,i)=>(i+1)+'. '+s.name+(s.minutes?' · '+s.minutes+' мин':'')+(s.note?' — '+s.note:''))].filter(Boolean).join('\n'):''}catch{return ''}})()""") { result ->
             val text = runCatching { org.json.JSONTokener(result).nextValue() as? String }.getOrNull()
