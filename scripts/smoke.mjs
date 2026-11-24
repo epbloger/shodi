@@ -57,6 +57,20 @@ try {
     assert.ok(await page.locator("#city-options option").count() >= 1100, "Full city list must load");
     await page.locator("#guide-panel").waitFor({ state: "visible", timeout: 15000 });
     assert.ok(await page.locator(".place-add").count() > 0, "Catalog must contain places");
+    const initialTheme = await page.locator("html").getAttribute("data-theme");
+    const nextTheme = initialTheme === "dark" ? "light" : "dark";
+    const originalBackground = await page.locator("html").evaluate(el => getComputedStyle(el).backgroundColor);
+    await page.locator("#theme-toggle").click();
+    assert.equal(await page.locator("html").getAttribute("data-theme"), nextTheme);
+    assert.notEqual(await page.locator("html").evaluate(el => getComputedStyle(el).backgroundColor), originalBackground);
+    const themeSaved = await page.evaluate(() => { try { return localStorage.getItem("shodi/theme/v1"); } catch { return null; } });
+    if (themeSaved === nextTheme) {
+      await page.reload();
+      await page.locator("#guide-panel").waitFor({ state: "visible" });
+      assert.equal(await page.locator("html").getAttribute("data-theme"), nextTheme);
+    }
+    await page.locator("#theme-toggle").click();
+    assert.equal(await page.locator("html").getAttribute("data-theme"), initialTheme);
     await page.locator("#guide-city").fill("Кострома");
     await page.locator("#guide-city").press("Enter");
     await page.locator("#guide-city-name").filter({ hasText: "Кострома" }).waitFor();
@@ -68,6 +82,23 @@ try {
     assert.equal(await page.locator("#stop-list .visit-toggle").count(), 1);
     await page.locator("#stop-list .visit-toggle").check();
     assert.equal(await page.locator("#route-progress").getAttribute("value"), "1");
+    await page.locator(".remove-stop").click();
+    await page.locator("#delete-dialog").waitFor({ state: "visible" });
+    await page.locator('#delete-form button[value="cancel"]').click();
+    await page.locator("#delete-dialog").waitFor({ state: "hidden" });
+    assert.equal(await page.locator("#stop-list .stop").count(), 1);
+    await page.locator(".remove-stop").click();
+    await page.locator('#delete-form button[value="confirm"]').click();
+    await page.locator("#no-stops").waitFor({ state: "visible" });
+    assert.equal(await page.locator("#stop-list .stop").count(), 0);
+    const count = await page.locator("#route-list .route-link").count();
+    await page.locator("#remove-route").click();
+    await page.locator('#delete-form button[value="cancel"]').click();
+    await page.locator("#delete-dialog").waitFor({ state: "hidden" });
+    assert.equal(await page.locator("#route-list .route-link").count(), count);
+    await page.locator("#remove-route").click();
+    await page.locator('#delete-form button[value="confirm"]').click();
+    await page.waitForFunction(expected => document.querySelectorAll("#route-list .route-link").length === expected, count - 1);
     assert.deepEqual(errors, [], "Browser must not report script or CSP errors");
     await context.close();
     console.log("Browser smoke test passed:", url);
