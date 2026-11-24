@@ -55,6 +55,11 @@ try {
     assert.ok(await page.locator("#guide-city").evaluate(el => getComputedStyle(el).fontFamily.includes("Manrope")), "Application stylesheet must load");
     await page.locator("#startup-notice").waitFor({ state: "hidden" });
     assert.ok(await page.locator("#city-options option").count() >= 1100, "Full city list must load");
+    const cityOptions=await page.locator("#city-options option").evaluateAll(options=>options.map(option=>({value:option.value,label:option.label})));
+    assert.ok(cityOptions.every(option=>option.label===option.value),"City suggestions must show city names in Firefox and Chromium");
+    assert.ok(cityOptions.some(option=>option.value==="Пермь"));
+    const duplicateCities=cityOptions.filter(option=>option.value.startsWith("Советск, "));
+    assert.ok(duplicateCities.length>1&&new Set(duplicateCities.map(option=>option.label)).size===duplicateCities.length);
     await page.locator("#guide-panel").waitFor({ state: "visible", timeout: 15000 });
     assert.ok(await page.locator(".place-add").count() > 0, "Catalog must contain places");
     assert.equal(await page.locator("#guide-city").inputValue(), "Санкт-Петербург");

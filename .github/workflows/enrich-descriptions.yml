@@ -2,7 +2,7 @@ name: Enrich place descriptions
 on:
   push:
     branches: [android-v2]
-    paths: ['scripts/enrich-descriptions.mjs', 'scripts/import-place-photos.mjs', '.github/workflows/enrich-descriptions.yml']
+    paths: ['scripts/enrich-descriptions.mjs', 'scripts/import-place-photos.mjs', 'scripts/photo-import-policy.mjs', '.github/workflows/enrich-descriptions.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -79,10 +79,11 @@ jobs:
       - name: Validate and integrate only catalog data
         id: commit
         run: |
-          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js public/data/place-descriptions.js public/data/imported-descriptions.js public/data/place-photos.js public/photos.js scripts/enrich-descriptions.mjs scripts/import-place-photos.mjs
+          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js public/data/place-descriptions.js public/data/imported-descriptions.js public/data/place-photos.js public/photos.js public/commons-thumbnail.js scripts/enrich-descriptions.mjs scripts/import-place-photos.mjs scripts/photo-import-policy.mjs
           node --input-type=module <<'JS'
           import {readFile,writeFile} from "node:fs/promises";
           import {validatePhoto} from "./public/photos.js";
+          import {PHOTO_LIMIT,PHOTO_BYTES_LIMIT,photoBytes} from "./scripts/photo-import-policy.mjs";
           const raw=await readFile("import-snapshot/public/data/imported-descriptions.js","utf8");
           const m=/^\/\/[^\n]*\nexport const importedDescriptions = (\[[\s\S]*\]);\n?$/.exec(raw);
           if(!m)throw Error("Generated data is not a plain JSON array");
@@ -100,7 +101,11 @@ jobs:
           const photos=JSON.parse(photoMatch[1]);
           const entries=Object.entries(photos);
           const photoReport=JSON.parse(await readFile("import-snapshot/docs/photo-coverage.json","utf8"));
-          if(entries.length===0||entries.length>100||entries.some(([id,p])=>!/^Q[1-9]\d*$/.test(id)||!validatePhoto(p))||photoReport.photos!==entries.length||!Number.isInteger(photoReport.coveredPlaces)||photoReport.coveredPlaces<=0||photoReport.coveredPlaces>photoReport.catalogPlaces||photoReport.bytes>5000000)throw Error("Invalid photo data");
+          const actualBytes=entries.reduce((sum,[,p])=>sum+photoBytes(p),0);
+          if(entries.length===0||entries.length>PHOTO_LIMIT||entries.some(([id,p])=>!/^Q[1-9]\d*$/.test(id)||!validatePhoto(p)||!photoBytes(p))||photoReport.photos!==entries.length||!Number.isInteger(photoReport.coveredPlaces)||photoReport.coveredPlaces<=0||photoReport.coveredPlaces>photoReport.catalogPlaces||photoReport.bytes!==actualBytes||actualBytes>PHOTO_BYTES_LIMIT)throw Error("Invalid photo data");
+          const oldPhotos=(await import("./public/data/place-photos.js")).placePhotos;
+          const previousCovered=Object.keys(oldPhotos).filter(id=>validatePhoto(oldPhotos[id])&&photoBytes(oldPhotos[id]));
+          if(previousCovered.some(id=>!Object.hasOwn(photos,id)))throw Error("Photo import would discard a previously verified photo; review before replacing");
           await writeFile("public/data/place-photos.js","// Licensed Wikimedia Commons thumbnails.\nexport const placePhotos = "+JSON.stringify(photos)+";\n");
           await writeFile("docs/photo-coverage.json",JSON.stringify(photoReport,null,2)+"\n");
           JS
@@ -122,3 +127,4 @@ jobs:
       checkout_ref: ${{ needs.integrate.outputs.revision }}
     permissions:
       contents: read
+      actions: read

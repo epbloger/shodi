@@ -32,7 +32,8 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   for (const entry of cities) {
     const option = document.createElement("option");
     option.value = entry.label;
-    option.label = entry.region;
+    // Firefox displays the label; keep the city name visible in every engine.
+    option.textContent = entry.label;
     cityChoices.append(option);
   }
   options.append(cityChoices);

@@ -1,5 +1,6 @@
 import {writeFile} from "node:fs/promises";
 import {thumbnailUrl} from "../public/commons-thumbnail.js";
+import {PHOTO_LIMIT,PHOTO_BYTES_LIMIT,photoBytes} from "./photo-import-policy.mjs";
 import {placePhotos as previous} from "../public/data/place-photos.js";
 import {validatePhoto,unrestrictedPhotoLicense} from "../public/photos.js";
 import {currentPlaces} from "../public/data/current-places.js";
@@ -34,14 +35,18 @@ const catalog = Object.values(currentPlaces).flat().filter(r => !r[6] || ["open"
 const placeIds = catalog.map(r => descriptionForPlace(r[1],r[4],r[5])?.qid ?? null);
 const qids = [...new Set(placeIds.filter(Boolean))];
 const out={};let bytes=0;
-for(const qid of qids){const p=previous[qid];if(validatePhoto(p)&&Object.keys(out).length<100&&bytes+Math.ceil(p.data.length*.75)<=5000000){out[qid]=p;bytes+=Math.ceil(p.data.length*.75);}}
+for(const qid of qids){
+ const p=previous[qid],size=photoBytes(p);
+ if(validatePhoto(p)&&size&&Object.keys(out).length<PHOTO_LIMIT&&bytes+size<=PHOTO_BYTES_LIMIT){out[qid]=p;bytes+=size;}
+}
+const retained=Object.keys(out).length;
 let attempts=0,errors=0,rejectedLicense=0;
-for(let i=0;i<qids.length&&Object.keys(out).length<100&&bytes<5000000&&attempts<300;i+=40){
+for(let i=0;i<qids.length&&Object.keys(out).length<PHOTO_LIMIT&&bytes<PHOTO_BYTES_LIMIT&&attempts<300;i+=40){
   const ids=qids.slice(i,i+40).filter(q=>!out[q]);if(!ids.length)continue;
   let entities;
   try{const u=new URL("https://www.wikidata.org/w/api.php");u.search=new URLSearchParams({action:"wbgetentities",ids:ids.join("|"),props:"claims",format:"json"});entities=(await get(u)).entities;}catch(e){console.warn("Wikidata request failed:",String(e));errors++;if(errors>=3)break;continue;}
   for(const qid of ids){
-    if(Object.keys(out).length>=100||bytes>=5000000||attempts>=300)break;
+    if(Object.keys(out).length>=PHOTO_LIMIT||bytes>=PHOTO_BYTES_LIMIT||attempts>=300)break;
     const claims=entities?.[qid]?.claims?.P18||[];
     const filename=claims.filter(c=>c.rank!=="deprecated").sort((a,b)=>Number(b.rank==="preferred")-Number(a.rank==="preferred"))[0]?.mainsnak?.datavalue?.value;
     if(typeof filename!=="string"||!/\.(jpe?g|png)$/i.test(filename))continue;
@@ -61,14 +66,14 @@ for(let i=0;i<qids.length&&Object.keys(out).length<100&&bytes<5000000&&attempts<
       const source="https://commons.wikimedia.org/wiki/"+encodeURIComponent(page.title.replaceAll(" ","_")).replace(/^File%3A/,"File:");
       const image=await get(thumb,false);
       const photo={data:image.data,author,title:page.title,license,licenseUrl:licensed.url,source};
-      if(validatePhoto(photo)&&bytes+image.bytes<=5000000){out[qid]=photo;bytes+=image.bytes;}
+      if(validatePhoto(photo)&&photoBytes(photo)===image.bytes&&bytes+image.bytes<=PHOTO_BYTES_LIMIT){out[qid]=photo;bytes+=image.bytes;}
     }catch(e){errors++;console.warn("Skipped",qid,String(e));if(errors>=5)break;}
     await pause(2000);
   }
   if(errors>=15)break;
   await pause(1000);
 }
-const report={catalogPlaces:catalog.length,coveredPlaces:placeIds.filter(q=>q && Object.hasOwn(out,q)).length,candidateItems:qids.length,photos:Object.keys(out).length,bytes,attempts,errors,rejectedLicense,source:"Wikimedia Commons",generatedAt:new Date().toISOString()};
+const report={catalogPlaces:catalog.length,coveredPlaces:placeIds.filter(q=>q && Object.hasOwn(out,q)).length,candidateItems:qids.length,photos:Object.keys(out).length,retained,added:Object.keys(out).length-retained,photoLimit:PHOTO_LIMIT,byteLimit:PHOTO_BYTES_LIMIT,bytes,attempts,errors,rejectedLicense,source:"Wikimedia Commons",generatedAt:new Date().toISOString()};
 await writeFile("docs/photo-coverage.json",JSON.stringify(report,null,2)+"\n");
 await writeFile("public/data/place-photos.js","// Licensed Wikimedia Commons thumbnails.\nexport const placePhotos = "+JSON.stringify(out)+";\n");
 console.log(JSON.stringify(report));
