@@ -28,7 +28,7 @@ class MainActivity : Activity() {
     private var editing = false
     private var destroyed = false
     private var legalDialogOpen = false
-    private val consentRevision = "2026-11-24-draft-1"
+    private val consentRevision = "2026-11-24-draft-2"
     private val local = "https://appassets.androidplatform.net/assets/index.html"
     private val tick = object : Runnable {
         override fun run() {

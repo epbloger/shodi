@@ -1,3 +1,4 @@
+import { descriptionForPlace } from "./descriptions.js";
 import { russianCities } from "./data/cities.js";
 import { russianPlaces } from "./data/places.js";
 import { currentCatalog, currentPlaces } from "./data/current-places.js";
@@ -185,7 +186,7 @@ export function catalogPlacesForCity(cityId) {
   if (freshCityCache.has(cityId)) return freshCityCache.get(cityId);
   const places = currentPlaces[cityId].filter(row => !row[6] || ["open", "unknown"].includes(row[6])).map(([id, name, kind, address, lat, lon, status]) => ({
     id, name, kind, area: address || city.label, address, city: city.label,
-    description: PLACE_CATEGORIES[kind].name, lat, lon, budget: { type: "unknown" },
+    description: descriptionForPlace(name, lat, lon)?.text ?? "", descriptionSource: descriptionForPlace(name, lat, lon)?.source, lat, lon, budget: { type: "unknown" },
     source: currentCatalog.release, status: status ?? "unknown",
   }));
   freshCityCache.set(cityId, places);
