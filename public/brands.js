@@ -5,7 +5,10 @@ const qid=/^Q[1-9]\d*$/;
 export const brandNameKey=s=>String(s||"").normalize("NFKC").toLocaleLowerCase("ru").replaceAll("ё","е").replace(/[«»"“”]/g,"").replace(/[‐‑–—-]/g," ").replace(/\s+/g," ").trim();
 const seeds=[
  {qid:"Q112406961",name:"Вкусно — и точка",aliases:["Вкусно — и точка","Вкусно и точка","Vkusno i tochka"],file:"Vkusno I Tochka symbol.svg",kind:["food"]},
- {qid:"Q177054",name:"Burger King",aliases:["Burger King","Бургер Кинг","Бургеркинг"],file:"Burger King 2020.svg",kind:["food"]}
+ {qid:"Q177054",name:"Burger King",aliases:["Burger King","Бургер Кинг","Бургеркинг"],file:"Burger King 2020.svg",kind:["food"]},
+ {qid:"Q3442874",name:"Rostic's",aliases:["Rostic's","Rostic’s","Ростикс"],file:"Текстовой логотип сети Rostic's.svg",kind:["food"]},
+ {qid:"Q524757",name:"KFC",aliases:["KFC","КФС"],file:"KFC logo wordmark.svg",kind:["food"]},
+ {qid:"Q55662627",name:"Coffee Like",aliases:["Coffee Like"],kind:["coffee","food"]}
 ];
 export function brandForPlace(id,name,kind){
  const row=Object.hasOwn(placeBrands,id)?placeBrands[id]:null;

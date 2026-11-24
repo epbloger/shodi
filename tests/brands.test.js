@@ -23,3 +23,10 @@ test("P154 logo claim requires current rank and brand match",()=>{
  assert.equal(brandMatches(e,b),true);
  assert.deepEqual(logoFiles(e),["Logo.svg"]);
 });
+
+test("verified supplemental chain identities remain category constrained",()=>{
+ assert.equal(brandForPlace("fake","Rostic's","food")?.qid,"Q3442874");
+ assert.equal(brandForPlace("fake","KFC","food")?.qid,"Q524757");
+ assert.equal(brandForPlace("fake","Coffee Like","coffee")?.qid,"Q55662627");
+ assert.equal(brandForPlace("fake","Coffee Like","park"),null);
+});

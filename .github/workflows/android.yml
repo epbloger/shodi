@@ -27,6 +27,9 @@ concurrency:
   cancel-in-progress: false
 jobs:
   test:
+    permissions:
+      contents: read
+      actions: read
     runs-on: ubuntu-latest
     timeout-minutes: 65
     steps:
@@ -61,8 +64,33 @@ jobs:
             public/data/place-brands.js
             docs/brand-coverage.json
           key: shodi-brand-links-v1-${{ hashFiles('public/data/current-places.js', 'docs/current-catalog.json', 'scripts/import-brand-links.py') }}
-      - name: Import all brand links from the exact catalog snapshot
+      - name: Reuse previously verified exact-snapshot brand links
+        id: seed-brand-links
         if: steps.brand-links-cache.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -eu
+          echo "reused=false" >> "$GITHUB_OUTPUT"
+          test "$(git rev-parse HEAD:public/data/current-places.js)" = b772116cc742991504bf97d467023ef788d44844 || exit 0
+          test "$(git rev-parse HEAD:docs/current-catalog.json)" = 017cc3d800a81a8aa6f1cb9f00ede6978f4003e6 || exit 0
+          test "$(git rev-parse HEAD:scripts/import-brand-links.py)" = a2ab089d82acd5b09d7ca4270cdf8b3afeedd883 || exit 0
+          seed="$(mktemp -d)"
+          trap 'rm -rf "$seed"' EXIT
+          if ! gh run download 45455551160 --repo epbloger/shodi --name shodi-brand-coverage --dir "$seed"; then
+            echo "Previous artifact unavailable; use normal import."
+            exit 0
+          fi
+          if ! (cd "$seed" && printf '%s\n' 'cab6592c08804cc3f02228a809d70e3b4ce385b0ba6d15f7e8c38b4fdfa6f8c1  public/data/place-brands.js' 'a148dbe7a7835258957942a7916f72d1684834b1b611596196ddf92d633fde5a  docs/brand-coverage.json' | sha256sum --check --strict); then
+            echo "Artifact checksum mismatch; use normal import."
+            exit 0
+          fi
+          cp "$seed/public/data/place-brands.js" public/data/place-brands.js
+          cp "$seed/docs/brand-coverage.json" docs/brand-coverage.json
+          echo "reused=true" >> "$GITHUB_OUTPUT"
+      - name: Import all brand links from the exact catalog snapshot
+        if: steps.brand-links-cache.outputs.cache-hit != 'true' && steps.seed-brand-links.outputs.reused != 'true'
         run: |
           pip install duckdb==1.5.4
           python scripts/import-brand-links.py
