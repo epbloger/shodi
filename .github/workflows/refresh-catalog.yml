@@ -23,6 +23,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
@@ -51,6 +53,18 @@ jobs:
           git add docs/badges/places.svg public/data/current-places.js docs/current-catalog.json docs/catalog-coverage.json README.md package.json package-lock.json
           if ! git diff --cached --quiet; then
             git commit -m "feat(data): publish nationwide status-filtered category catalog"
-            git push origin HEAD:main
+            published=false
+            for attempt in 1 2 3; do
+              git fetch origin main
+              git rebase origin/main
+              npm test
+              npm run build
+              if git push origin HEAD:main; then
+                published=true
+                break
+              fi
+              echo "Concurrent update; retrying safely"
+            done
+            test "$published" = true
           fi
           gh workflow run pages.yml --ref main
