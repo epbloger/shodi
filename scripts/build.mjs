@@ -35,7 +35,7 @@ for (const [file, type] of [["icon.svg", "image/svg+xml"], ["embankment.webp", "
   const bytes = await readFile(root + "public/assets/" + file);
   html = containsTag(html, "./assets/" + file, "data:" + type + ";base64," + bytes.toString("base64"));
 }
-const licenses = await Promise.all(["manrope", "pt-serif", "yandex-reviews"].map(name =>
+const licenses = await Promise.all(["manrope", "pt-serif", "yandex-reviews", "overture"].map(name =>
   readFile(root + "public/assets/" + name + "-license.txt", "utf8")));
 html += "\n<!-- Font and data licenses\n" + licenses.join("\n") + "\n-->\n";
 await mkdir(root + "dist", { recursive: true });

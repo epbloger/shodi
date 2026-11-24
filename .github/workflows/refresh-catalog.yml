@@ -1,0 +1,52 @@
+name: Refresh 2026 places catalog
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/import-overture.py
+      - .github/workflows/refresh-catalog.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: refresh-catalog
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: pip install duckdb==1.5.4 Unidecode==1.4.0
+      - name: Import dated snapshot
+        run: python scripts/import-overture.py --release 2026-11-18.0
+      - name: Set version and validate app
+        run: |
+          npm version 1.4.0 --no-git-tag-version --allow-same-version
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+      - name: Commit generated catalog and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/current-places.js docs/current-catalog.json README.md package.json package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m "feat(data): import November 2026 Overture places snapshot"
+            git push origin HEAD:main
+          fi
+          gh workflow run pages.yml --ref main

@@ -25,3 +25,9 @@ aefd11fd133881c348e0138b273a300ec6b3909c8f61d8d1d5ffc5e85021ec0d  city.csv
 2008efc1db0718b32296e50175c800a38d815b7e2f1bdb2d33e3ecb1e42a3120  geo-reviews-dataset-2023-1.parquet
 d7fac358acc4342ffe6921090356bb89c3adfa86e2b0d88fd827ecc2974f07f8  geo-reviews-dataset-2023-2.parquet
 ```
+
+## Обновление каталога 2026
+
+Новый источник — [Overture Maps Places, выпуск 2026-11-18.0](https://docs.overturemaps.org/blog/2026/11/18/release-notes/). Используем записи от документированных разрешительных поставщиков (без Foursquare), [источники и лицензии](https://docs.overturemaps.org/attribution/), [текст CDLA-Permissive-2.0](../public/assets/overture-license.txt). Изменения: отбор категорий, однозначное сопоставление городов, исключение известных закрытых мест, отбор по confidence. Confidence — оценка уверенности в существовании объекта, не рейтинг посетителей. Дата релиза не означает проверку каждого объекта в этот день. Цены, рейтинги и часы работы не выдумываются. Старые записи сохраняются для маршрутов и отдельно отмеченного архива там, где нет свежей подборки.
+
+Запуск: `pip install duckdb==1.5.4 Unidecode==1.4.0`, затем `python scripts/import-overture.py --release 2026-11-18.0`. GitHub Actions проверяет минимальное покрытие, тесты и сборку до фиксации данных и публикации. Файл docs/current-catalog.json создаётся только после успешного импорта.
