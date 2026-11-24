@@ -1,6 +1,37 @@
 {
   "release": "2026-11-18.0",
-  "cities": 571,
-  "places": 5363,
-  "source": "Overture Maps Foundation"
+  "cities": 573,
+  "places": 54799,
+  "source": "Overture Maps Foundation",
+  "categories": {
+    "active": 933,
+    "architecture": 3928,
+    "books": 1119,
+    "coffee": 13062,
+    "family": 1473,
+    "food": 20050,
+    "gallery": 679,
+    "live": 2287,
+    "market": 126,
+    "museum": 1744,
+    "night": 6100,
+    "park": 2995,
+    "walk": 303
+  },
+  "saint_petersburg": 6837,
+  "saint_petersburg_categories": {
+    "coffee": 1581,
+    "museum": 265,
+    "food": 2439,
+    "books": 157,
+    "gallery": 133,
+    "night": 897,
+    "family": 131,
+    "live": 226,
+    "park": 323,
+    "active": 79,
+    "market": 9,
+    "architecture": 577,
+    "walk": 20
+  }
 }

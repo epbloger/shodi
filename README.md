@@ -12,7 +12,7 @@
 [![Скачать HTML](https://img.shields.io/badge/Скачать-HTML_файл-496780?style=for-the-badge)](https://github.com/epbloger/shodi/releases/latest/download/shodi.html)
 
 ![Города](https://img.shields.io/badge/Города-1117-34785B)
-![Места](https://img.shields.io/badge/Места-5132-34785B)
+![Места](https://img.shields.io/badge/Места-54799-34785B)
 ![Категории](https://img.shields.io/badge/Категории-15-34785B)
 [![Версия](https://img.shields.io/github/v/release/epbloger/shodi?label=версия&color=496780)](https://github.com/epbloger/shodi/releases/latest)
 
@@ -80,7 +80,7 @@
 ## 🏙️ География
 
 <!-- current-catalog -->
-**Обновление 2026-11-18.0:** 571 городов, 5363 мест из Overture Maps. Для остальных городов доступна отдельно обозначенная архивная подборка или поиск на карте.
+**Обновление 2026-11-18.0:** 573 городов, 54799 мест из Overture Maps. Для остальных городов доступна отдельно обозначенная архивная подборка или поиск на карте.
 <!-- /current-catalog -->
 
 | 1 117 городов | 15 категорий | Санкт-Петербург |
