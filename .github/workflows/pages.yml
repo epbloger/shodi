@@ -73,3 +73,42 @@ jobs:
         env:
           SHODI_PUBLIC_URL: https://epbloger.github.io/shodi/
         run: node scripts/smoke.mjs
+
+  release-version:
+    needs: verify-public
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Check whether this version is already published
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v$(node -p "require('./package.json').version")"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.version.outputs.publish == 'true'
+        run: npm ci --ignore-scripts
+      - if: steps.version.outputs.publish == 'true'
+        run: npm test
+      - if: steps.version.outputs.publish == 'true'
+        run: npm run build
+      - name: Publish verified standalone version
+        if: steps.version.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          gh release create "$TAG" dist/shodi.html --target "$GITHUB_SHA" --title "Сходи $TAG" --generate-notes
