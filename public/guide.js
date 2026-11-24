@@ -1,4 +1,4 @@
-import {brandForPlace} from "./brands.js";
+import {brandForPlace,bundledBrandLogo} from "./brands.js";
 import {osmPhotoLink} from "./osm-photo-links.js";
 import { photoForItem } from "./photos.js";
 import { descriptionForPlace } from "./descriptions.js";
@@ -189,9 +189,10 @@ export function catalogPlacesForCity(cityId) {
   if (freshCityCache.has(cityId)) return freshCityCache.get(cityId);
   const places = currentPlaces[cityId].filter(row => !row[6] || ["open", "unknown"].includes(row[6])).map(([id, name, kind, address, lat, lon, status]) => {
     const details = descriptionForPlace(name, lat, lon);
+    const brand=brandForPlace(id,name,kind);
     return ({
     id, name, kind, area: address || city.label, address, city: city.label,
-    description: details?.text ?? "", descriptionSource: details?.source, photo: photoForItem(details?.qid), photoItem: details?.qid, brand: brandForPlace(id,name,kind), osmPhotoLink: osmPhotoLink(id), lat, lon, budget: { type: "unknown" },
+    description: details?.text ?? "", descriptionSource: details?.source, photo: photoForItem(details?.qid) || bundledBrandLogo(brand), photoItem: details?.qid, brand, osmPhotoLink: osmPhotoLink(id), lat, lon, budget: { type: "unknown" },
     source: currentCatalog.release, status: status ?? "unknown",
     });
   });

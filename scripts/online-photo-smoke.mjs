@@ -4,7 +4,7 @@ import {chromium} from "playwright";
 import {cities,catalogPlacesForCity} from "../public/guide.js";
 const html=await readFile("dist/shodi.html","utf8");
 const origin="https://appassets.androidplatform.net";
-const entry=cities.flatMap(city=>catalogPlacesForCity(city.id).filter(p=>!p.photo&&!p.photoItem&&p.name.length>4&&p.name.length<60).slice(0,1).map(place=>({city,place}))).find(x=>x.city.id!=="spb"&&x.city.id!=="msk");
+const entry=cities.flatMap(city=>catalogPlacesForCity(city.id).filter(p=>!p.photo&&!p.photoItem&&!p.brand&&p.name.length>4&&p.name.length<60).slice(0,1).map(place=>({city,place}))).find(x=>x.city.id!=="spb"&&x.city.id!=="msk");
 assert.ok(entry,"Missing non-bundled photo test place");
 const {city,place}=entry;
 const kartaMode=process.argv.includes("--karta");

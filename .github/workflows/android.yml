@@ -28,7 +28,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 65
     steps:
       - uses: actions/checkout@v6
         with:
@@ -57,12 +57,17 @@ jobs:
         run: |
           pip install duckdb==1.5.4
           python scripts/import-brand-links.py
+      - name: Verify and bundle licensed brand logo thumbnails
+        run: node scripts/import-brand-logos.mjs
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: shodi-brand-coverage
           path: |
             public/data/place-brands.js
             docs/brand-coverage.json
+            public/data/brand-logos.js
+            docs/brand-logo-coverage.json
           if-no-files-found: error
           retention-days: 7
       - run: npm ci --ignore-scripts && npm test && npm run build
@@ -75,6 +80,7 @@ jobs:
           node scripts/mobile-smoke.mjs
           node scripts/online-photo-smoke.mjs
           node scripts/online-photo-smoke.mjs --karta
+          node scripts/brand-logo-smoke.mjs
       - name: Audit npm dependencies
         run: npm audit --audit-level=high
       - run: gradle -p android :app:assembleDebug :app:lintDebug --no-daemon

@@ -1,3 +1,4 @@
+import {brandLogos} from "./data/brand-logos.js";
 import {placeBrands} from "./data/place-brands.js";
 import {unrestrictedPhotoLicense} from "./photos.js";
 const qid=/^Q[1-9]\d*$/;
@@ -38,4 +39,10 @@ export function brandLicense(metadata){
 export function validBrandLogo(p,brand){
  if(!p||p.brandLogo!==true||p.brandKey!==brand.key||p.brandName!==brand.name||p.nearby===true||typeof p.data!=="string"||p.data.length>140000||!/^data:image\/(?:jpeg|png);base64,[A-Za-z0-9+/]+={0,2}$/.test(p.data)||typeof p.author!=="string"||!p.author.trim()||p.author.length>500||typeof p.title!=="string"||!p.title.startsWith("File:")||p.title.length>500||typeof p.source!=="string"||!/^https:\/\/commons\.wikimedia\.org\/wiki\/File:[^\s?#]+$/.test(p.source))return false;
  return p.license==="Public domain"?p.licenseUrl===pdUrl:Boolean(unrestrictedPhotoLicense({LicenseShortName:{value:p.license},LicenseUrl:{value:p.licenseUrl},Restrictions:{value:[]}}));
+}
+
+export function bundledBrandLogo(brand){
+ if(!brand||!Object.hasOwn(brandLogos,brand.key))return null;
+ const logo={...brandLogos[brand.key],brandName:brand.name};
+ return validBrandLogo(logo,brand)?logo:null;
 }
