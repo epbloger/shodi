@@ -1,0 +1,27 @@
+# Источники каталога
+
+## Города
+
+Список городов адаптирован из [справочника DaData / HFLabs](https://github.com/hflabs/city/tree/ae661bffe572880472249097c9b29c42b09650ea), лицензия [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). В адаптации оставлены название города, регион и сокращённый идентификатор. Результат в `public/data/cities.js` также распространяется по CC BY-SA 4.0.
+
+## Места
+
+Использована [открытая выборка Yandex Geo Reviews Dataset 2023](https://github.com/yandex/geo-reviews-dataset-2023/tree/8ed84aefeb3976106f89ed1c93c545941e2651f4), лицензия MIT. [Текст лицензии](../public/assets/yandex-reviews-license.txt). Две копии файлов Parquet опубликованы в [архиве AndreyKapusti](https://github.com/AndreyKapusti/geo-reviews-dataset-2023-analytics/tree/80c29106e52971efefd0e35e6cebc392df0739e1).
+
+В выборку входят отзывы за январь — июль 2023 года. Из исходных файлов используются название, адрес, рубрики и оценки для подсчёта среднего и количества отзывов в выборке. Тексты отзывов не считываются скриптом и не распространяются. Наряду с рейтингом учитывается число попавших в выборку отзывов. Отбор чередует категории. Справочник не содержит текущих цен и сведений о том, открыто ли заведение сейчас.
+
+## Обновление данных
+
+Сохраните CSV городов и две части отзывов Parquet указанных ревизий. Для запуска импортера нужен Python с DuckDB 1.5.4.
+
+```sh
+python scripts/import-russia.py city.csv geo-reviews-dataset-2023-1.parquet geo-reviews-dataset-2023-2.parquet
+```
+
+Контрольные суммы SHA-256 входных файлов:
+
+```text
+aefd11fd133881c348e0138b273a300ec6b3909c8f61d8d1d5ffc5e85021ec0d  city.csv
+2008efc1db0718b32296e50175c800a38d815b7e2f1bdb2d33e3ecb1e42a3120  geo-reviews-dataset-2023-1.parquet
+d7fac358acc4342ffe6921090356bb89c3adfa86e2b0d88fd827ecc2974f07f8  geo-reviews-dataset-2023-2.parquet
+```
