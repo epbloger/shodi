@@ -28,6 +28,8 @@ class MainActivity : Activity() {
     private var route = false
     private var editing = false
     private var destroyed = false
+    private var legalDialogOpen = false
+    private val consentRevision = "2026-11-24-draft-1"
     private val local = "https://appassets.androidplatform.net/assets/index.html"
     private val tick = object : Runnable {
         override fun run() {
@@ -42,7 +44,7 @@ class MainActivity : Activity() {
                     route = state.getBoolean(0)
                     editing = state.getBoolean(1)
                     share.visibility = if (route && !editing) View.VISIBLE else View.GONE
-                    ads.update(!route && !editing, oldRoute && !route && !editing)
+                    ads.update(!route && !editing && !legalDialogOpen, oldRoute && !route && !editing && !legalDialogOpen)
                 }
             }
             handler.postDelayed(this, 1000)
@@ -72,8 +74,8 @@ class MainActivity : Activity() {
         }
         bar.addView(share)
         bar.addView(Button(this).apply {
-            text = "Конфиденциальность"
-            setOnClickListener { privacyDialog() }
+            text = "О приложении"
+            setOnClickListener { aboutDialog() }
         })
         root.addView(bar)
         web = WebView(this)
@@ -84,7 +86,10 @@ class MainActivity : Activity() {
         ads = AdsController(this, adSlot)
         configureWeb()
         web.loadUrl(local)
-        if (!prefs.contains("ads_allowed")) privacyDialog()
+        if (prefs.getString("consent_revision", "") != consentRevision) {
+            prefs.edit().putBoolean("ads_allowed", false).apply()
+            privacyDialog()
+        }
     }
 
     private fun configureWeb() {
@@ -129,18 +134,77 @@ class MainActivity : Activity() {
         catch (_: Exception) { Toast.makeText(this, "Нет приложения для открытия ссылки", Toast.LENGTH_SHORT).show() }
     }
 
+    private fun showLegal(title: String, filename: String, after: (() -> Unit)? = null) {
+        legalDialogOpen = true
+        ads.update(false, false)
+        val raw = assets.open(filename).bufferedReader(Charsets.UTF_8).use { it.readText() }
+        val body = raw.substringAfter("<main>").substringBefore("<footer>")
+        val content = TextView(this).apply {
+            setPadding(24, 12, 24, 12)
+            text = android.text.Html.fromHtml(body, android.text.Html.FROM_HTML_MODE_LEGACY)
+            textSize = 15f
+            movementMethod = android.text.method.LinkMovementMethod.getInstance()
+        }
+        AlertDialog.Builder(this).setTitle(title)
+            .setView(ScrollView(this).apply { addView(content) })
+            .setPositiveButton("Закрыть", null)
+            .setOnDismissListener { legalDialogOpen = false; after?.invoke() }
+            .show()
+    }
+
+    private fun aboutDialog() {
+        legalDialogOpen = true
+        ads.update(false, false)
+        val choices = arrayOf("Разработчик и поддержка", "Политика конфиденциальности",
+            "Пользовательское соглашение", "Согласие на обработку данных для рекламы",
+            "Источники данных и лицензии", "Настройки рекламы", "Сайт проекта")
+        val files = arrayOf("about.html", "privacy.html", "terms.html", "consent.html", "licenses.html")
+        AlertDialog.Builder(this).setTitle("Сходи · " + BuildConfig.VERSION_NAME)
+            .setItems(choices) { _, i ->
+                when (i) {
+                    in 0..4 -> showLegal(choices[i], files[i])
+                    5 -> privacyDialog()
+                    6 -> openExternal(Uri.parse("https://epbloger.github.io/shodi/"))
+                }
+            }
+            .setNegativeButton("Закрыть", null)
+            .setOnDismissListener { legalDialogOpen = false }
+            .show()
+    }
+
     private fun privacyDialog() {
-        AlertDialog.Builder(this).setTitle("Конфиденциальность и реклама")
-            .setMessage("Каталог и маршруты хранятся на устройстве. Для рекламы используется SDK Яндекса: при разрешении рекламы он может обрабатывать технические сведения об устройстве и IP-адрес. Геолокация и рекламный идентификатор отключены; маршруты рекламной сети не передаются. Без рекламы все функции доступны.")
+        legalDialogOpen = true
+        ads.update(false, false)
+        AlertDialog.Builder(this).setTitle("Отдельное согласие на рекламу")
+            .setMessage("Разрешение добровольное. Все функции доступны без рекламы. Прежде чем дать согласие, ознакомьтесь с отдельным документом. Реклама использует SDK Яндекса и технические данные. Вы можете изменить выбор в разделе «О приложении».")
+            .setPositiveButton("Прочитать согласие") { _, _ -> consentDialog() }
+            .setNegativeButton("Без рекламы") { _, _ -> setAds(false) }
+            .setNeutralButton("Политика") { _, _ -> showLegal("Политика конфиденциальности", "privacy.html") { privacyDialog() } }
+            .setOnDismissListener { legalDialogOpen = false }
+            .show()
+    }
+
+    private fun consentDialog() {
+        legalDialogOpen = true
+        ads.update(false, false)
+        val raw = assets.open("consent.html").bufferedReader(Charsets.UTF_8).use { it.readText() }
+        val content = TextView(this).apply {
+            setPadding(24, 12, 24, 12)
+            text = android.text.Html.fromHtml(raw.substringAfter("<main>").substringBefore("<footer>"), android.text.Html.FROM_HTML_MODE_LEGACY)
+            textSize = 15f
+        }
+        AlertDialog.Builder(this).setTitle("Согласие на рекламную обработку данных")
+            .setView(ScrollView(this).apply { addView(content) })
             .setPositiveButton("Разрешить рекламу") { _, _ -> setAds(true) }
             .setNegativeButton("Без рекламы") { _, _ -> setAds(false) }
-            .setNeutralButton("Политика") { _, _ ->
-                openExternal(Uri.parse("https://epbloger.github.io/shodi/privacy.html"))
-            }.show()
+            .setOnDismissListener { legalDialogOpen = false }
+            .show()
     }
 
     private fun setAds(allowed: Boolean) {
-        prefs.edit().putBoolean("ads_allowed", allowed).apply()
+        prefs.edit().putBoolean("ads_allowed", allowed)
+            .putString("consent_revision", consentRevision)
+            .putLong("consent_timestamp", System.currentTimeMillis()).apply()
         ads.setAllowed(allowed)
     }
 

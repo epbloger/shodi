@@ -11,6 +11,11 @@ if (production) {
     for (key in ["SHODI_KEYSTORE", "SHODI_STORE_PASSWORD", "SHODI_KEY_ALIAS", "SHODI_KEY_PASSWORD"]) {
         if (!env[key]) throw new GradleException("Missing release signing configuration: " + key)
     }
+    for (doc in ["about.html", "privacy.html", "terms.html", "consent.html", "licenses.html"]) {
+        def legal = rootProject.file("../public/" + doc).getText("UTF-8")
+        if (legal.contains("[PUBLIC_") || legal.contains("ПРОЕКТ ДОКУМЕНТА")) throw new GradleException("Legal document not approved: " + doc)
+    }
+    if (env["SHODI_LEGAL_APPROVED"] != "true") throw new GradleException("Legal review approval is required")
     if (!file(signingPath).isFile()) throw new GradleException("Release keystore is unavailable")
     for (kind in adIds) {
         if (!(env["SHODI_" + kind + "_ID"] ==~ /R-M-\d+-\d+/)) throw new GradleException("Missing or invalid ad block configuration: " + kind)
@@ -70,7 +75,14 @@ tasks.register("copyWeb", Copy) {
         if (!rootProject.file("../dist/shodi.html").isFile()) throw new GradleException("Run npm ci && npm run build in repository root first")
     }
 }
-tasks.named("preBuild").configure { dependsOn("copyWeb") }
+tasks.register("copyLegal", Copy) {
+    from(rootProject.file("../public")) {
+        include "about.html", "privacy.html", "terms.html", "consent.html", "licenses.html"
+    }
+    into(layout.buildDirectory.dir("generated/legalAssets"))
+}
+android.sourceSets.main.assets.srcDir(layout.buildDirectory.dir("generated/legalAssets"))
+tasks.named("preBuild").configure { dependsOn("copyWeb", "copyLegal") }
 dependencies {
     implementation 'androidx.webkit:webkit:1.12.1'
     implementation 'com.yandex.android:mobileads:8.6.0'
