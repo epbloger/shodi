@@ -26,5 +26,14 @@ class ImportTests(unittest.TestCase):
         self.assertEqual(len(result["msk"]), 1)
         self.assertEqual(result["msk"][0][1], "Test museum")
 
+    def test_no_city_cap_and_distinct_branches(self):
+        rows = [(str(i), "Same coffee chain", "cafe", "cafe", [], .9, f"Street {i}", "Москва", 55.75, 37.61, [{"dataset":"Meta, Overture"}]) for i in range(100)]
+        rows.append(("duplicate", "Same coffee chain", "cafe", "cafe", [], .7, "Street 0", "Москва", 55.75, 37.61, [{"dataset":"Meta, Overture"}]))
+        rows.append(("museum", "Museum", "museum", "museum", [], .7, "Museum street", "Москва", 55.75, 37.61, [{"dataset":"Meta, Overture"}]))
+        result = mod.make_catalog(rows)["msk"]
+        self.assertEqual(len(result), 101)
+        self.assertEqual({entry[2] for entry in result[:2]}, {"coffee", "museum"})
+        self.assertEqual(len({entry[0] for entry in result}), 101)
+
 if __name__ == "__main__":
     unittest.main()

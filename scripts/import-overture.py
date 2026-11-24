@@ -16,12 +16,12 @@ CATEGORIES = {
     "gallery": "art_gallery art_center exhibition_center",
     "theater": "theater performing_arts performing_arts_theater opera_house",
     "live": "concert_hall music_venue live_music_venue",
-    "family": "zoo aquarium amusement_park water_park circus theme_park",
+    "family": "zoo aquarium amusement_park water_park circus theme_park playground indoor_playground cinema movie_theater",
     "books": "bookstore book_store library",
-    "view": "observation_deck scenic_viewpoint viewpoint lookout",
-    "active": "ice_skating_rink skating_rink ski_resort climbing_gym go_kart stadium",
+    "view": "observation_deck scenic_viewpoint viewpoint lookout scenic_overlook observation_tower",
+    "active": "ice_skating_rink skating_rink ski_resort climbing_gym go_kart stadium bowling_alley sports_complex swimming_pool skating",
     "park": "park botanical_garden garden national_park",
-    "architecture": "monument historical_landmark historic_site historical_site castle",
+    "architecture": "monument historical_landmark historic_site historical_site castle memorial historic_building palace",
     "walk": "tourist_attraction landmark beach waterfront hiking_trail",
     "market": "market farmers_market food_market flea_market",
     "coffee": "coffee_shop cafe tea_house bakery",
@@ -82,7 +82,7 @@ def permitted_sources(sources):
         recognized.update(labels)
     return bool(recognized)
 
-def make_catalog(rows, limit=20):
+def make_catalog(rows):
     cities, index = cities_index()
     groups = defaultdict(dict)
     stats, rejected_sources, unmatched_cities = Counter(), Counter(), Counter()
@@ -115,7 +115,8 @@ def make_catalog(rows, limit=20):
         stats["accepted"] += 1
         digest = hashlib.sha256(str(id).encode()).hexdigest()[:12]
         entry = [city_id + "-o" + digest, name, kind, address, round(lat, 6), round(lon, 6)]
-        key = norm(name)
+        # Preserve distinct branches of the same chain, and deduplicate the same name/address.
+        key = (norm(name), norm(street) or (round(lat, 4), round(lon, 4)))
         score = (float(confidence or 0), bool(street), str(id))
         previous = groups[city_id].get(key)
         if previous is None or score > previous[0]:
@@ -123,16 +124,16 @@ def make_catalog(rows, limit=20):
     result = {}
     for city_id, entries in sorted(groups.items()):
         ranked = sorted(entries.values(), key=lambda x: x[0], reverse=True)
-        counts, seen, selected = Counter(), set(), []
-        for cap in (1, 3, limit):
-            for _, entry in ranked:
-                if len(selected) >= limit:
-                    break
-                if entry[0] in seen or counts[entry[2]] >= cap:
-                    continue
-                selected.append(entry)
-                seen.add(entry[0])
-                counts[entry[2]] += 1
+        # Round-robin categories, so the first page is varied even in large cities.
+        by_kind = defaultdict(list)
+        for _, entry in ranked:
+            by_kind[entry[2]].append(entry)
+        selected, seen = [], set()
+        for i in range(max(map(len, by_kind.values()))):
+            for bucket in by_kind.values():
+                if i < len(bucket) and bucket[i][0] not in seen:
+                    selected.append(bucket[i])
+                    seen.add(bucket[i][0])
         result[city_id] = selected
     print("Import counters:", dict(stats), flush=True)
     print("Rejected source labels:", rejected_sources.most_common(12), flush=True)
@@ -168,9 +169,14 @@ def main():
                 yield from batch
         catalog = make_catalog(stream())
     total = sum(map(len, catalog.values()))
-    if len(catalog) < 100 or total < 1000 or not all(catalog.get(c) for c in ("ekb","msk","spb","kzn","nn")):
+    if len(catalog) < 500 or total < 15000 or len(catalog.get("spb", [])) < 100 or not all(catalog.get(c) for c in ("ekb","msk","spb","kzn","nn")):
         raise RuntimeError(f"Insufficient fresh coverage: {len(catalog)} cities, {total} places; existing catalog retained")
-    meta = {"release": args.release, "cities": len(catalog), "places": total, "source": "Overture Maps Foundation"}
+    category_counts = Counter(entry[2] for entries in catalog.values() for entry in entries)
+    meta = {"release": args.release, "cities": len(catalog), "places": total, "source": "Overture Maps Foundation",
+            "categories": dict(sorted(category_counts.items())), "saint_petersburg": len(catalog["spb"]),
+            "saint_petersburg_categories": dict(Counter(entry[2] for entry in catalog["spb"]))}
+    if len(meta["saint_petersburg_categories"]) < 10:
+        raise RuntimeError("Saint Petersburg has insufficient category diversity")
     def enc(obj):
         return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
     (ROOT / "public/data/current-places.js").write_text(
@@ -183,6 +189,7 @@ def main():
     text = readme.read_text(encoding="utf-8")
     text = re.sub(r"<!-- current-catalog -->.*?<!-- /current-catalog -->",
                   f"<!-- current-catalog -->\n**Обновление {args.release}:** {len(catalog)} городов, {total} мест из Overture Maps. Для остальных городов доступна отдельно обозначенная архивная подборка или поиск на карте.\n<!-- /current-catalog -->", text, flags=re.S)
+    text = re.sub(r"(!\[Места\]\(https://img.shields.io/badge/Места-)\d+", r"\g<1>" + str(total), text)
     readme.write_text(text, encoding="utf-8")
 
 if __name__ == "__main__":

@@ -37,7 +37,7 @@ jobs:
         run: python scripts/import-overture.py --release 2026-11-18.0
       - name: Set version and validate app
         run: |
-          npm version 1.4.0 --no-git-tag-version --allow-same-version
+          npm version 1.5.0 --no-git-tag-version --allow-same-version
           npm ci --ignore-scripts
           npm test
           npm run build
@@ -49,7 +49,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/data/current-places.js docs/current-catalog.json README.md package.json package-lock.json
           if ! git diff --cached --quiet; then
-            git commit -m "feat(data): import November 2026 Overture places snapshot"
+            git commit -m "feat(data): publish expanded November 2026 places catalog"
             git push origin HEAD:main
           fi
           gh workflow run pages.yml --ref main
