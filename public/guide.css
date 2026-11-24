@@ -4,19 +4,19 @@
   justify-content: flex-start;
   padding: 10px 12px;
   gap: 9px;
-  color: #e7eddd;
-  border: 1px solid #677c6b;
+  color: #e0e4ea;
+  border: 1px solid #646e7f;
   background: transparent;
   border-radius: 11px;
   text-align: left;
   font-weight: 800;
   margin-bottom: 21px;
 }
-.guide-link:hover { background: #3a5040; }
+.guide-link:hover { background: #394251; }
 .guide-link[aria-current="page"] {
-  color: #243b2d;
-  background: #d4dfa9;
-  border-color: #d4dfa9;
+  color: #232c3c;
+  background: #a6bce2;
+  border-color: #a6bce2;
 }
 .guide-link .icon { width: 18px; height: 18px; }
 .guide-hero {
@@ -25,8 +25,8 @@
   overflow: hidden;
   border-radius: 22px;
   min-height: 242px;
-  background: #22392e;
-  color: #fffdf1;
+  background: #212a3a;
+  color: #f4f7fc;
 }
 .guide-hero-copy {
   align-self: center;
@@ -41,7 +41,7 @@
 .guide-hero p {
   max-width: 28ch;
   margin-top: 17px;
-  color: #d7e3d0;
+  color: #d4d8df;
   font-size: .95rem;
   line-height: 1.55;
 }
@@ -66,7 +66,7 @@
 .guide-field {
   display: grid;
   gap: 5px;
-  color: #465746;
+  color: #454c58;
   font-size: .78rem;
   font-weight: 800;
 }
@@ -76,8 +76,8 @@
   min-height: 41px;
   padding: 8px 10px;
   color: var(--ink);
-  background: #f6f6ec;
-  border: 1px solid #d5d8c9;
+  background: #eef0f4;
+  border: 1px solid #cbcfd6;
   border-radius: 8px;
   font-size: .94rem;
   font-weight: 700;
@@ -89,7 +89,7 @@
   left: 11px;
   width: 17px;
   height: 17px;
-  color: #5c6e58;
+  color: #57606f;
   pointer-events: none;
 }
 .search-input input { padding-left: 34px; }
@@ -109,18 +109,18 @@
 .category-chip {
   min-height: 36px;
   padding: 6px 12px;
-  border: 1px solid #d6d8c8;
+  border: 1px solid #caced6;
   border-radius: 999px;
-  color: #40523f;
-  background: #fffdf7;
+  color: #3e4653;
+  background: #f9fafd;
   font-size: .79rem;
   font-weight: 800;
 }
-.category-chip:hover { background: #e8eedc; }
+.category-chip:hover { background: #dfe4eb; }
 .category-chip[aria-pressed="true"] {
-  border-color: #2b543e;
-  background: #2b543e;
-  color: #fffdf3;
+  border-color: #293956;
+  background: #293956;
+  color: #f5f8fd;
 }
 .guide-results-header {
   display: flex;
@@ -130,7 +130,7 @@
   margin-top: 24px;
 }
 .guide-results-header h2 {
-  color: #26382c;
+  color: #252c39;
   font-size: clamp(1.75rem, 3.6vw, 2.2rem);
   letter-spacing: -.03em;
 }
@@ -138,12 +138,12 @@
 .guide-price-note { margin: 6px 0 16px; }
 .city-help { margin-top: 8px; color: #6a4925; font-size: .82rem; }
 .guide-attribution { margin-top: 20px; color: var(--muted); font-size: .76rem; line-height: 1.55; }
-.guide-attribution a { color: #365b45; }
+.guide-attribution a { color: #34435d; }
 .guide-feedback {
-  border: 1px solid #ccdac5;
+  border: 1px solid #c9ced6;
   border-radius: 9px;
-  background: #eaf1e1;
-  color: #36563a;
+  background: #e4e8ee;
+  color: #344158;
   margin: 0 0 13px;
   padding: 7px 10px;
   font-size: .82rem;
@@ -155,8 +155,8 @@
   gap: 12px;
 }
 .place-card {
-  --tag: #e7eadc;
-  --tag-text: #4a5c43;
+  --tag: #dfe2e7;
+  --tag-text: #424c5d;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -178,7 +178,7 @@
   --tag-text: #405b6b;
 }
 .place-card[data-category="family"], .place-card[data-category="active"] {
-  --tag: #f1ebd2;
+  --tag: #d8dfeb;
   --tag-text: #6e571b;
 }
 .place-top { display: flex; align-items: center; gap: 8px; margin-bottom: 11px; }
@@ -193,26 +193,26 @@
 }
 .place-category { color: var(--tag-text); font-size: .77rem; font-weight: 800; }
 .place-name { font-size: 1.08rem; line-height: 1.32; font-weight: 800; overflow-wrap: anywhere; }
-.place-area { color: #606b58; font-size: .77rem; font-weight: 750; margin-top: 4px; }
-.place-rating { color: #4a603c; font-size: .77rem; font-weight: 800; margin-top: 4px; }
+.place-area { color: #565e6d; font-size: .77rem; font-weight: 750; margin-top: 4px; }
+.place-rating { color: #3a4962; font-size: .77rem; font-weight: 800; margin-top: 4px; }
 .place-description { color: var(--muted); font-size: .84rem; line-height: 1.55; margin: 10px 0 15px; }
 .place-footer {
   margin-top: auto;
   padding-top: 10px;
-  border-top: 1px solid #e6e5d8;
+  border-top: 1px solid #dbdee3;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 6px 10px;
 }
-.place-budget { color: #405738; font-size: .79rem; font-weight: 800; }
+.place-budget { color: #364359; font-size: .79rem; font-weight: 800; }
 .place-map {
   display: inline-flex;
   gap: 3px;
   align-items: center;
   min-height: 30px;
-  color: #355b47;
+  color: #33425d;
   font-size: .77rem;
   font-weight: 800;
   text-decoration: underline;
@@ -224,12 +224,12 @@
   justify-content: center;
   min-height: 35px;
   margin-top: 8px;
-  color: #35513d;
-  background: #f1f3e5;
-  border-color: #dce3d0;
+  color: #343f52;
+  background: #e8ebf0;
+  border-color: #d4d8df;
 }
-.place-add:disabled { background: #e7efde; color: #4a634c; }
-.place-add:disabled:hover { border-color: #dce3d0; }
+.place-add:disabled { background: #e1e5ec; color: #495364; }
+.place-add:disabled:hover { border-color: #d4d8df; }
 .stop-map { width: fit-content; }
 .guide-empty { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 
@@ -262,20 +262,34 @@
 [data-theme="dark"] :is(.guide-field, .search-input .icon, .guide-results-header h2, .place-area, .place-rating, .place-budget, .place-map, .guide-attribution a) { color: var(--accent); }
 [data-theme="dark"] .guide-field :is(input, select) { background: var(--field); border-color: var(--line); }
 [data-theme="dark"] .category-chip { background: var(--paper); border-color: var(--line); color: var(--accent); }
-[data-theme="dark"] .category-chip:hover { background: #34483a; }
-[data-theme="dark"] .category-chip[aria-pressed="true"] { background: #b4d2a1; border-color: #b4d2a1; color: #17251b; }
+[data-theme="dark"] .category-chip:hover { background: #333b49; }
+[data-theme="dark"] .category-chip[aria-pressed="true"] { background: #9fb2d4; border-color: #9fb2d4; color: #161c26; }
 [data-theme="dark"] .city-help { color: #f4d7a3; }
-[data-theme="dark"] .guide-feedback { background: #293e30; border-color: #48614d; color: #c9e0c1; }
+[data-theme="dark"] .guide-feedback { background: #28303f; border-color: #475162; color: #c7ceda; }
 [data-theme="dark"] .guide-error { background: #49302c; border-color: #794c43; color: #ffb4a7; }
-[data-theme="dark"] .place-card { --tag: #364839; --tag-text: #c9e0c1; }
+[data-theme="dark"] .place-card { --tag: #353c49; --tag-text: #c7ceda; }
 [data-theme="dark"] .place-card:is([data-category="coffee"], [data-category="food"], [data-category="market"]) { --tag: #493a2c; --tag-text: #f0cba7; }
 [data-theme="dark"] .place-card:is([data-category="museum"], [data-category="gallery"], [data-category="theater"], [data-category="night"], [data-category="live"]) { --tag: #43374b; --tag-text: #e1c5ee; }
 [data-theme="dark"] .place-card:is([data-category="view"], [data-category="walk"], [data-category="architecture"]) { --tag: #30454e; --tag-text: #bcdeed; }
-[data-theme="dark"] .place-card:is([data-category="family"], [data-category="active"]) { --tag: #49422b; --tag-text: #efdb9d; }
+[data-theme="dark"] .place-card:is([data-category="family"], [data-category="active"]) { --tag: #2a364a; --tag-text: #adbfdf; }
 [data-theme="dark"] .place-footer { border-color: var(--line); }
-[data-theme="dark"] .place-add { background: #304338; border-color: #49614e; color: #d4e7ca; }
-[data-theme="dark"] .place-add:disabled { background: #29372d; color: #a7bca5; }
+[data-theme="dark"] .place-add { background: #2f3744; border-color: #485162; color: #d0d6e1; }
+[data-theme="dark"] .place-add:disabled { background: #282e38; color: #a4adbd; }
 
 .guide-pagination { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; margin: 16px 0; }
 .guide-pagination:has(> [hidden] + [hidden]) { display: none; }
 .guide-pagination .guide-price-note { margin: 0; }
+
+.guide-hero { background: linear-gradient(115deg, #19253b, #294a83); box-shadow: 0 10px 30px #182a4c20; }
+.guide-hero-copy { position: relative; }
+.guide-hero-copy h1 { letter-spacing: -.04em; }
+.guide-controls { box-shadow: 0 3px 15px #182a4c0c; }
+.category-chip[aria-pressed="true"] { background: #315dce; border-color: #315dce; color: #fff; }
+.place-card { border-radius: 16px; box-shadow: 0 3px 12px #182a4c0b; transition: border-color .15s, box-shadow .15s; }
+.place-card:hover { border-color: #96add9; box-shadow: 0 7px 22px #182a4c16; }
+.place-add { background: #edf2ff; color: #294d9d; border-color: #d7e2fa; }
+.place-add:hover:not(:disabled) { background: #dbe7ff; border-color: #a9bff0; }
+[data-theme="dark"] .category-chip[aria-pressed="true"] { background: #a8bfff; border-color: #a8bfff; color: #142346; }
+[data-theme="dark"] .place-add { background: #263956; color: #c4d6ff; border-color: #41577d; }
+[data-theme="dark"] .place-add:hover:not(:disabled) { background: #354d71; }
+@media (prefers-reduced-motion: reduce) { .place-card { transition: none; } }
