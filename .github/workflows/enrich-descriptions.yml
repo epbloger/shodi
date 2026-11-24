@@ -2,7 +2,7 @@ name: Enrich place descriptions
 on:
   push:
     branches: [android-v2]
-    paths: ['scripts/enrich-descriptions.mjs', '.github/workflows/enrich-descriptions.yml']
+    paths: ['scripts/enrich-descriptions.mjs', 'scripts/import-place-photos.mjs', '.github/workflows/enrich-descriptions.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -99,7 +99,7 @@ jobs:
           const photos=JSON.parse(photoMatch[1]);
           const entries=Object.entries(photos);
           const photoReport=JSON.parse(await readFile("import-snapshot/docs/photo-coverage.json","utf8"));
-          if(entries.length>100||entries.some(([id,p])=>!/^Q[1-9]\d*$/.test(id)||!validatePhoto(p))||photoReport.photos!==entries.length||photoReport.bytes>5000000)throw Error("Invalid photo data");
+          if(entries.length>100||entries.some(([id,p])=>!/^Q[1-9]\d*$/.test(id)||!validatePhoto(p))||photoReport.photos!==entries.length||!Number.isInteger(photoReport.coveredPlaces)||photoReport.coveredPlaces<0||photoReport.coveredPlaces>photoReport.catalogPlaces||photoReport.bytes>5000000)throw Error("Invalid photo data");
           await writeFile("public/data/place-photos.js","// Licensed Wikimedia Commons thumbnails.\nexport const placePhotos = "+JSON.stringify(photos)+";\n");
           await writeFile("docs/photo-coverage.json",JSON.stringify(photoReport,null,2)+"\n");
           JS

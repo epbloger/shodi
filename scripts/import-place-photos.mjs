@@ -1,8 +1,8 @@
 import {writeFile} from "node:fs/promises";
-import {descriptionRecords} from "../public/data/place-descriptions.js";
-import {importedDescriptions} from "../public/data/imported-descriptions.js";
 import {placePhotos as previous} from "../public/data/place-photos.js";
 import {validatePhoto,licenses} from "../public/photos.js";
+import {currentPlaces} from "../public/data/current-places.js";
+import {descriptionForPlace} from "../public/descriptions.js";
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const ua="SHODI/2.0 catalog (https://github.com/epbloger/shodi; helpmoorkis@yandex.ru)";
 async function get(url,json=true){
@@ -18,7 +18,9 @@ async function get(url,json=true){
   if(type==="image/png"&&!b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))throw Error("Bad PNG");
   return {data:"data:"+type+";base64,"+b.toString("base64"),bytes:b.length};
 }
-const qids=[...new Set([...descriptionRecords,...importedDescriptions].map(r=>r[4]).filter(q=>/^Q[1-9]\d*$/.test(q)))];
+const catalog = Object.values(currentPlaces).flat().filter(r => !r[6] || ["open","unknown"].includes(r[6]));
+const placeIds = catalog.map(r => descriptionForPlace(r[1],r[4],r[5])?.qid ?? null);
+const qids = [...new Set(placeIds.filter(Boolean))];
 const out={};let bytes=0;
 for(const qid of qids){const p=previous[qid];if(validatePhoto(p)&&Object.keys(out).length<100&&bytes+Math.ceil(p.data.length*.75)<=5000000){out[qid]=p;bytes+=Math.ceil(p.data.length*.75);}}
 let attempts=0,errors=0;
@@ -53,7 +55,7 @@ for(let i=0;i<qids.length&&Object.keys(out).length<100&&bytes<5000000&&attempts<
   if(errors>=15)break;
   await pause(1000);
 }
-const report={candidateItems:qids.length,photos:Object.keys(out).length,bytes,attempts,errors,source:"Wikimedia Commons",generatedAt:new Date().toISOString()};
+const report={catalogPlaces:catalog.length,coveredPlaces:placeIds.filter(q=>q && Object.hasOwn(out,q)).length,candidateItems:qids.length,photos:Object.keys(out).length,bytes,attempts,errors,source:"Wikimedia Commons",generatedAt:new Date().toISOString()};
 await writeFile("docs/photo-coverage.json",JSON.stringify(report,null,2)+"\n");
 await writeFile("public/data/place-photos.js","// Licensed Wikimedia Commons thumbnails.\nexport const placePhotos = "+JSON.stringify(out)+";\n");
 console.log(JSON.stringify(report));
