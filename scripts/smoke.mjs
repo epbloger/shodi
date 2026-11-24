@@ -3,7 +3,9 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { resolve, extname } from "node:path";
-import { chromium } from "playwright";
+import { chromium, firefox } from "playwright";
+const engine = process.env.SHODI_BROWSER || "chromium";
+assert.ok(["chromium", "firefox"].includes(engine), "Unsupported browser engine");
 
 const mime = { ".html": "text/html; charset=utf-8", ".js": "application/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml", ".webp": "image/webp" };
 const server = createServer(async (req, res) => {
@@ -19,7 +21,7 @@ const server = createServer(async (req, res) => {
 await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
 let browser;
 try {
-  browser = await chromium.launch({ headless: true });
+  browser = await (engine === "firefox" ? firefox : chromium).launch({ headless: true });
   for (const url of process.env.SHODI_PUBLIC_URL ? [process.env.SHODI_PUBLIC_URL] : [
     "http://127.0.0.1:" + server.address().port + "/shodi/",
     pathToFileURL(resolve("dist/shodi.html")).href,
@@ -55,6 +57,13 @@ try {
     assert.ok(await page.locator("#guide-city").evaluate(el => getComputedStyle(el).fontFamily.includes("Manrope")), "Application stylesheet must load");
     await page.locator("#startup-notice").waitFor({ state: "hidden" });
     assert.ok(await page.locator("#city-options option").count() >= 1100, "Full city list must load");
+    const cityOptions = await page.locator("#city-options option").evaluateAll(options =>
+      options.map(option => ({value: option.value, label: option.label})));
+    assert.ok(cityOptions.every(option => option.label === option.value), "Firefox must display city names, not region-only labels");
+    assert.ok(cityOptions.some(option => option.value === "Пермь" && option.label === "Пермь"));
+    const sovetsk = cityOptions.filter(option => option.value.startsWith("Советск, "));
+    assert.ok(sovetsk.length > 1, "Cities with duplicate names must retain their regions");
+    assert.equal(new Set(sovetsk.map(option => option.label)).size, sovetsk.length);
     await page.locator("#guide-panel").waitFor({ state: "visible", timeout: 15000 });
     assert.ok(await page.locator(".place-add").count() > 0, "Catalog must contain places");
     assert.equal(await page.locator("#guide-city").inputValue(), "Санкт-Петербург");
@@ -81,6 +90,9 @@ try {
     }
     await page.locator("#theme-toggle").click();
     assert.equal(await page.locator("html").getAttribute("data-theme"), initialTheme);
+    await page.locator("#guide-city").fill("Пермь");
+    await page.locator("#guide-city").press("Enter");
+    await page.waitForFunction(() => document.querySelector("#guide-city-name").textContent === "Пермь");
     await page.locator("#guide-city").fill("Кострома");
     await page.locator("#guide-city").press("Enter");
     await page.locator("#guide-city-name").filter({ hasText: "Кострома" }).waitFor();
@@ -111,7 +123,7 @@ try {
     await page.waitForFunction(expected => document.querySelectorAll("#route-list .route-link").length === expected, count - 1);
     assert.deepEqual(errors, [], "Browser must not report script or CSP errors");
     await context.close();
-    console.log("Browser smoke test passed:", url);
+    console.log("Browser smoke test passed:", engine, url);
   }
 } finally {
   await browser?.close();

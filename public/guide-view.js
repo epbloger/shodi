@@ -28,7 +28,9 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   for (const entry of cities) {
     const option = document.createElement("option");
     option.value = entry.label;
-    option.label = entry.region;
+    // Firefox displays the option label instead of its value. The city label
+    // already includes the region for duplicate names; use it in both engines.
+    option.textContent = entry.label;
     cityChoices.append(option);
   }
   options.append(cityChoices);
