@@ -1,0 +1,218 @@
+.guide-link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 12px;
+  gap: 9px;
+  color: #e7eddd;
+  border: 1px solid #677c6b;
+  background: transparent;
+  border-radius: 11px;
+  text-align: left;
+  font-weight: 800;
+  margin-bottom: 21px;
+}
+.guide-link:hover { background: #3a5040; }
+.guide-link[aria-current="page"] {
+  color: #243b2d;
+  background: #d4dfa9;
+  border-color: #d4dfa9;
+}
+.guide-link .icon { width: 18px; height: 18px; }
+.guide-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .95fr);
+  overflow: hidden;
+  border-radius: 22px;
+  min-height: 242px;
+  background: #22392e;
+  color: #fffdf1;
+}
+.guide-hero-copy {
+  align-self: center;
+  padding: 32px clamp(25px, 3.7vw, 52px);
+  min-width: 0;
+}
+.guide-hero h1 {
+  font-size: clamp(2.85rem, 5.4vw, 4.75rem);
+  line-height: .98;
+  letter-spacing: -.047em;
+}
+.guide-hero p {
+  max-width: 28ch;
+  margin-top: 17px;
+  color: #d7e3d0;
+  font-size: .95rem;
+  line-height: 1.55;
+}
+.guide-hero img {
+  width: 100%;
+  min-height: 232px;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 52%;
+}
+.guide-controls {
+  display: grid;
+  grid-template-columns: minmax(160px, .72fr) minmax(190px, 1.28fr);
+  align-items: end;
+  gap: 13px;
+  margin-top: 17px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+}
+.guide-field {
+  display: grid;
+  gap: 5px;
+  color: #465746;
+  font-size: .78rem;
+  font-weight: 800;
+}
+.guide-field input, .guide-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 41px;
+  padding: 8px 10px;
+  color: var(--ink);
+  background: #f6f6ec;
+  border: 1px solid #d5d8c9;
+  border-radius: 8px;
+  font-size: .94rem;
+  font-weight: 700;
+}
+.search-input { position: relative; }
+.search-input .icon {
+  position: absolute;
+  top: 12px;
+  left: 11px;
+  width: 17px;
+  height: 17px;
+  color: #5c6e58;
+  pointer-events: none;
+}
+.search-input input { padding-left: 34px; }
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 18px;
+}
+.category-chip {
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid #d6d8c8;
+  border-radius: 999px;
+  color: #40523f;
+  background: #fffdf7;
+  font-size: .79rem;
+  font-weight: 800;
+}
+.category-chip:hover { background: #e8eedc; }
+.category-chip[aria-pressed="true"] {
+  border-color: #2b543e;
+  background: #2b543e;
+  color: #fffdf3;
+}
+.guide-results-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 13px;
+  margin-top: 24px;
+}
+.guide-results-header h2 {
+  color: #26382c;
+  font-size: clamp(1.75rem, 3.6vw, 2.2rem);
+  letter-spacing: -.03em;
+}
+.guide-results-header p, .guide-price-note { color: var(--muted); font-size: .82rem; }
+.guide-price-note { margin: 6px 0 16px; }
+.place-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.place-card {
+  --tag: #e7eadc;
+  --tag-text: #4a5c43;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+}
+.place-card[data-category="coffee"], .place-card[data-category="food"], .place-card[data-category="market"] {
+  --tag: #f1e5d5;
+  --tag-text: #745239;
+}
+.place-card[data-category="museum"], .place-card[data-category="gallery"], .place-card[data-category="theater"], .place-card[data-category="night"], .place-card[data-category="live"] {
+  --tag: #eee5ef;
+  --tag-text: #6c4c74;
+}
+.place-card[data-category="view"], .place-card[data-category="walk"], .place-card[data-category="architecture"] {
+  --tag: #e4ebef;
+  --tag-text: #405b6b;
+}
+.place-card[data-category="family"], .place-card[data-category="active"] {
+  --tag: #f1ebd2;
+  --tag-text: #6e571b;
+}
+.place-top { display: flex; align-items: center; gap: 8px; margin-bottom: 11px; }
+.place-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--tag);
+  color: var(--tag-text);
+}
+.place-category { color: var(--tag-text); font-size: .77rem; font-weight: 800; }
+.place-name { font-size: 1.08rem; line-height: 1.32; font-weight: 800; overflow-wrap: anywhere; }
+.place-area { color: #606b58; font-size: .77rem; font-weight: 750; margin-top: 4px; }
+.place-description { color: var(--muted); font-size: .84rem; line-height: 1.55; margin: 10px 0 15px; }
+.place-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid #e6e5d8;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 10px;
+}
+.place-budget { color: #405738; font-size: .79rem; font-weight: 800; }
+.place-map {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  min-height: 30px;
+  color: #355b47;
+  font-size: .77rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.place-map .icon { width: 13px; height: 13px; }
+.guide-empty { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
+@media (max-width: 1120px) {
+  .place-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .guide-link { margin: 0 0 11px; min-height: 40px; }
+  .guide-hero { min-height: 190px; }
+  .guide-hero img { min-height: 190px; }
+}
+@media (max-width: 540px) {
+  .guide-hero { grid-template-columns: 1fr; border-radius: 17px; }
+  .guide-hero-copy { padding: 22px; }
+  .guide-hero img { min-height: 0; height: 145px; }
+  .guide-controls { grid-template-columns: 1fr; padding: 12px; gap: 10px; }
+  .place-grid { grid-template-columns: 1fr; }
+  .category-chip { min-height: 34px; }
+}

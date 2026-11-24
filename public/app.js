@@ -2,6 +2,7 @@ import {
   KINDS, MAX_ROUTES, MAX_STOPS, demoBoard, minuteLabel, moveStop,
   newId, readBoard, routeDetails, routeStats, stopDetails,
 } from "./routes.js";
+import { mountGuide } from "./guide-view.js";
 
 const KEY = "weekend-atlas/v1";
 const byId = id => document.getElementById(id);
@@ -11,9 +12,17 @@ const removeDialog = byId("delete-dialog");
 const fields = form.elements;
 const stopList = byId("stop-list");
 const routeList = byId("route-list");
+const guideTrigger = byId("guide-trigger");
 let board = demoBoard();
 let editorContext = null;
 let storage;
+let showingGuide = location.hash !== "#route";
+mountGuide();
+
+function showView(guide) {
+  showingGuide = guide;
+  history.replaceState(null, "", guide ? "#places" : "#route");
+}
 
 function notice(message) {
   const banner = byId("storage-notice");
@@ -72,7 +81,7 @@ function renderRoutes() {
   for (const route of board.routes) {
     const link = clone("route-template");
     link.dataset.id = route.id;
-    if (route.id === board.selected) link.setAttribute("aria-current", "true");
+    if (!showingGuide && route.id === board.selected) link.setAttribute("aria-current", "true");
     text(link.querySelector(".route-name"), route.name);
     const city = link.querySelector(".route-city");
     text(city, route.city);
@@ -80,8 +89,9 @@ function renderRoutes() {
     const { visited } = routeStats(route.stops);
     text(link.querySelector(".route-summary"), visited + "/" + route.stops.length);
     link.addEventListener("click", () => {
-      if (board.selected === route.id) return;
-      save({ ...board, selected: route.id }, "Открыт маршрут «" + route.name + "».");
+      showView(false);
+      if (board.selected === route.id) render();
+      else save({ ...board, selected: route.id }, "Открыт маршрут «" + route.name + "».");
       focusRoute(route.id);
     });
     fragment.append(link);
@@ -153,8 +163,11 @@ function renderStops(route) {
 function render() {
   renderRoutes();
   const route = activeRoute();
-  byId("active-route").hidden = !route;
-  byId("empty-board").hidden = Boolean(route);
+  guideTrigger.toggleAttribute("aria-current", showingGuide);
+  if (showingGuide) guideTrigger.setAttribute("aria-current", "page");
+  byId("guide-panel").hidden = !showingGuide;
+  byId("active-route").hidden = showingGuide || !route;
+  byId("empty-board").hidden = showingGuide || Boolean(route);
   byId("add-route").disabled = board.routes.length >= MAX_ROUTES;
   if (!route) {
     stopList.replaceChildren();
@@ -222,6 +235,7 @@ form.addEventListener("submit", event => {
       if (itemId) replaceRoute({ ...route, ...details }, "Маршрут обновлён.");
       else {
         const created = { id: newId(), ...details, stops: [] };
+        showView(false);
         save({ ...board, selected: created.id, routes: [...board.routes, created] }, "Маршрут создан.");
         focusRoute(created.id);
       }
@@ -291,6 +305,10 @@ window.addEventListener("storage", event => {
 });
 
 byId("add-route").addEventListener("click", () => openEditor("route"));
+guideTrigger.addEventListener("click", () => {
+  showView(true);
+  render();
+});
 byId("empty-add").addEventListener("click", () => openEditor("route"));
 byId("edit-route").addEventListener("click", () => openEditor("route", activeRoute()));
 byId("add-stop").addEventListener("click", () => openEditor("stop"));
