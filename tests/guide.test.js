@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   budgetLabel, cities, cityByQuery, cityMatches, findPlaces, mapLink, placeById,
-  placesForCity, PLACE_CATEGORIES, reviewLabel,
+  placesForCity, PLACE_CATEGORIES, reviewLabel, catalogPlacesForCity, catalogSource,
 } from "../public/guide.js";
 import { demoBoard, readBoard, routeDetails, stopDetails } from "../public/routes.js";
 
@@ -68,12 +68,12 @@ test("the national catalog provides valid stops and distinguishes cities with th
 
 test("categories and case-insensitive search can be combined", () => {
   assert.ok(cityMatches(" санкт-петербург ", "Санкт-Петербург"));
-  assert.equal(findPlaces({ cityId: "msk", category: "museum" }).length, 2);
-  assert.ok(findPlaces({ cityId: "ekb", category: "coffee", query: "КАФЕ" }).length > 0);
-  const blackLake = findPlaces({ cityId: "kzn", query: "черное озеро" });
+  assert.equal(findPlaces({ legacy: true, cityId: "msk", category: "museum" }).length, 2);
+  assert.ok(findPlaces({ legacy: true, cityId: "ekb", category: "coffee", query: "КАФЕ" }).length > 0);
+  const blackLake = findPlaces({ legacy: true, cityId: "kzn", query: "черное озеро" });
   assert.deepEqual(blackLake.map(place => place.id), ["kzn-black"]);
-  assert.equal(findPlaces({ cityId: "not-a-city" }).length, 0);
-  assert.equal(findPlaces({ cityId: "msk", query: "кремль паровоз" }).length, 0);
+  assert.equal(findPlaces({ legacy: true, cityId: "not-a-city" }).length, 0);
+  assert.equal(findPlaces({ legacy: true, cityId: "msk", query: "кремль паровоз" }).length, 0);
 });
 
 test("price types distinguish free entry, tickets and average check", () => {
@@ -101,4 +101,22 @@ test("saved routes support catalog categories and older records", () => {
   assert.deepEqual(readBoard(JSON.stringify(board)), board);
   board.routes[0].stops.at(-1).placeId = "bad/id";
   assert.throws(() => readBoard(JSON.stringify(board)), /Некорректный номер/);
+});
+
+test("fresh catalog records preserve routes and do not invent reviews or prices", () => {
+  const ids = new Set();
+  for (const city of cities) {
+    const source = catalogSource(city.id);
+    if (!source) continue;
+    assert.match(source.release, /^2026-/);
+    for (const place of catalogPlacesForCity(city.id)) {
+      assert.ok(!ids.has(place.id));
+      ids.add(place.id);
+      assert.ok(Number.isFinite(place.lat) && Number.isFinite(place.lon));
+      assert.equal(place.budget.type, "unknown");
+      assert.equal(reviewLabel(place), "");
+      assert.deepEqual(placeById(place.id), place);
+      assert.doesNotThrow(() => stopDetails({ name: place.name, kind: place.kind, note: place.description, minutes: 0 }));
+    }
+  }
 });

@@ -1,5 +1,6 @@
 import { russianCities } from "./data/cities.js";
 import { russianPlaces } from "./data/places.js";
+import { currentCatalog, currentPlaces } from "./data/current-places.js";
 
 export const PLACE_CATEGORIES = Object.freeze({
   museum: { label: "Музеи", name: "Музей", icon: "culture" },
@@ -170,14 +171,29 @@ export function cityMatches(name, city) {
   return normalized(name) === normalized(city);
 }
 
-export function placeById(id) {
-  const cityId = id.startsWith("ru-") ? id.slice(0, id.lastIndexOf("-")) : id.split("-")[0];
-  return placesForCity(cityId).find(place => place.id === id);
+export function catalogSource(cityId) {
+  return currentCatalog && Object.hasOwn(currentPlaces, cityId) ? currentCatalog : null;
 }
 
-export function findPlaces({ cityId, category = "all", query = "" }) {
+export function catalogPlacesForCity(cityId) {
+  const city = citiesById.get(cityId);
+  if (!city) return [];
+  if (!catalogSource(cityId)) return placesForCity(cityId);
+  return currentPlaces[cityId].map(([id, name, kind, address, lat, lon]) => ({
+    id, name, kind, area: address || city.label, address, city: city.label,
+    description: PLACE_CATEGORIES[kind].name, lat, lon, budget: { type: "unknown" },
+    source: currentCatalog.release,
+  }));
+}
+
+export function placeById(id) {
+  const cityId = id.startsWith("ru-") ? id.slice(0, id.lastIndexOf("-")) : id.split("-")[0];
+  return catalogPlacesForCity(cityId).find(place => place.id === id) ?? placesForCity(cityId).find(place => place.id === id);
+}
+
+export function findPlaces({ cityId, category = "all", query = "", legacy = false }) {
   const terms = normalized(query).split(/\s+/).filter(Boolean);
-  return placesForCity(cityId).filter(place => {
+  return (legacy ? placesForCity(cityId) : catalogPlacesForCity(cityId)).filter(place => {
     if (category !== "all" && category !== place.kind) return false;
     if (!terms.length) return true;
     const kind = PLACE_CATEGORIES[place.kind];
@@ -205,6 +221,7 @@ export function reviewLabel(place) {
 
 export function mapLink(place) {
   const url = new URL("https://yandex.ru/maps/");
-  url.searchParams.set("text", place.name + " " + (place.address ?? place.city));
+  url.searchParams.set("text", place.name + " " + (place.address || place.city));
+  if (Number.isFinite(place.lat) && Number.isFinite(place.lon)) { url.searchParams.set("ll", place.lon + "," + place.lat); url.searchParams.set("z", "16"); }
   return url.href;
 }

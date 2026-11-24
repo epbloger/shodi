@@ -1,6 +1,6 @@
 import {
   budgetLabel, cities, cityById, cityByQuery, cityMatches, findPlaces,
-  mapLink, PLACE_CATEGORIES, reviewLabel,
+  mapLink, PLACE_CATEGORIES, reviewLabel, catalogSource,
 } from "./guide.js";
 
 const byId = id => document.getElementById(id);
@@ -70,9 +70,13 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     const cityMap = byId("city-map");
     cityMap.hidden = !noCatalog;
     cityMap.href = mapLink({ name: "Достопримечательности", city: city.label + " " + city.region });
-    byId("guide-price-note").textContent = city.id.startsWith("ru-")
-      ? "Подборка по отзывам 2023 года. Перед визитом проверьте, открыто ли место, и уточните цены."
-      : "Цены указаны ориентировочно на одного человека. Перед визитом проверьте тарифы и часы работы.";
+    const source = catalogSource(city.id);
+    byId("guide-price-note").textContent = source
+      ? "Источник: Overture Maps, выпуск " + source.release + ". Рейтинги и цены не предоставляются; часы работы уточняйте на карте."
+      : city.id.startsWith("ru-")
+        ? "Архивная подборка по отзывам 2023 года. Актуальные сведения проверьте на карте."
+        : "Архивная редакционная подборка; цены и сведения не подтверждены на 2026 год. Уточните их на карте.";
+    byId("current-attribution").hidden = !source;
     updateCategories();
 
     const fragment = document.createDocumentFragment();
