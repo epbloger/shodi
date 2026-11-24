@@ -77,7 +77,8 @@
         </header>
         <div class="guide-controls">
           <label class="guide-field">Город
-            <select id="guide-city"></select>
+            <input id="guide-city" type="text" list="city-options" maxlength="100" autocomplete="off" aria-describedby="city-help" placeholder="Начните вводить город">
+            <datalist id="city-options"></datalist>
           </label>
           <label class="guide-field guide-search">Поиск места
             <span class="search-input"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
@@ -91,18 +92,25 @@
             <button id="open-guide-route" class="button secondary" type="button" hidden>Открыть маршрут</button>
           </div>
         </div>
+        <p id="city-help" class="city-help" role="status" hidden></p>
         <div id="guide-categories" class="categories" role="group" aria-label="Категории мест"></div>
         <header class="guide-results-header">
           <h2 id="guide-city-name"></h2>
           <p id="guide-count" role="status"></p>
         </header>
-        <p class="guide-price-note">Цены указаны ориентировочно на одного человека. Перед визитом проверьте тарифы и часы работы.</p>
+        <p id="guide-price-note" class="guide-price-note"></p>
         <p id="guide-feedback" class="guide-feedback" role="status" hidden></p>
         <div id="guide-places" class="place-grid"></div>
         <div id="guide-empty" class="empty-card guide-empty" hidden>
-          <p>Нет мест по этим фильтрам.</p>
+          <p id="guide-empty-text"></p>
           <button id="clear-filters" class="button secondary" type="button">Сбросить фильтры</button>
+          <a id="city-map" class="place-map" target="_blank" rel="noopener noreferrer" hidden>Найти места на карте</a>
         </div>
+        <p class="guide-attribution">
+          Города — <a href="https://github.com/hflabs/city" target="_blank" rel="noopener noreferrer">DaData / HFLabs</a>
+          (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>).
+          Подборки по отзывам — <a href="https://github.com/yandex/geo-reviews-dataset-2023" target="_blank" rel="noopener noreferrer">Яндекс Карты, 2023</a>.
+        </p>
       </section>
       <section id="active-route" aria-labelledby="route-title" hidden>
         <header class="hero">
@@ -217,6 +225,7 @@
       </div>
       <h3 class="place-name"></h3>
       <p class="place-area"></p>
+      <p class="place-rating" hidden></p>
       <p class="place-description"></p>
       <div class="place-footer">
         <p class="place-budget"></p>

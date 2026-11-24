@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const options = { absWorkingDir: root, bundle: true, minify: true, write: false, legalComments: "none" };
+const options = { absWorkingDir: root, bundle: true, minify: true, write: false, charset: "utf8", legalComments: "none" };
 const [js, css] = await Promise.all([
   build({ ...options, entryPoints: ["public/app.js"], format: "iife" }),
   build({
@@ -35,9 +35,9 @@ for (const [file, type] of [["icon.svg", "image/svg+xml"], ["embankment.webp", "
   const bytes = await readFile(root + "public/assets/" + file);
   html = containsTag(html, "./assets/" + file, "data:" + type + ";base64," + bytes.toString("base64"));
 }
-const licenses = await Promise.all(["manrope", "pt-serif"].map(name =>
+const licenses = await Promise.all(["manrope", "pt-serif", "yandex-reviews"].map(name =>
   readFile(root + "public/assets/" + name + "-license.txt", "utf8")));
-html += "\n<!-- Embedded fonts\n" + licenses.join("\n") + "\n-->\n";
+html += "\n<!-- Font and data licenses\n" + licenses.join("\n") + "\n-->\n";
 await mkdir(root + "dist", { recursive: true });
 await writeFile(root + "dist/shodi.html", html);
 console.log("dist/shodi.html");

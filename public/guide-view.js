@@ -1,10 +1,13 @@
-import { budgetLabel, cities, cityMatches, findPlaces, mapLink, PLACE_CATEGORIES } from "./guide.js";
+import {
+  budgetLabel, cities, cityById, cityByQuery, cityMatches, findPlaces,
+  mapLink, PLACE_CATEGORIES, reviewLabel,
+} from "./guide.js";
 
 const byId = id => document.getElementById(id);
 const countLabel = new Intl.PluralRules("ru");
 
 export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
-  const citySelect = byId("guide-city");
+  const cityInput = byId("guide-city");
   const search = byId("guide-search");
   const categories = byId("guide-categories");
   const grid = byId("guide-places");
@@ -12,12 +15,21 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   const target = byId("guide-target");
   const openButton = byId("open-guide-route");
   const feedback = byId("guide-feedback");
+  const cityHelp = byId("city-help");
+  const options = byId("city-options");
+  let city = cityById("ekb");
   let category = "all";
   let selectedTarget;
 
-  for (const city of cities) {
-    citySelect.add(new Option(city.name, city.id));
+  const cityChoices = document.createDocumentFragment();
+  for (const entry of cities) {
+    const option = document.createElement("option");
+    option.value = entry.label;
+    option.label = entry.region;
+    cityChoices.append(option);
   }
+  options.append(cityChoices);
+  cityInput.value = city.label;
 
   function updateCategories() {
     for (const button of categories.children) {
@@ -39,18 +51,28 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   }
 
   function render() {
-    const city = cities.find(entry => entry.id === citySelect.value);
-    const places = findPlaces({ cityId: city?.id, category, query: search.value });
-    const routes = getRoutes().filter(route => city && cityMatches(route.city, city.name));
+    const places = findPlaces({ cityId: city.id, category, query: search.value });
+    const routes = getRoutes().filter(route => cityMatches(route.city, city.label));
     const routeId = selectedTarget ?? selectedRoute()?.id;
     target.replaceChildren(...routes.map(route => new Option(route.name, route.id)), new Option("Создать новый маршрут", ""));
     target.value = routes.some(route => route.id === routeId) ? routeId : (selectedTarget === "" ? "" : routes[0]?.id ?? "");
     openButton.hidden = !target.value;
     const route = routes.find(entry => entry.id === target.value);
-    byId("guide-city-name").textContent = city?.name ?? "";
+    byId("guide-city-name").textContent = city.label;
     const suffix = { one: "место", few: "места", many: "мест" }[countLabel.select(places.length)] ?? "мест";
     byId("guide-count").textContent = places.length + " " + suffix;
     byId("guide-empty").hidden = places.length !== 0;
+    const noCatalog = !places.length && !findPlaces({ cityId: city.id }).length;
+    byId("guide-empty-text").textContent = noCatalog
+      ? "В подборке пока нет мест для этого города. Их можно поискать на карте."
+      : "Нет мест по этим фильтрам.";
+    byId("clear-filters").hidden = noCatalog;
+    const cityMap = byId("city-map");
+    cityMap.hidden = !noCatalog;
+    cityMap.href = mapLink({ name: "Достопримечательности", city: city.label + " " + city.region });
+    byId("guide-price-note").textContent = city.id.startsWith("ru-")
+      ? "Подборка по отзывам 2023 года. Перед визитом проверьте, открыто ли место, и уточните цены."
+      : "Цены указаны ориентировочно на одного человека. Перед визитом проверьте тарифы и часы работы.";
     updateCategories();
 
     const fragment = document.createDocumentFragment();
@@ -63,7 +85,12 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
       card.querySelector(".place-category").textContent = kind.name;
       card.querySelector(".place-name").textContent = place.name;
       card.querySelector(".place-area").textContent = place.area;
-      card.querySelector(".place-description").textContent = place.description;
+      const rating = card.querySelector(".place-rating");
+      rating.textContent = reviewLabel(place);
+      rating.hidden = !place.reviews;
+      const description = card.querySelector(".place-description");
+      description.textContent = place.description;
+      description.hidden = !place.description || place.description === kind.name;
       card.querySelector(".place-budget").textContent = budgetLabel(place.budget);
       const map = card.querySelector(".place-map");
       map.href = mapLink(place);
@@ -104,9 +131,27 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     render();
   }
 
-  citySelect.addEventListener("change", () => {
+  function chooseCity(reportUnknown = false) {
+    const chosen = cityByQuery(cityInput.value);
+    if (!chosen) {
+      cityHelp.textContent = "Выберите город из подсказок. Для городов с одинаковым названием указан регион.";
+      cityHelp.hidden = !reportUnknown;
+      return;
+    }
+    cityHelp.hidden = true;
+    if (chosen.id === city.id) return;
+    city = chosen;
     selectedTarget = undefined;
     resetSearch();
+  }
+
+  cityInput.addEventListener("input", () => chooseCity());
+  cityInput.addEventListener("change", () => {
+    chooseCity(true);
+    if (cityHelp.hidden) cityInput.value = city.label;
+  });
+  cityInput.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.isComposing) chooseCity(true);
   });
   target.addEventListener("change", () => {
     selectedTarget = target.value;

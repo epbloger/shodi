@@ -136,6 +136,9 @@
 }
 .guide-results-header p, .guide-price-note { color: var(--muted); font-size: .82rem; }
 .guide-price-note { margin: 6px 0 16px; }
+.city-help { margin-top: 8px; color: #6a4925; font-size: .82rem; }
+.guide-attribution { margin-top: 20px; color: var(--muted); font-size: .76rem; line-height: 1.55; }
+.guide-attribution a { color: #365b45; }
 .guide-feedback {
   border: 1px solid #ccdac5;
   border-radius: 9px;
@@ -191,6 +194,7 @@
 .place-category { color: var(--tag-text); font-size: .77rem; font-weight: 800; }
 .place-name { font-size: 1.08rem; line-height: 1.32; font-weight: 800; overflow-wrap: anywhere; }
 .place-area { color: #606b58; font-size: .77rem; font-weight: 750; margin-top: 4px; }
+.place-rating { color: #4a603c; font-size: .77rem; font-weight: 800; margin-top: 4px; }
 .place-description { color: var(--muted); font-size: .84rem; line-height: 1.55; margin: 10px 0 15px; }
 .place-footer {
   margin-top: auto;

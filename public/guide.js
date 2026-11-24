@@ -1,3 +1,6 @@
+import { russianCities } from "./data/cities.js";
+import { russianPlaces } from "./data/places.js";
+
 export const PLACE_CATEGORIES = Object.freeze({
   museum: { label: "Музеи", name: "Музей", icon: "culture" },
   gallery: { label: "Галереи и арт", name: "Галерея", icon: "art" },
@@ -124,14 +127,38 @@ const CITIES = [
   ]],
 ];
 
-export const cities = Object.freeze(CITIES.map(([id, name]) => ({ id, name })));
+const collator = new Intl.Collator("ru");
+const nameCounts = new Map();
+for (const [, name] of russianCities) {
+  const key = normalized(name);
+  nameCounts.set(key, (nameCounts.get(key) ?? 0) + 1);
+}
+
+export const cities = Object.freeze(russianCities.map(([id, name, region]) => ({
+  id, name, region, label: nameCounts.get(normalized(name)) > 1 ? name + ", " + region : name,
+})).sort((a, b) => collator.compare(a.name, b.name) || collator.compare(a.region, b.region)));
+const citiesById = new Map(cities.map(city => [city.id, city]));
+
+export function cityById(id) {
+  return citiesById.get(id);
+}
+
+export function cityByQuery(query) {
+  const key = normalized(query);
+  return cities.find(city => normalized(city.label) === key);
+}
 
 export function placesForCity(cityId) {
   const city = CITIES.find(([id]) => id === cityId);
-  if (!city) return [];
-  return city[2].map(([id, kind, name, area, description, budgetType, low, high]) => ({
+  if (city) return city[2].map(([id, kind, name, area, description, budgetType, low, high]) => ({
     id: cityId + "-" + id, city: city[1], name, kind, area, description,
     budget: { type: budgetType, low, high },
+  }));
+  if (!Object.hasOwn(russianPlaces, cityId)) return [];
+  return russianPlaces[cityId].map(([id, name, kind, area, address, description, rating, reviews]) => ({
+    id, name, kind, area, address, description, rating, reviews,
+    city: citiesById.get(cityId).label,
+    budget: { type: "unknown" },
   }));
 }
 
@@ -144,7 +171,8 @@ export function cityMatches(name, city) {
 }
 
 export function placeById(id) {
-  return placesForCity(id.split("-")[0]).find(place => place.id === id);
+  const cityId = id.startsWith("ru-") ? id.slice(0, id.lastIndexOf("-")) : id.split("-")[0];
+  return placesForCity(cityId).find(place => place.id === id);
 }
 
 export function findPlaces({ cityId, category = "all", query = "" }) {
@@ -159,15 +187,24 @@ export function findPlaces({ cityId, category = "all", query = "" }) {
 }
 
 const money = new Intl.NumberFormat("ru-RU");
+const plural = new Intl.PluralRules("ru");
 
 export function budgetLabel({ type, low, high }) {
   if (type === "free") return "Вход свободный";
+  if (type === "unknown") return "Цена не указана";
   const name = type === "check" ? "Средний чек" : "Билет";
   return name + " ≈ " + money.format(low) + "–" + money.format(high) + " ₽";
 }
 
+export function reviewLabel(place) {
+  if (!place.reviews) return "";
+  const number = money.format(place.rating);
+  const suffix = { one: "отзыв", few: "отзыва", many: "отзывов" }[plural.select(place.reviews)];
+  return number + " из 5 · " + money.format(place.reviews) + " " + suffix + " в выборке 2023";
+}
+
 export function mapLink(place) {
   const url = new URL("https://yandex.ru/maps/");
-  url.searchParams.set("text", place.name + " " + place.city);
+  url.searchParams.set("text", place.name + " " + (place.address ?? place.city));
   return url.href;
 }
