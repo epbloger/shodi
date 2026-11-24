@@ -14,7 +14,8 @@ import com.yandex.mobile.ads.interstitial.*
 import com.yandex.mobile.ads.nativeads.*
 
 class AdsController(private val activity: Activity, private val slot: FrameLayout) {
-    private var allowed = false
+    private var personalized: Boolean? = null
+    private var requestGeneration = 0
     private var initialized = false
     private var initializing = false
     private var closed = false
@@ -39,31 +40,42 @@ class AdsController(private val activity: Activity, private val slot: FrameLayou
         val cm = activity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return cm.getNetworkCapabilities(cm.activeNetwork)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
     }
-    private fun eligible() = allowed && initialized && foreground && catalog && !closed && !fullShowing && online()
-    fun setAllowed(value: Boolean) {
-        allowed = value
+    private fun eligible() = personalized != null && initialized && foreground && catalog && !closed && !fullShowing && online()
+    fun setPersonalization(value: Boolean) {
+        if (closed) return
         foreground = true
-        if (!value) { clear(); return }
-        if (!initialized && !initializing && !closed && online()) {
-            initializing = true
-            YandexAds.setUserConsent(false)
-            YandexAds.setLocationTracking(false)
-            YandexAds.initialize(activity.applicationContext) {
-                initializing = false
-                initialized = true
-            }
+        if (personalized != value) {
+            // Invalidate previous creatives and asynchronous callbacks before changing consent.
+            requestGeneration++
+            clear()
+            personalized = value
+            nextBanner = 0L
+            nextFull = 0L
+            nativeRequested = false
+        }
+        // Pass the actual choice every resume, including false; do not disable
+        // all ad formats merely because personalization was declined.
+        YandexAds.setUserConsent(value)
+        YandexAds.setLocationTracking(false)
+    }
+    private fun initializeIfNeeded() {
+        if (personalized == null || initialized || initializing || closed || !online()) return
+        initializing = true
+        YandexAds.initialize(activity.applicationContext) {
+            initializing = false
+            if (!closed) initialized = true
         }
     }
     fun update(isCatalog: Boolean, returned: Boolean) {
         if (closed) return
         foreground = true
         catalog = isCatalog
-        if (!allowed || !online() || !catalog) {
+        if (personalized == null || !online() || !catalog) {
             slot.visibility = View.GONE
             if (!online()) { clearBanner(); clearNative() }
             return
         }
-        if (!initialized) { setAllowed(true); return }
+        if (!initialized) { initializeIfNeeded(); return }
         if (fullShowing) { slot.visibility = View.GONE; return }
         if (returned && SystemClock.elapsedRealtime() - lastFull >= interval && interstitial != null) {
             showFull()
@@ -108,12 +120,16 @@ class AdsController(private val activity: Activity, private val slot: FrameLayou
         nextFull = SystemClock.elapsedRealtime() + interval
         val loader = interstitialLoader ?: InterstitialAdLoader(activity).also { interstitialLoader = it }
         fullLoading = true
+        val generation = requestGeneration
         loader.loadAd(AdRequest.Builder(BuildConfig.INTERSTITIAL_ID).build(), object : InterstitialAdLoadListener {
             override fun onAdLoaded(ad: InterstitialAd) {
+                if (generation != requestGeneration || closed) return
                 fullLoading = false
-                if (allowed && !closed) interstitial = ad
+                interstitial = ad
             }
-            override fun onAdFailedToLoad(error: AdRequestError) { fullLoading = false }
+            override fun onAdFailedToLoad(error: AdRequestError) {
+                if (generation == requestGeneration) fullLoading = false
+            }
         })
     }
     private fun showFull() {
@@ -142,11 +158,12 @@ class AdsController(private val activity: Activity, private val slot: FrameLayou
         nativeRequested = true // at most one native request per activity session
         val loader = NativeAdLoader(activity)
         nativeLoader = loader
+        val generation = requestGeneration
         loader.loadAd(AdRequest.Builder(BuildConfig.NATIVE_ID).build(),
             NativeAdOptions.Builder().setShouldLoadImagesAutomatically(true).build(),
             object : NativeAdLoadListener {
                 override fun onAdLoaded(ad: NativeAd) {
-                    if (!eligible()) return
+                    if (generation != requestGeneration || !eligible()) return
                     bindNative(ad)
                 }
                 override fun onAdFailedToLoad(error: AdRequestError) {}
@@ -236,5 +253,5 @@ class AdsController(private val activity: Activity, private val slot: FrameLayou
     }
     fun pause() { foreground = false; slot.visibility = View.GONE }
     fun resize() { clearBanner(); nextBanner = 0L }
-    fun destroy() { closed = true; clear() }
+    fun destroy() { closed = true; requestGeneration++; clear() }
 }

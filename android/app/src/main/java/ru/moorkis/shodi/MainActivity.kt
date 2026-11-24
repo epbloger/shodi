@@ -29,7 +29,7 @@ class MainActivity : Activity() {
     private var destroyed = false
     private var legalDialogDepth = 0
     private val legalDialogOpen get() = legalDialogDepth > 0
-    private val consentRevision = "2026-11-24-draft-2"
+    private val consentRevision = "2026-11-24-draft-3"
     private val local = "https://appassets.androidplatform.net/assets/index.html"
     private val tick = object : Runnable {
         override fun run() {
@@ -71,7 +71,7 @@ class MainActivity : Activity() {
         configureWeb()
         web.loadUrl(local)
         if (prefs.getString("consent_revision", "") != consentRevision) {
-            prefs.edit().putBoolean("ads_allowed", false).apply()
+            prefs.edit().remove("ads_allowed").remove("ads_personalized").remove("consent_timestamp").apply()
             privacyDialog()
         }
     }
@@ -164,8 +164,8 @@ class MainActivity : Activity() {
         legalDialogDepth++
         ads.update(false, false)
         val choices = arrayOf("Разработчик и поддержка", "Политика конфиденциальности",
-            "Пользовательское соглашение", "Согласие на обработку данных для рекламы",
-            "Источники данных и лицензии", "Персональные данные и согласие", "Сайт проекта")
+            "Пользовательское соглашение", "Согласие на персонализацию рекламы",
+            "Источники данных и лицензии", "Персонализация рекламы", "Сайт проекта")
         val files = arrayOf("about.html", "privacy.html", "terms.html", "consent.html", "licenses.html")
         AlertDialog.Builder(this).setTitle("Сходи · " + BuildConfig.VERSION_NAME)
             .setItems(choices) { _, i ->
@@ -183,10 +183,10 @@ class MainActivity : Activity() {
     private fun privacyDialog() {
         legalDialogDepth++
         ads.update(false, false)
-        AlertDialog.Builder(this).setTitle("Обработка данных для рекламы")
-            .setMessage("Разрешение добровольное. Реклама является частью сервиса. При отказе от необходимой обработки данных объявления могут быть недоступны. Прежде чем дать согласие, ознакомьтесь с отдельным документом. Реклама использует SDK Яндекса и технические данные. Отозвать согласие можно в разделе «О приложении».")
+        AlertDialog.Builder(this).setTitle("Персонализация рекламы")
+            .setMessage("Сходи — бесплатное приложение с рекламой. Можно разрешить подбор рекламы по интересам или отказаться от персонализации. Обычная реклама останется доступной в пределах законного режима SDK. Изменить выбор можно в разделе «О приложении».")
             .setPositiveButton("Прочитать согласие") { _, _ -> consentDialog() }
-            .setNegativeButton("Не даю согласия") { _, _ -> setAds(false) }
+            .setNegativeButton("Без персонализации") { _, _ -> setPersonalization(false) }
             .setNeutralButton("Политика") { _, _ -> showLegal("Политика конфиденциальности", "privacy.html") { privacyDialog() } }
             .setOnDismissListener { legalDialogDepth = (legalDialogDepth - 1).coerceAtLeast(0) }
             .show()
@@ -201,19 +201,19 @@ class MainActivity : Activity() {
             text = android.text.Html.fromHtml(raw.substringAfter("<main>").substringBefore("<footer>"), android.text.Html.FROM_HTML_MODE_LEGACY)
             textSize = 15f
         }
-        AlertDialog.Builder(this).setTitle("Согласие на рекламную обработку данных")
+        AlertDialog.Builder(this).setTitle("Согласие на персонализацию рекламы")
             .setView(ScrollView(this).apply { addView(content) })
-            .setPositiveButton("Разрешить рекламу") { _, _ -> setAds(true) }
-            .setNegativeButton("Не даю согласия") { _, _ -> setAds(false) }
+            .setPositiveButton("Разрешить персонализацию") { _, _ -> setPersonalization(true) }
+            .setNegativeButton("Без персонализации") { _, _ -> setPersonalization(false) }
             .setOnDismissListener { legalDialogDepth = (legalDialogDepth - 1).coerceAtLeast(0) }
             .show()
     }
 
-    private fun setAds(allowed: Boolean) {
-        prefs.edit().putBoolean("ads_allowed", allowed)
+    private fun setPersonalization(allowed: Boolean) {
+        prefs.edit().remove("ads_allowed").putBoolean("ads_personalized", allowed)
             .putString("consent_revision", consentRevision)
             .putLong("consent_timestamp", System.currentTimeMillis()).apply()
-        ads.setAllowed(allowed)
+        ads.setPersonalization(allowed)
     }
 
     private fun shareRoute() {
@@ -239,7 +239,7 @@ class MainActivity : Activity() {
         super.onResume()
         active = true
         web.onResume()
-        ads.setAllowed(prefs.getBoolean("ads_allowed", false))
+        ads.setPersonalization(prefs.getString("consent_revision", "") == consentRevision && prefs.getBoolean("ads_personalized", false))
         handler.post(tick)
     }
 

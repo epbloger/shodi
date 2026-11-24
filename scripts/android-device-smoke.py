@@ -81,16 +81,16 @@ def capture(name):
 def assert_refusal():
     raw=adb("shell","run-as",PACKAGE,"cat","shared_prefs/privacy.xml")
     prefs=ET.fromstring(raw)
-    assert any(n.get("name")=="ads_allowed" and n.get("value")=="false" for n in prefs),"Consent refusal not persisted"
+    assert any(n.get("name")=="ads_personalized" and n.get("value")=="false" for n in prefs),"Consent refusal not persisted"
 def run():
     wait_for_boot()
     adb("install","-r","apk/app-debug.apk")
     adb("shell","pm","clear",PACKAGE)
     adb("logcat","-b","main","-b","system","-b","events","-b","crash","-c")
     launch()
-    find_text("Обработка данных для рекламы", timeout=120, recover_launcher=True)
+    find_text("Персонализация рекламы", timeout=120, recover_launcher=True)
     capture("android-consent.png")
-    tap("Не даю согласия",dialog_button="android:id/button2",dialog_title="Обработка данных для рекламы")
+    tap("Без персонализации",dialog_button="android:id/button2",dialog_title="Персонализация рекламы")
     find_text("О приложении")
     assert_refusal()
     tap("О приложении")
