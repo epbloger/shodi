@@ -258,3 +258,20 @@
   .categories { flex-wrap: nowrap; overflow-x: auto; padding: 3px 3px 8px; }
   .category-chip { min-height: 34px; flex: none; }
 }
+
+[data-theme="dark"] :is(.guide-field, .search-input .icon, .guide-results-header h2, .place-area, .place-rating, .place-budget, .place-map, .guide-attribution a) { color: var(--accent); }
+[data-theme="dark"] .guide-field :is(input, select) { background: var(--field); border-color: var(--line); }
+[data-theme="dark"] .category-chip { background: var(--paper); border-color: var(--line); color: var(--accent); }
+[data-theme="dark"] .category-chip:hover { background: #34483a; }
+[data-theme="dark"] .category-chip[aria-pressed="true"] { background: #b4d2a1; border-color: #b4d2a1; color: #17251b; }
+[data-theme="dark"] .city-help { color: #f4d7a3; }
+[data-theme="dark"] .guide-feedback { background: #293e30; border-color: #48614d; color: #c9e0c1; }
+[data-theme="dark"] .guide-error { background: #49302c; border-color: #794c43; color: #ffb4a7; }
+[data-theme="dark"] .place-card { --tag: #364839; --tag-text: #c9e0c1; }
+[data-theme="dark"] .place-card:is([data-category="coffee"], [data-category="food"], [data-category="market"]) { --tag: #493a2c; --tag-text: #f0cba7; }
+[data-theme="dark"] .place-card:is([data-category="museum"], [data-category="gallery"], [data-category="theater"], [data-category="night"], [data-category="live"]) { --tag: #43374b; --tag-text: #e1c5ee; }
+[data-theme="dark"] .place-card:is([data-category="view"], [data-category="walk"], [data-category="architecture"]) { --tag: #30454e; --tag-text: #bcdeed; }
+[data-theme="dark"] .place-card:is([data-category="family"], [data-category="active"]) { --tag: #49422b; --tag-text: #efdb9d; }
+[data-theme="dark"] .place-footer { border-color: var(--line); }
+[data-theme="dark"] .place-add { background: #304338; border-color: #49614e; color: #d4e7ca; }
+[data-theme="dark"] .place-add:disabled { background: #29372d; color: #a7bca5; }

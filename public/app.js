@@ -5,7 +5,10 @@ import {
 import { mountGuide } from "./guide-view.js";
 import { budgetLabel, cityMatches, mapLink, placeById, PLACE_CATEGORIES, reviewLabel } from "./guide.js";
 
+import { initTheme } from "./theme.js";
+
 const KEY = "weekend-atlas/v1";
+initTheme();
 const byId = id => document.getElementById(id);
 const editor = byId("editor");
 const form = byId("edit-form");
