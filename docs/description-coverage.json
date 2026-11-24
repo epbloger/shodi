@@ -1,8 +1,8 @@
 {
   "catalogPlaces": 55716,
   "uniqueLabels": 47130,
-  "queriedLabels": 47030,
-  "failedLabels": 100,
+  "queriedLabels": 47130,
+  "failedLabels": 0,
   "unqueriedLabels": 0,
   "coveredPlaces": 659,
   "importedRecords": 711,
@@ -76,6 +76,7 @@
     65,
     66,
     67,
+    68,
     69,
     70,
     71,
@@ -481,9 +482,9 @@
     471
   ],
   "linkedChecked": 172,
-  "linkedAdded": 32,
+  "linkedAdded": 0,
   "linkedErrors": 0,
   "license": "CC0",
   "source": "https://www.wikidata.org/",
-  "generatedAt": "2026-11-24T20:07:57.531Z"
+  "generatedAt": "2026-11-24T20:30:57.498Z"
 }
