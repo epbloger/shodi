@@ -1,5 +1,6 @@
 // Verify all discovered brands, not just popular chains. Never execute remote SVG.
-import {writeFile} from "node:fs/promises";
+import {readFile,writeFile} from "node:fs/promises";
+import {priorAttempts,unresolvedFirst} from "./brand-import-progress.mjs";
 import {currentPlaces} from "../public/data/current-places.js";
 import {brandForPlace,brandMatches,brandNameKey,logoFiles,brandLicense,validBrandLogo} from "../public/brands.js";
 import {brandLogos as previous} from "../public/data/brand-logos.js";
@@ -13,6 +14,13 @@ for(const [id,name,kind,,,,status] of Object.values(currentPlaces).flat()){
  brands.get(b.key).branches++;
 }
 const out={},states={},candidates=new Map(),errors=[];
+let previousReport=null;
+try{previousReport=JSON.parse(await readFile("docs/brand-logo-coverage.json","utf8"));}
+catch(e){if(e.code!=="ENOENT")console.warn("Ignoring unreadable previous coverage report:",String(e));}
+const attempts=priorAttempts(previousReport,brands);
+const attempted=rows=>{const at=Date.now();for(const {brand} of rows)attempts.set(brand.key,at);};
+const previousStates=new Map((Array.isArray(previousReport?.brands)?previousReport.brands:[]).filter(row=>row&&typeof row.status==="string"&&!["verified","retained"].includes(row.status)).map(row=>[row.key,row.status]));
+
 const deadline=Date.now()+25*60000;
 let last=0;
 const blocked=new Map();
@@ -45,10 +53,11 @@ for(const {brand} of brands.values()){
  if(p&&validBrandLogo({...p,brandName:brand.name},brand)){out[brand.key]=p;states[brand.key]="retained";}
  if(brand.file)candidates.set(brand.key,[brand.file]);
 }
-const known=[...brands.values()].filter(x=>x.brand.qid&&!out[x.brand.key]);
+const known=unresolvedFirst([...brands.values()].filter(x=>x.brand.qid&&!out[x.brand.key]),attempts);
 for(let i=0;i<known.length;i+=40){
  if(!available("www.wikidata.org"))break;
  const batch=known.slice(i,i+40);
+ attempted(batch);
  try{
   const data=await entities(batch.map(x=>x.brand.qid));
   for(const {brand} of batch){
@@ -103,13 +112,14 @@ for(let i=0;i<files.length;i+=20){
 await importCandidates();
 // Batch exact labels and aliases via the public Wikidata query service.
 // This replaces hundreds of one-by-one search requests, while keeping ambiguity checks.
-const pending=[...brands.values()].filter(({brand})=>!brand.qid&&!out[brand.key]);
+const pending=unresolvedFirst([...brands.values()].filter(({brand})=>!brand.qid&&!out[brand.key]),attempts);
 for(let i=0;i<pending.length;i+=20){
  if(!available("query.wikidata.org")||!available("www.wikidata.org"))break;
  const batch=pending.slice(i,i+20);
+ attempted(batch);
  const labels=[...new Set(batch.flatMap(({brand})=>[brand.name,brandNameKey(brand.name)]))].filter(Boolean);
  const values=labels.flatMap(name=>["ru","en"].map(lang=>JSON.stringify(name)+"@"+lang)).join(" ");
- const query="SELECT DISTINCT ?item ?label WHERE { VALUES ?label { "+values+" } { ?item rdfs:label ?label } UNION { ?item skos:altLabel ?label } ?item wdt:P154 ?logo . }";
+ const query="SELECT DISTINCT ?item ?label WHERE { VALUES ?label { "+values+" } { ?item rdfs:label ?label } UNION { ?item skos:altLabel ?label } }";
  try{
   const result=await get("https://query.wikidata.org/sparql",false,{method:"POST",body:new URLSearchParams({query,format:"json"}),headers:{Accept:"application/sparql-results+json"}});
   if(!Array.isArray(result.results?.bindings))throw Error("Unexpected SPARQL response");
@@ -143,9 +153,9 @@ for(let i=0;i<pending.length;i+=20){
 // name service cannot consume the whole import budget before any image is saved.
 
 await importCandidates();
-for(const key of brands.keys())if(!states[key])states[key]="not-verified";
+for(const key of brands.keys())if(!states[key])states[key]=previousStates.get(key)||"not-verified";
 const counts={};for(const v of Object.values(states))counts[v]=(counts[v]||0)+1;
-const report={totalBrands:brands.size,brandedPlaces:[...brands.values()].reduce((n,b)=>n+b.branches,0),verifiedLogos:Object.keys(out).length,coveredPlaces:Object.keys(out).reduce((n,key)=>n+brands.get(key).branches,0),statusCounts:counts,errors,brands:[...brands.entries()].map(([key,{brand,branches}])=>({key,name:brand.name,branches,status:states[key],source:out[key]?.source})),generatedAt:new Date().toISOString()};
+const report={totalBrands:brands.size,brandedPlaces:[...brands.values()].reduce((n,b)=>n+b.branches,0),verifiedLogos:Object.keys(out).length,coveredPlaces:Object.keys(out).reduce((n,key)=>n+brands.get(key).branches,0),statusCounts:counts,errors,brands:[...brands.entries()].map(([key,{brand,branches}])=>({key,name:brand.name,branches,status:states[key],lastAttemptAt:attempts.has(key)?new Date(attempts.get(key)).toISOString():undefined,source:out[key]?.source})),generatedAt:new Date().toISOString()};
 await writeFile("public/data/brand-logos.js","// Generated verified Commons raster logos; see docs/photo-providers.md.\nexport const brandLogos = "+JSON.stringify(out)+";\n");
 await writeFile("docs/brand-logo-coverage.json",JSON.stringify(report,null,2)+"\n");
 console.log(JSON.stringify({...report,brands:undefined,errors:errors.slice(0,8)}));

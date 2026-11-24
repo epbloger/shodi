@@ -111,9 +111,9 @@ jobs:
           path: |
             public/data/brand-logos.js
             docs/brand-logo-coverage.json
-          key: shodi-brand-logos-v1-${{ hashFiles('public/data/current-places.js', 'scripts/import-brand-links.py', 'scripts/import-brand-logos.mjs', 'public/brands.js', 'public/photos.js') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: shodi-brand-logos-v2-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'public/brands.js', 'public/photos.js') }}-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
-            shodi-brand-logos-v1-${{ hashFiles('public/data/current-places.js', 'scripts/import-brand-links.py', 'scripts/import-brand-logos.mjs', 'public/brands.js', 'public/photos.js') }}-
+            shodi-brand-logos-v2-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'public/brands.js', 'public/photos.js') }}-
       - name: Verify and bundle licensed brand logo thumbnails
         run: |
           node --check scripts/import-brand-logos.mjs
@@ -126,6 +126,8 @@ jobs:
             public/data/brand-logos.js
             docs/brand-logo-coverage.json
           key: ${{ steps.logo-cache.outputs.cache-primary-key }}
+      - name: Measure actual offline catalog quality
+        run: node scripts/catalog-quality.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -135,6 +137,7 @@ jobs:
             docs/brand-coverage.json
             public/data/brand-logos.js
             docs/brand-logo-coverage.json
+            docs/catalog-quality.json
           if-no-files-found: error
           retention-days: 7
       - run: npm ci --ignore-scripts && npm test && npm run build
@@ -161,6 +164,7 @@ jobs:
           apk=android/app/build/outputs/apk/debug/app-debug.apk
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$apk"
           for doc in index about privacy terms consent licenses; do unzip -l "$apk" | grep "assets/$doc.html"; done
+          unzip -p "$apk" assets/index.html | cmp - dist/shodi.html
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='ru.moorkis.shodi.debug'"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump permissions "$apk" > android-permissions.txt
           if grep -E 'ACCESS_(FINE|COARSE)_LOCATION|com.google.android.gms.permission.AD_ID|READ_CONTACTS|READ_PHONE_STATE|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|RECORD_AUDIO|android.permission.CAMERA|QUERY_ALL_PACKAGES' android-permissions.txt; then
@@ -309,6 +313,7 @@ jobs:
           apk=android/app/build/outputs/apk/release/app-release.apk
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$apk"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='ru.moorkis.shodi'"
+          unzip -p "$apk" assets/index.html | cmp - dist/shodi.html
           mkdir -p android-release-output
           cp "$apk" android-release-output/shodi-2.0.0.apk
       - uses: actions/upload-artifact@v4
