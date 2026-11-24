@@ -175,20 +175,28 @@ export function catalogSource(cityId) {
   return currentCatalog && Object.hasOwn(currentPlaces, cityId) ? currentCatalog : null;
 }
 
+const freshCityCache = new Map();
+const freshIdCache = new Map();
+
 export function catalogPlacesForCity(cityId) {
   const city = citiesById.get(cityId);
   if (!city) return [];
   if (!catalogSource(cityId)) return placesForCity(cityId);
-  return currentPlaces[cityId].map(([id, name, kind, address, lat, lon]) => ({
+  if (freshCityCache.has(cityId)) return freshCityCache.get(cityId);
+  const places = currentPlaces[cityId].map(([id, name, kind, address, lat, lon]) => ({
     id, name, kind, area: address || city.label, address, city: city.label,
     description: PLACE_CATEGORIES[kind].name, lat, lon, budget: { type: "unknown" },
     source: currentCatalog.release,
   }));
+  freshCityCache.set(cityId, places);
+  for (const place of places) freshIdCache.set(place.id, place);
+  return places;
 }
 
 export function placeById(id) {
   const cityId = id.startsWith("ru-") ? id.slice(0, id.lastIndexOf("-")) : id.split("-")[0];
-  return catalogPlacesForCity(cityId).find(place => place.id === id) ?? placesForCity(cityId).find(place => place.id === id);
+  if (catalogSource(cityId)) catalogPlacesForCity(cityId);
+  return freshIdCache.get(id) ?? placesForCity(cityId).find(place => place.id === id);
 }
 
 export function findPlaces({ cityId, category = "all", query = "", legacy = false }) {

@@ -58,6 +58,14 @@ try {
     await page.locator("#guide-panel").waitFor({ state: "visible", timeout: 15000 });
     assert.ok(await page.locator(".place-add").count() > 0, "Catalog must contain places");
     assert.equal(await page.locator("#guide-city").inputValue(), "Санкт-Петербург");
+    const initialCount = await page.locator(".place-add").count();
+    assert.ok(initialCount <= 36, "Catalog must render at most one initial page");
+    if (await page.locator("#guide-more").isVisible()) {
+      await page.locator("#guide-more").click();
+      assert.ok(await page.locator(".place-add").count() > initialCount);
+    }
+    await page.locator("#guide-categories button[value=all]").click();
+    assert.equal(await page.locator(".place-add").count(), initialCount);
     const initialTheme = await page.locator("html").getAttribute("data-theme");
     const nextTheme = initialTheme === "dark" ? "light" : "dark";
     const originalBackground = await page.locator("html").evaluate(el => getComputedStyle(el).backgroundColor);

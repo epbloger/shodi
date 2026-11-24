@@ -275,3 +275,7 @@
 [data-theme="dark"] .place-footer { border-color: var(--line); }
 [data-theme="dark"] .place-add { background: #304338; border-color: #49614e; color: #d4e7ca; }
 [data-theme="dark"] .place-add:disabled { background: #29372d; color: #a7bca5; }
+
+.guide-pagination { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; margin: 16px 0; }
+.guide-pagination:has(> [hidden] + [hidden]) { display: none; }
+.guide-pagination .guide-price-note { margin: 0; }

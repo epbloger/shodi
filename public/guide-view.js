@@ -5,6 +5,7 @@ import {
 
 const byId = id => document.getElementById(id);
 const countLabel = new Intl.PluralRules("ru");
+const PAGE_SIZE = 36;
 
 export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   const cityInput = byId("guide-city");
@@ -20,6 +21,8 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   let city = cityById("spb");
   let category = "all";
   let selectedTarget;
+  let visibleLimit = PAGE_SIZE;
+  const more = byId("guide-more");
 
   const cityChoices = document.createDocumentFragment();
   for (const entry of cities) {
@@ -31,9 +34,13 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   options.append(cityChoices);
   cityInput.value = city.label;
 
-  function updateCategories() {
+  function updateCategories(allPlaces) {
+    const counts = new Map();
+    for (const place of allPlaces) counts.set(place.kind, (counts.get(place.kind) ?? 0) + 1);
     for (const button of categories.children) {
       button.setAttribute("aria-pressed", String(button.value === category));
+      const count = button.value === "all" ? allPlaces.length : (counts.get(button.value) ?? 0);
+      button.textContent = button.dataset.label + " · " + count;
     }
   }
 
@@ -41,10 +48,12 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "category-chip";
+    button.dataset.label = label;
     button.textContent = label;
     button.value = kind;
     button.addEventListener("click", () => {
       category = kind;
+      visibleLimit = PAGE_SIZE;
       render();
     });
     categories.append(button);
@@ -52,6 +61,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
 
   function render() {
     const places = findPlaces({ cityId: city.id, category, query: search.value });
+    const allPlaces = findPlaces({ cityId: city.id, query: search.value });
     const routes = getRoutes().filter(route => cityMatches(route.city, city.label));
     const routeId = selectedTarget ?? selectedRoute()?.id;
     target.replaceChildren(...routes.map(route => new Option(route.name, route.id)), new Option("Создать новый маршрут", ""));
@@ -63,13 +73,18 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     byId("guide-count").textContent = places.length + " " + suffix;
     byId("guide-empty").hidden = places.length !== 0;
     const noCatalog = !places.length && !findPlaces({ cityId: city.id }).length;
+    more.hidden = places.length <= visibleLimit;
+    more.textContent = "Показать ещё " + Math.min(PAGE_SIZE, Math.max(0, places.length - visibleLimit)) + " мест";
+    byId("guide-shown").hidden = places.length <= PAGE_SIZE;
+    byId("guide-shown").textContent = "Показано " + Math.min(visibleLimit, places.length) + " из " + places.length;
     byId("guide-empty-text").textContent = noCatalog
       ? "В подборке пока нет мест для этого города. Их можно поискать на карте."
       : "Нет мест по этим фильтрам.";
     byId("clear-filters").hidden = noCatalog;
     const cityMap = byId("city-map");
-    cityMap.hidden = !noCatalog;
-    cityMap.href = mapLink({ name: "Достопримечательности", city: city.label + " " + city.region });
+    cityMap.hidden = places.length !== 0;
+    const mapQuery = [category === "all" ? "Достопримечательности" : PLACE_CATEGORIES[category].label, search.value.trim()].filter(Boolean).join(" ");
+    cityMap.href = mapLink({ name: mapQuery, city: city.label + " " + city.region });
     const source = catalogSource(city.id);
     byId("guide-price-note").textContent = source
       ? "Источник: Overture Maps, выпуск " + source.release + ". Рейтинги и цены не предоставляются; часы работы уточняйте на карте."
@@ -77,10 +92,10 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         ? "Архивная подборка по отзывам 2023 года. Актуальные сведения проверьте на карте."
         : "Архивная редакционная подборка; цены и сведения не подтверждены на 2026 год. Уточните их на карте.";
     byId("current-attribution").hidden = !source;
-    updateCategories();
+    updateCategories(allPlaces);
 
     const fragment = document.createDocumentFragment();
-    for (const place of places) {
+    for (const place of places.slice(0, visibleLimit)) {
       const card = template.content.firstElementChild.cloneNode(true);
       const kind = PLACE_CATEGORIES[place.kind];
       card.dataset.category = place.kind;
@@ -95,7 +110,9 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
       const description = card.querySelector(".place-description");
       description.textContent = place.description;
       description.hidden = !place.description || place.description === kind.name;
-      card.querySelector(".place-budget").textContent = budgetLabel(place.budget);
+      const budget = card.querySelector(".place-budget");
+      budget.hidden = place.budget.type === "unknown";
+      budget.textContent = budget.hidden ? "" : budgetLabel(place.budget);
       const map = card.querySelector(".place-map");
       map.href = mapLink(place);
       map.setAttribute("aria-label", place.name + " на карте, откроется в новой вкладке");
@@ -130,6 +147,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
 
   function resetSearch() {
     category = "all";
+    visibleLimit = PAGE_SIZE;
     search.value = "";
     showFeedback("");
     render();
@@ -163,7 +181,13 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     render();
   });
   openButton.addEventListener("click", () => openRoute(target.value));
-  search.addEventListener("input", render);
+  search.addEventListener("input", () => { visibleLimit = PAGE_SIZE; render(); });
+  more.addEventListener("click", () => {
+    const firstNew = visibleLimit;
+    visibleLimit += PAGE_SIZE;
+    render();
+    grid.children[firstNew]?.querySelector(".place-map")?.focus();
+  });
   byId("clear-filters").addEventListener("click", () => {
     resetSearch();
     search.focus();
