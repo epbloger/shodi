@@ -193,7 +193,7 @@ export function catalogPlacesForCity(cityId) {
     const brand=brandForPlace(id,name,kind);
     return ({
     id, name, kind, area: address || city.label, address, city: city.label,
-    description: details?.text ?? catalogSummary({kind,address,city:city.label,brand}), descriptionSource: details?.source, descriptionKind: details ? "wikidata" : "catalog", photo: photoForItem(details?.qid) || bundledBrandLogo(brand), photoItem: details?.qid, brand, osmPhotoLink: osmPhotoLink(id), lat, lon, budget: { type: "unknown" },
+    description: details?.text ?? catalogSummary({id,kind,address,city:city.label,brand}), descriptionSource: details?.source, descriptionKind: details ? "wikidata" : "catalog", photo: photoForItem(details?.qid) || bundledBrandLogo(brand), photoItem: details?.qid, brand, osmPhotoLink: osmPhotoLink(id), lat, lon, budget: { type: "unknown" },
     source: currentCatalog.release, status: status ?? "unknown",
     });
   });

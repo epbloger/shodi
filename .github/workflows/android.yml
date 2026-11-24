@@ -104,6 +104,25 @@ jobs:
             public/data/place-brands.js
             docs/brand-coverage.json
           key: ${{ steps.brand-links-cache.outputs.cache-primary-key }}
+      - name: Restore precise place taxonomy
+        id: taxonomy-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: public/data/place-taxonomy.js
+          key: shodi-taxonomy-v1-${{ hashFiles('public/data/current-places.js', 'docs/current-catalog.json', 'scripts/import-place-taxonomy.py', 'scripts/import-brand-links.py') }}
+      - name: Import precise taxonomy from the exact Overture snapshot
+        if: steps.taxonomy-cache.outputs.cache-hit != 'true'
+        run: |
+          pip install duckdb==1.5.4
+          python scripts/import-place-taxonomy.py
+      - name: Validate precise place taxonomy
+        run: node scripts/validate-place-taxonomy.mjs
+      - name: Save precise place taxonomy
+        if: steps.taxonomy-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: public/data/place-taxonomy.js
+          key: ${{ steps.taxonomy-cache.outputs.cache-primary-key }}
       - name: Restore previously verified logos
         id: logo-cache
         uses: actions/cache/restore@v4
@@ -138,6 +157,7 @@ jobs:
             public/data/brand-logos.js
             docs/brand-logo-coverage.json
             docs/catalog-quality.json
+            public/data/place-taxonomy.js
           if-no-files-found: error
           retention-days: 7
       - run: npm ci --ignore-scripts && npm test && npm run build
@@ -287,8 +307,10 @@ jobs:
         with:
           name: shodi-brand-coverage
           path: .
-      - name: Validate the same brand data used by the tested APK
-        run: node scripts/validate-brand-data.mjs --logos
+      - name: Validate the same catalog data used by the tested APK
+        run: |
+          node scripts/validate-brand-data.mjs --logos
+          node scripts/validate-place-taxonomy.mjs
       - run: npm ci --ignore-scripts && npm test && npm run build
       - name: Assemble signed production APK
         env:

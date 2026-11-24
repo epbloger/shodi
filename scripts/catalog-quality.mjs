@@ -5,6 +5,7 @@ import {execFileSync} from "node:child_process";
 import {currentPlaces,currentCatalog} from "../public/data/current-places.js";
 import {cities,catalogPlacesForCity} from "../public/guide.js";
 import {bundledBrandLogo} from "../public/brands.js";
+import {hasSpecificType} from "../public/catalog-summary.js";
 const report=JSON.parse(await readFile("docs/brand-logo-coverage.json","utf8"));
 const rows=Object.values(currentPlaces).flat();
 const active=rows.filter(r=>!r[6]||["open","unknown"].includes(r[6]));
@@ -32,7 +33,7 @@ const quality={
  brandedPlaces:branded.length,placesWithAvailableBrandLogo:verified.length,brandedPlacesWithoutLogo:branded.length-verified.length,
  cardsDisplayingBundledLogo:logos.length,cardsDisplayingBundledPlacePhoto:photos.length,
  cardsWithBundledImage:logos.length+photos.length,cardsWithoutBundledImage:places.length-logos.length-photos.length,
- cardsWithVerifiedDescription:descriptions.length,cardsWithCatalogSummary:summaries.length,cardsWithAnyDescription:descriptions.length+summaries.length,cardsWithoutAnyDescription:places.length-descriptions.length-summaries.length,cardsWithoutVerifiedDescription:places.length-descriptions.length,
+ cardsWithVerifiedDescription:descriptions.length,cardsWithCatalogSummary:summaries.length,cardsWithSpecificCategorySummary:summaries.filter(p=>hasSpecificType(p.id,p.kind)).length,cardsWithAnyDescription:descriptions.length+summaries.length,cardsWithoutAnyDescription:places.length-descriptions.length-summaries.length,cardsWithoutVerifiedDescription:places.length-descriptions.length,
  cardsWithOsmPhotoReference:places.filter(p=>p.osmPhotoLink).length,
  cardsWithUnknownOpeningStatus:places.filter(p=>p.status==="unknown").length,
  brandStatusCounts:report.statusCounts,generatedAt:new Date().toISOString()
