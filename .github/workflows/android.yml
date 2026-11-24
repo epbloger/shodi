@@ -136,8 +136,12 @@ jobs:
         with:
           name: shodi-emulator-report
           path: |
+            android-consent.png
             android-about.png
             android-offline.png
+            android-failure.png
+            android-failure.xml
+            android-failure-log.txt
           retention-days: 7
   production:
     if: github.event_name == 'workflow_dispatch' && inputs.production && github.ref == 'refs/heads/main'
