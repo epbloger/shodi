@@ -3,6 +3,7 @@ import {osmPhotoLink} from "./osm-photo-links.js";
 import { photoForItem } from "./photos.js";
 import { descriptionForPlace } from "./descriptions.js";
 import { catalogSummary } from "./catalog-summary.js";
+import { wikiSummaryForPlace } from "./wiki-summary.js";
 import { russianCities } from "./data/cities.js";
 import { russianPlaces } from "./data/places.js";
 import { currentCatalog, currentPlaces } from "./data/current-places.js";
@@ -191,9 +192,11 @@ export function catalogPlacesForCity(cityId) {
   const places = currentPlaces[cityId].filter(row => !row[6] || ["open", "unknown"].includes(row[6])).map(([id, name, kind, address, lat, lon, status]) => {
     const details = descriptionForPlace(name, lat, lon);
     const brand=brandForPlace(id,name,kind);
+    const wiki=wikiSummaryForPlace(id,details,brand);
+    const best=wiki?.kind==="wikipedia-place"?wiki:details?{...details,kind:"wikidata"}:wiki;
     return ({
     id, name, kind, area: address || city.label, address, city: city.label,
-    description: details?.text ?? catalogSummary({id,kind,address,city:city.label,brand}), descriptionSource: details?.source, descriptionKind: details ? "wikidata" : "catalog", photo: photoForItem(details?.qid) || bundledBrandLogo(brand), photoItem: details?.qid, brand, osmPhotoLink: osmPhotoLink(id), lat, lon, budget: { type: "unknown" },
+    description: best?.text ?? catalogSummary({id,kind,address,city:city.label,brand}), descriptionSource: best?.source, descriptionKind: best?.kind ?? "catalog", descriptionLicense: best?.license, descriptionTitle: best?.title, photo: photoForItem(details?.qid) || bundledBrandLogo(brand), photoItem: details?.qid, brand, osmPhotoLink: osmPhotoLink(id), lat, lon, budget: { type: "unknown" },
     source: currentCatalog.release, status: status ?? "unknown",
     });
   });

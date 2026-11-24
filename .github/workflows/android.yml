@@ -145,6 +145,25 @@ jobs:
             public/data/brand-logos.js
             docs/brand-logo-coverage.json
           key: ${{ steps.logo-cache.outputs.cache-primary-key }}
+      - name: Restore Wikipedia descriptions
+        id: wiki-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            public/data/wiki-summaries.js
+            docs/wiki-summary-coverage.json
+          key: shodi-wiki-v1-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'scripts/import-wiki-summaries.mjs', 'public/wiki-summary.js') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            shodi-wiki-v1-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'scripts/import-wiki-summaries.mjs', 'public/wiki-summary.js') }}-
+      - name: Import licensed Wikipedia descriptions
+        run: node scripts/import-wiki-summaries.mjs
+      - name: Save Wikipedia progress
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            public/data/wiki-summaries.js
+            docs/wiki-summary-coverage.json
+          key: ${{ steps.wiki-cache.outputs.cache-primary-key }}
       - name: Measure actual offline catalog quality
         run: node scripts/catalog-quality.mjs
       - uses: actions/upload-artifact@v4
@@ -158,6 +177,8 @@ jobs:
             docs/brand-logo-coverage.json
             docs/catalog-quality.json
             public/data/place-taxonomy.js
+            public/data/wiki-summaries.js
+            docs/wiki-summary-coverage.json
           if-no-files-found: error
           retention-days: 7
       - run: npm ci --ignore-scripts && npm test && npm run build
