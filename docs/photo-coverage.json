@@ -1,11 +1,12 @@
 {
   "catalogPlaces": 55716,
-  "coveredPlaces": 0,
+  "coveredPlaces": 105,
   "candidateItems": 619,
-  "photos": 0,
-  "bytes": 0,
-  "attempts": 300,
-  "errors": 10,
+  "photos": 100,
+  "bytes": 2984458,
+  "attempts": 225,
+  "errors": 2,
+  "rejectedLicense": 123,
   "source": "Wikimedia Commons",
-  "generatedAt": "2026-11-24T17:08:12.112Z"
+  "generatedAt": "2026-11-24T17:19:32.481Z"
 }
