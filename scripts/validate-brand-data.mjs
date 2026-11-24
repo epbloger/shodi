@@ -39,8 +39,25 @@ if(process.argv.includes("--logos")){
  }
  assert.ok(Object.keys(logos).length>0);
  assert.equal(counts.totalBrands,map.size);
+ assert.equal(counts.brandedPlaces,[...map.values()].reduce((sum,row)=>sum+row.branches,0));
  assert.equal(counts.verifiedLogos,Object.keys(logos).length);
  assert.equal(counts.coveredPlaces,covered);
+ assert.ok(Array.isArray(counts.brands)&&counts.brands.length===map.size,"Incomplete per-brand report");
+ const reported=new Set(),statusCounts={};
+ for(const row of counts.brands){
+  const expected=map.get(row.key);
+  assert.ok(expected&&!reported.has(row.key),"Unknown or duplicate reported brand: "+row.key);
+  reported.add(row.key);
+  assert.equal(row.name,expected.brand.name);
+  assert.equal(row.branches,expected.branches);
+  assert.ok(typeof row.status==="string"&&row.status.length>0);
+  const logo=Object.hasOwn(logos,row.key)?logos[row.key]:null;
+  assert.equal(["verified","retained"].includes(row.status),Boolean(logo),"Logo status mismatch: "+row.key);
+  assert.equal(row.source,logo?.source,"Logo source mismatch: "+row.key);
+  statusCounts[row.status]=(statusCounts[row.status]||0)+1;
+ }
+ assert.deepEqual(counts.statusCounts,statusCounts);
+ console.log("Unverified brands:",map.size-Object.keys(logos).length,"; uncovered branded places:",counts.brandedPlaces-covered);
  console.log("Verified logo manifest:",counts.verifiedLogos,"logos,",covered,"places");
 }
 console.log("Verified brand link manifest:",Object.keys(links).length,"places");
