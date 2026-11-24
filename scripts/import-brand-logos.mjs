@@ -1,7 +1,7 @@
 // Verify all discovered brands, not just popular chains. Never execute remote SVG.
 import {readFile,writeFile} from "node:fs/promises";
 import {thumbnailUrl} from "../public/commons-thumbnail.js";
-import {brandLabelVariants} from "./catalog-match-helpers.mjs";
+import {brandLabelVariants,exactLogoTitle} from "./catalog-match-helpers.mjs";
 import {priorAttempts,unresolvedFirst} from "./brand-import-progress.mjs";
 import {currentPlaces} from "../public/data/current-places.js";
 import {brandForPlace,brandMatches,brandNameKey,logoFiles,brandLicense,validBrandLogo} from "../public/brands.js";
@@ -20,6 +20,8 @@ let previousReport=null;
 try{previousReport=JSON.parse(await readFile("docs/brand-logo-coverage.json","utf8"));}
 catch(e){if(e.code!=="ENOENT")console.warn("Ignoring unreadable previous coverage report:",String(e));}
 const attempts=priorAttempts(previousReport,brands);
+const directAttempts=new Map((Array.isArray(previousReport?.brands)?previousReport.brands:[]).filter(r=>brands.has(r.key)&&Number.isFinite(Date.parse(r.directAttemptAt))).map(r=>[r.key,Date.parse(r.directAttemptAt)]));
+const resolvedQids=new Map([...brands.values()].filter(x=>x.brand.qid).map(x=>[x.brand.key,x.brand.qid]));
 const attempted=rows=>{const at=Date.now();for(const {brand} of rows)attempts.set(brand.key,at);};
 const previousStates=new Map((Array.isArray(previousReport?.brands)?previousReport.brands:[]).filter(row=>row&&typeof row.status==="string"&&!["verified","retained"].includes(row.status)).map(row=>[row.key,row.status]));
 
@@ -150,7 +152,9 @@ for(let i=0;i<pending.length;i+=20){
    const data=await entities(subset);
    for(const {brand,id} of selected.filter(x=>subset.includes(x.id))){
     const entity=data.entities?.[id];
-    const files=brandMatches(entity,brand)?logoFiles(entity):[];
+    const exact=brandMatches(entity,brand);
+    if(exact)resolvedQids.set(brand.key,id);
+    const files=exact?logoFiles(entity):[];
     if(files.length)candidates.set(brand.key,files);
     else states[brand.key]="no-verified-logo-claim";
    }
@@ -161,9 +165,33 @@ for(let i=0;i<pending.length;i+=20){
 // name service cannot consume the whole import budget before any image is saved.
 
 await importCandidates();
+// Independent structured Commons search for brands without a usable P154.
+// Require both a verified entity link and a standalone exact-name logo file.
+candidates.clear();
+let directChecked=0,directCandidates=0;
+const direct=unresolvedFirst([...brands.values()].filter(x=>resolvedQids.has(x.brand.key)&&!out[x.brand.key]),directAttempts);
+for(const {brand} of direct.slice(0,120)){
+ if(!available("commons.wikimedia.org"))break;
+ if(Date.now()-(directAttempts.get(brand.key)||0)<7*86400000)continue;
+ const qid=resolvedQids.get(brand.key);
+ try{
+  const results=[];
+  for(const term of ["logo","логотип"]){
+   const data=await api("commons.wikimedia.org",{action:"query",list:"search",srnamespace:"6",srlimit:"30",srsearch:"haswbstatement:P180="+qid+" intitle:"+term,formatversion:"2"});
+   if(!Array.isArray(data.query?.search))throw Error("Unexpected Commons structured search response");
+   for(const row of data.query.search)if(exactLogoTitle(row.title,brand.name)&&Number.isSafeInteger(row.pageid)&&row.pageid>0)results.push(row);
+  }
+  directAttempts.set(brand.key,Date.now());
+  directChecked++;
+  const unique=[...new Map(results.map(row=>[row.pageid,row])).values()];
+  // Multiple distinct designs may be historical or ambiguous.
+  if(unique.length===1){candidates.set(brand.key,[unique[0].title.slice(5)]);directCandidates++;}
+ }catch(e){recordError("commons-structured",e);}
+}
+await importCandidates();
 for(const key of brands.keys())if(!states[key])states[key]=previousStates.get(key)||"not-verified";
 const counts={};for(const v of Object.values(states))counts[v]=(counts[v]||0)+1;
-const report={totalBrands:brands.size,brandedPlaces:[...brands.values()].reduce((n,b)=>n+b.branches,0),verifiedLogos:Object.keys(out).length,coveredPlaces:Object.keys(out).reduce((n,key)=>n+brands.get(key).branches,0),statusCounts:counts,errors,brands:[...brands.entries()].map(([key,{brand,branches}])=>({key,name:brand.name,branches,status:states[key],lastAttemptAt:attempts.has(key)?new Date(attempts.get(key)).toISOString():undefined,source:out[key]?.source})),generatedAt:new Date().toISOString()};
+const report={totalBrands:brands.size,brandedPlaces:[...brands.values()].reduce((n,b)=>n+b.branches,0),verifiedLogos:Object.keys(out).length,coveredPlaces:Object.keys(out).reduce((n,key)=>n+brands.get(key).branches,0),statusCounts:counts,directChecked,directCandidates,errors,brands:[...brands.entries()].map(([key,{brand,branches}])=>({key,name:brand.name,branches,status:states[key],lastAttemptAt:attempts.has(key)?new Date(attempts.get(key)).toISOString():undefined,directAttemptAt:directAttempts.has(key)?new Date(directAttempts.get(key)).toISOString():undefined,source:out[key]?.source})),generatedAt:new Date().toISOString()};
 await writeFile("public/data/brand-logos.js","// Generated verified Commons raster logos; see docs/photo-providers.md.\nexport const brandLogos = "+JSON.stringify(out)+";\n");
 await writeFile("docs/brand-logo-coverage.json",JSON.stringify(report,null,2)+"\n");
 console.log(JSON.stringify({...report,brands:undefined,errors:errors.slice(0,8)}));

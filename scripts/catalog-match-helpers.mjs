@@ -17,3 +17,12 @@ export function linkedDescription(entity,place,qid){
  if(!nearby.length)return null;
  return [place.name,nearby[0].latitude,nearby[0].longitude,description.trim().replace(/\s+/g," "),qid];
 }
+
+// A depicts match alone may be a shop photograph; require the exact logo title.
+export function exactLogoTitle(title,brandName){
+ if(typeof title!=="string"||!/^File:/i.test(title)||!/\.(svg|png|jpe?g)$/i.test(title))return false;
+ const stem=title.slice(5).replace(/\.(svg|png|jpe?g)$/i,"").replaceAll("_"," ").trim();
+ if(!/(?:^|[\s-])(?:logo|wordmark|логотип)(?:$|[\s-])/iu.test(stem))return false;
+ const clean=s=>String(s).normalize("NFKC").toLocaleLowerCase("ru").replaceAll("ё","е").replace(/[«»"'’“”]/g,"").replace(/[‐–—-]/g," ").replace(/\s+/g," ").trim();
+ return clean(stem.replace(/(?:^|[\s-])(?:logo|wordmark|логотип)(?=$|[\s-])/giu," "))===clean(brandName);
+}

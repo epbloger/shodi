@@ -37,3 +37,6 @@ Mapillary: https://help.mapillary.com/hc/en-us/articles/115001770409-CC-BY-SA-li
 
 ### Дополнительное точное сопоставление
 Поиск брендов учитывает варианты регистра и пунктуации, не отменяя проверку неоднозначности и P154. Импорт описаний хранит контрольный SHA списка названий и номера успешных пакетов; ошибочные и непройденные пакеты повторяются. Дополнительные QID из OSM проверяются по точному имени, координатам Wikidata и русскому описанию. Ссылки без подтвержденных данных не считаются покрытием.
+
+### Independent Commons search and resumable OSM coverage
+When P154 is missing, search Commons structured depicts (P180) for a verified brand QID plus a standalone exact-name logo title. Only one distinct matching file is accepted, and the same license, thumbnail and offline decoding checks apply. Successful searches are not repeated for seven days. OSM scanning now persists successful cells against the exact catalog digest; failed cells remain eligible for later imports. The offline place-photo budget is 500 files / 24 MB decoded bytes, not a promise that this many eligible photos exist. Catalog quality reports identify the actual checked-out commit, including reusable workflows.

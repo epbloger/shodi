@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: shodi-osm-photo-links
   cancel-in-progress: false
@@ -86,3 +87,4 @@ jobs:
       checkout_ref: ${{ needs.integrate.outputs.revision }}
     permissions:
       contents: read
+      actions: read

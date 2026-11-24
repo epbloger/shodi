@@ -1,6 +1,7 @@
 // Measure the actual catalog consumed by the application, not only source links.
 import assert from "node:assert/strict";
 import {writeFile,readFile} from "node:fs/promises";
+import {execFileSync} from "node:child_process";
 import {currentPlaces,currentCatalog} from "../public/data/current-places.js";
 import {cities,catalogPlacesForCity} from "../public/guide.js";
 import {bundledBrandLogo} from "../public/brands.js";
@@ -23,7 +24,7 @@ assert.equal(branded.length,report.brandedPlaces);
 assert.equal(verified.length,report.coveredPlaces);
 assert.equal(logos.length+photos.length,places.filter(p=>p.photo).length);
 const quality={
- revision:process.env.GITHUB_SHA||"local",release:currentCatalog.release,
+ revision:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),release:currentCatalog.release,
  catalogPlaces:rows.length,visiblePlaces:places.length,citiesWithPlaces:Object.keys(currentPlaces).length,
  recognizedBrands:distinct.size,verifiedBrandLogos:report.verifiedLogos,missingBrandLogos:distinct.size-report.verifiedLogos,
  brandedPlaces:branded.length,placesWithAvailableBrandLogo:verified.length,brandedPlacesWithoutLogo:branded.length-verified.length,

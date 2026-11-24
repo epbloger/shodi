@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {brandLabelVariants,linkedDescription} from "../scripts/catalog-match-helpers.mjs";
+import {brandLabelVariants,linkedDescription,exactLogoTitle} from "../scripts/catalog-match-helpers.mjs";
 test("exact brand lookup includes original, lower, title and uppercase spelling",()=>{
  assert.deepEqual(brandLabelVariants("кофе лайк"),["кофе лайк","Кофе Лайк","КОФЕ ЛАЙК"]);
  assert.ok(brandLabelVariants("coffee-like").includes("Coffee-Like"));
@@ -15,4 +15,13 @@ test("OSM-linked description requires verified QID, exact label, earth coordinat
  assert.equal(linkedDescription(entity,{...p,name:"Другой музей"},"Q123"),null);
  assert.equal(linkedDescription({...entity,descriptions:{en:{value:"Museum"}}},p,"Q123"),null);
  assert.equal(linkedDescription({...entity,claims:{}},p,"Q123"),null);
+});
+
+test("direct Commons candidate must be a standalone logo with the exact brand name",()=>{
+ assert.equal(exactLogoTitle("File:Coffee Like logo.svg","Coffee Like"),true);
+ assert.equal(exactLogoTitle("File:Логотип Ростикс.png","Ростикс"),true);
+ assert.equal(exactLogoTitle("File:Coffee Like shop and logo.jpg","Coffee Like"),false);
+ assert.equal(exactLogoTitle("File:Other Coffee logo.svg","Coffee Like"),false);
+ assert.equal(exactLogoTitle("File:Coffee Like logo 2010.svg","Coffee Like"),false);
+ assert.equal(exactLogoTitle("File:Coffee Like.jpg","Coffee Like"),false);
 });
