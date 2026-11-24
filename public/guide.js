@@ -1,3 +1,4 @@
+import {osmPhotoLink} from "./osm-photo-links.js";
 import { photoForItem } from "./photos.js";
 import { descriptionForPlace } from "./descriptions.js";
 import { russianCities } from "./data/cities.js";
@@ -189,7 +190,7 @@ export function catalogPlacesForCity(cityId) {
     const details = descriptionForPlace(name, lat, lon);
     return ({
     id, name, kind, area: address || city.label, address, city: city.label,
-    description: details?.text ?? "", descriptionSource: details?.source, photo: photoForItem(details?.qid), photoItem: details?.qid, lat, lon, budget: { type: "unknown" },
+    description: details?.text ?? "", descriptionSource: details?.source, photo: photoForItem(details?.qid), photoItem: details?.qid, osmPhotoLink: osmPhotoLink(id), lat, lon, budget: { type: "unknown" },
     source: currentCatalog.release, status: status ?? "unknown",
     });
   });

@@ -59,9 +59,37 @@ export function thumbnailUrl(value){
     return u.href;
   }catch{return null;}
 }
+async function getCommonsPhoto(filename){
+  if(typeof filename!=="string"||filename.length>350||!/\.(jpe?g|png)$/i.test(filename))return null;
+  const result=await request("commons.wikimedia.org",{action:"query",titles:"File:"+filename,prop:"imageinfo",iiprop:"url|mime|extmetadata",iiurlwidth:"330",formatversion:"2"});
+  const page=result.query?.pages?.[0],info=page?.imageinfo?.[0];
+  const license=unrestrictedPhotoLicense(info?.extmetadata);
+  const author=String(info?.extmetadata?.Artist?.value||"").replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();
+  const url=thumbnailUrl(info?.thumburl);
+  if(!license||!url||!author||author.length>500||typeof page.title!=="string")return null;
+  const response=await fetch(url,{credentials:"omit",referrerPolicy:"no-referrer",redirect:"error",signal:AbortSignal.timeout(12000)});
+  if(response.status===429){cooldown=Date.now()+60000;throw Error("Thumbnail rate limit");}
+  if(!response.ok)return null;
+  const type=response.headers.get("content-type")?.split(";")[0];
+  if(!["image/jpeg","image/png"].includes(type))return null;
+  const reader=response.body?.getReader();if(!reader)return null;
+  const chunks=[];let size=0;
+  try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>95000)throw Error("Thumbnail exceeds size budget");chunks.push(value);}}finally{await reader.cancel().catch(()=>{});}
+  const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
+  if(type==="image/jpeg"&&!(bytes[0]===255&&bytes[1]===216&&bytes[2]===255))return null;
+  if(type==="image/png"&&![137,80,78,71,13,10,26,10].every((n,i)=>bytes[i]===n))return null;
+  let binary="";for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
+  const photo={data:"data:"+type+";base64,"+btoa(binary),author,title:page.title,license:license.name,licenseUrl:license.url,source:"https://commons.wikimedia.org/wiki/"+encodeURIComponent(page.title.replaceAll(" ","_")).replace(/^File%3A/,"File:")};
+  if(validatePhoto(photo))return photo;
+  return null;
+}
 async function lookup(place){
+  for(const file of place.osmPhotoLink?.files||[]){
+    const photo=await getCommonsPhoto(file);
+    if(photo)return {...photo,osmSource:place.osmPhotoLink.osm[0]};
+  }
   let ids=[];
-  if(QID.test(place.photoItem||""))ids=[place.photoItem];
+  if(QID.test(place.photoItem||place.osmPhotoLink?.qid||""))ids=[place.photoItem||place.osmPhotoLink.qid];
   else {
     const search=await request("www.wikidata.org",{action:"wbsearchentities",search:place.name,language:"ru",uselang:"ru",type:"item",limit:"8"});
     ids=[...new Set((search.search||[]).map(x=>x.id).filter(id=>QID.test(id)))];
@@ -74,26 +102,8 @@ async function lookup(place){
   for(const claim of claims.filter(x=>x.rank!=="deprecated").sort((a,b)=>Number(b.rank==="preferred")-Number(a.rank==="preferred")).slice(0,2)){
     const filename=claim.mainsnak?.datavalue?.value;
     if(typeof filename!=="string"||filename.length>350||!/\.jpe?g$|\.png$|\.webp$/i.test(filename))continue;
-    const result=await request("commons.wikimedia.org",{action:"query",titles:"File:"+filename,prop:"imageinfo",iiprop:"url|mime|extmetadata",iiurlwidth:"330",formatversion:"2"});
-    const page=result.query?.pages?.[0],info=page?.imageinfo?.[0];
-    const license=unrestrictedPhotoLicense(info?.extmetadata);
-    const author=String(info?.extmetadata?.Artist?.value||"").replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();
-    const url=thumbnailUrl(info?.thumburl);
-    if(!license||!url||!author||author.length>500||typeof page.title!=="string")continue;
-    const response=await fetch(url,{credentials:"omit",referrerPolicy:"no-referrer",redirect:"error",signal:AbortSignal.timeout(12000)});
-    if(response.status===429){cooldown=Date.now()+60000;throw Error("Thumbnail rate limit");}
-    if(!response.ok)continue;
-    const type=response.headers.get("content-type")?.split(";")[0];
-    if(!["image/jpeg","image/png"].includes(type))continue;
-    const reader=response.body?.getReader();if(!reader)continue;
-    const chunks=[];let size=0;
-    try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>95000)throw Error("Thumbnail exceeds size budget");chunks.push(value);}}finally{await reader.cancel().catch(()=>{});}
-    const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
-    if(type==="image/jpeg"&&!(bytes[0]===255&&bytes[1]===216&&bytes[2]===255))continue;
-    if(type==="image/png"&&![137,80,78,71,13,10,26,10].every((n,i)=>bytes[i]===n))continue;
-    let binary="";for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
-    const photo={data:"data:"+type+";base64,"+btoa(binary),author,title:page.title,license:license.name,licenseUrl:license.url,source:"https://commons.wikimedia.org/wiki/"+encodeURIComponent(page.title.replaceAll(" ","_")).replace(/^File%3A/,"File:")};
-    if(validatePhoto(photo))return photo;
+    const photo=await getCommonsPhoto(filename);
+    if(photo)return photo;
   }
   return null;
 }

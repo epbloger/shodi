@@ -310,3 +310,10 @@
 .place-photo img{display:block;width:100%;height:auto;aspect-ratio:8/5;object-fit:contain;border-radius:12px;background:var(--tag);}
 .place-photo figcaption{font-size:.67rem;line-height:1.45;color:var(--muted);margin-top:5px;overflow-wrap:anywhere;}
 .place-photo a{color:inherit;text-decoration:underline;}
+
+.place-cover{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:105px;aspect-ratio:3/1;margin:12px 0 4px;border-radius:12px;background:linear-gradient(125deg,var(--tag),var(--paper));color:var(--tag-text);border:1px solid var(--line);text-align:center;padding:8px;}
+.place-cover[hidden]{display:none;}
+.place-cover::before,.place-cover::after{content:"";position:absolute;z-index:-1;width:130px;height:130px;border:1px solid currentColor;border-radius:50%;opacity:.12;}
+.place-cover::before{left:-36px;top:-60px;}.place-cover::after{right:-28px;bottom:-70px;}
+.place-cover .icon{width:32px;height:32px;stroke-width:1.5;}.place-cover span{font-size:.82rem;font-weight:800;}.place-cover small{font-size:.68rem;opacity:.85;}
+.place-photo img{object-fit:cover;}

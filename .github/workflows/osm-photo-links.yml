@@ -1,0 +1,88 @@
+name: Import OpenStreetMap photo links
+on:
+  push:
+    branches: [android-v2]
+    paths: ['scripts/import-osm-photo-links.mjs','.github/workflows/osm-photo-links.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: shodi-osm-photo-links
+  cancel-in-progress: false
+jobs:
+  import:
+    if: github.ref == 'refs/heads/android-v2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: node scripts/import-osm-photo-links.mjs
+      - run: npm ci --ignore-scripts && npm test && npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-osm-photo-links
+          path: |
+            public/data/osm-photo-links.js
+            docs/osm-photo-coverage.json
+          if-no-files-found: error
+  integrate:
+    needs: import
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      revision: ${{ steps.commit.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: android-v2
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-osm-photo-links
+          path: osm-snapshot
+      - id: commit
+        run: |
+          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js public/data/osm-photo-links.js public/osm-photo-links.js scripts/import-osm-photo-links.mjs
+          node --input-type=module <<'JS'
+          import {readFile,writeFile} from "node:fs/promises";
+          import {currentPlaces} from "./public/data/current-places.js";
+          import {commonsFile} from "./public/osm-photo-links.js";
+          const raw=await readFile("osm-snapshot/public/data/osm-photo-links.js","utf8");
+          const match=/^\/\/[^\n]*\nexport const osmPhotoLinks = (\{[\s\S]*\});\n?$/.exec(raw);
+          if(!match)throw Error("Malformed OSM link manifest");
+          const links=JSON.parse(match[1]);
+          const ids=new Set(Object.values(currentPlaces).flat().map(p=>p[0]));
+          const entries=Object.entries(links);
+          if(!entries.length||entries.length>ids.size||entries.some(([id,r])=>!ids.has(id)||!r||!Array.isArray(r.files)||r.files.length>2||r.files.some(n=>typeof n!=="string"||commonsFile("File:"+n)!==n)||r.qid!==null&&!/^Q[1-9]\d*$/.test(r.qid)||!r.files.length&&!r.qid||!Array.isArray(r.osm)||!r.osm.length||r.osm.some(x=>!/^(node|way|relation)\/[1-9]\d*$/.test(x))))throw Error("Invalid OSM photo link records");
+          const report=JSON.parse(await readFile("osm-snapshot/docs/osm-photo-coverage.json","utf8"));
+          if(report.matchedPlaces!==entries.length||report.catalogPlaces!==ids.size||report.license!=="ODbL-1.0")throw Error("Invalid OSM coverage report");
+          await writeFile("public/data/osm-photo-links.js","// OpenStreetMap contributors, ODbL 1.0. Separate photo-link database; see docs/photo-providers.md.\nexport const osmPhotoLinks = "+JSON.stringify(links)+";\n");
+          await writeFile("docs/osm-photo-coverage.json",JSON.stringify(report,null,2)+"\n");
+          JS
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+          git add public/data/osm-photo-links.js docs/osm-photo-coverage.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "data(photos): integrate ODbL photo links"
+            git push origin HEAD:android-v2
+          fi
+          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  verify-apk:
+    needs: integrate
+    uses: ./.github/workflows/android.yml
+    with:
+      checkout_ref: ${{ needs.integrate.outputs.revision }}
+    permissions:
+      contents: read

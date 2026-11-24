@@ -133,6 +133,9 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         source.textContent = "Источник описания";
         description.append(document.createElement("br"), source);
       }
+      const cover = card.querySelector(".place-cover");
+      cover.querySelector("use").setAttribute("href","#i-"+kind.icon);
+      cover.querySelector("span").textContent=kind.name;
       const renderPhoto = photo => {
         const figure = card.querySelector(".place-photo");
         const image = figure.querySelector("img");
@@ -142,8 +145,10 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
           a.target="_blank"; a.rel="noopener noreferrer"; return a;
         };
         image.alt = place.name;
-        image.addEventListener("error", () => { figure.hidden = true; }, {once:true});
+        image.addEventListener("error", () => { figure.hidden = true; cover.hidden = false; }, {once:true});
         caption.replaceChildren(link(photo.source,photo.author+" · Wikimedia Commons")," · ",link(photo.licenseUrl,photo.license)," · уменьшенная копия");
+        if(typeof photo.osmSource==="string"&&/^(node|way|relation)\/[1-9]\d*$/.test(photo.osmSource))caption.append(" · ",link("https://www.openstreetmap.org/"+photo.osmSource,"© OpenStreetMap contributors"));
+        cover.hidden = true;
         image.src = photo.data;
         figure.hidden = false;
       };
