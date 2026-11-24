@@ -278,6 +278,13 @@ jobs:
         with:
           packages: "platform-tools platforms;android-35 build-tools;35.0.0"
           log-accepted-android-sdk-licenses: false
+      - name: Restore the verified brand assets from this workflow run
+        uses: actions/download-artifact@v4
+        with:
+          name: shodi-brand-coverage
+          path: .
+      - name: Validate the same brand data used by the tested APK
+        run: node scripts/validate-brand-data.mjs --logos
       - run: npm ci --ignore-scripts && npm test && npm run build
       - name: Assemble signed production APK
         env:
