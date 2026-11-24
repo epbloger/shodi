@@ -317,3 +317,5 @@
 .place-cover::before{left:-36px;top:-60px;}.place-cover::after{right:-28px;bottom:-70px;}
 .place-cover .icon{width:32px;height:32px;stroke-width:1.5;}.place-cover span{font-size:.82rem;font-weight:800;}.place-cover small{font-size:.68rem;opacity:.85;}
 .place-photo img{object-fit:cover;}
+
+.place-photo.place-brand-logo img{object-fit:contain;background:#fff;padding:14px;aspect-ratio:3/2;}

@@ -50,6 +50,21 @@ jobs:
         with:
           packages: "platform-tools platforms;android-35 build-tools;35.0.0"
           log-accepted-android-sdk-licenses: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Import all brand links from the exact catalog snapshot
+        run: |
+          pip install duckdb==1.5.4
+          python scripts/import-brand-links.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-brand-coverage
+          path: |
+            public/data/place-brands.js
+            docs/brand-coverage.json
+          if-no-files-found: error
+          retention-days: 7
       - run: npm ci --ignore-scripts && npm test && npm run build
       - name: Browser regression tests
         run: |

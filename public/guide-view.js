@@ -136,6 +136,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
       const cover = card.querySelector(".place-cover");
       cover.querySelector("use").setAttribute("href","#i-"+kind.icon);
       cover.querySelector("span").textContent=kind.name;
+      if(place.brand){cover.querySelector("span").textContent=place.brand.name;cover.querySelector("small").textContent="Бренд · фото пока нет";}
       const renderPhoto = photo => {
         const figure = card.querySelector(".place-photo");
         const image = figure.querySelector("img");
@@ -144,7 +145,8 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
           const a = document.createElement("a"); a.href=url; a.textContent=text;
           a.target="_blank"; a.rel="noopener noreferrer"; return a;
         };
-        image.alt = photo.nearby === true ? "Окрестности: "+place.name : place.name;
+        figure.classList.toggle("place-brand-logo",photo.brandLogo===true);
+        image.alt = photo.brandLogo===true ? "Логотип "+photo.brandName : photo.nearby === true ? "Окрестности: "+place.name : place.name;
         image.addEventListener("error", () => { figure.hidden = true; cover.hidden = false; }, {once:true});
         caption.replaceChildren(link(photo.source,photo.provider==="kartaview"?photo.author:photo.author+" · Wikimedia Commons")," · ",link(photo.licenseUrl,photo.license)," · уменьшенная копия");
         if(photo.provider==="kartaview"){
@@ -152,6 +154,11 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
           if(photo.captureDate)caption.append(" · "+photo.captureDate);
         }
         if(typeof photo.osmSource==="string"&&/^(node|way|relation)\/[1-9]\d*$/.test(photo.osmSource))caption.append(" · ",link("https://www.openstreetmap.org/"+photo.osmSource,"© OpenStreetMap contributors"));
+        if(photo.brandLogo===true){
+          const note=document.createElement("strong");
+          note.textContent="Логотип бренда · "+photo.brandName;
+          caption.prepend(note,document.createElement("br"));
+        }
         if(photo.nearby===true) {
           const note=document.createElement("strong");
           note.textContent="Фото рядом с местом (не самого объекта)"+(Number.isInteger(photo.nearbyMeters)&&photo.nearbyMeters>=0&&photo.nearbyMeters<=100?" · около "+photo.nearbyMeters+" м":"");

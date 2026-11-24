@@ -1,3 +1,4 @@
+import {brandMatches,logoFiles,brandLicense,validBrandLogo} from "./brands.js";
 import {KARTA_API,kartaCandidates,kartaRecord,validKartaPhoto} from "./kartaview-photos.js";
 import {validatePhoto,unrestrictedPhotoLicense} from "./photos.js";
 const ORIGIN="https://appassets.androidplatform.net";
@@ -76,19 +77,60 @@ async function readThumbnail(url,provider){
   let binary="";for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
   return "data:"+type+";base64,"+btoa(binary);
 }
-async function getCommonsPhoto(filename){
-  if(typeof filename!=="string"||filename.length>350||!/\.(jpe?g|png)$/i.test(filename))return null;
+async function getCommonsPhoto(filename,brand=null){
+  if(typeof filename!=="string"||filename.length>350||!(brand?/\.(svg|jpe?g|png)$/i:/\.(jpe?g|png)$/i).test(filename))return null;
   const result=await request("commons.wikimedia.org",{action:"query",titles:"File:"+filename,prop:"imageinfo",iiprop:"url|mime|extmetadata",iiurlwidth:"330",formatversion:"2"});
   const page=result.query?.pages?.[0],info=page?.imageinfo?.[0];
-  const license=unrestrictedPhotoLicense(info?.extmetadata);
-  const author=String(info?.extmetadata?.Artist?.value||"").replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();
+  const license=brand?brandLicense(info?.extmetadata):unrestrictedPhotoLicense(info?.extmetadata);
+  const author=String(info?.extmetadata?.Artist?.value||(brand&&license?.name==="Public domain"?"Автор не указан":"")).replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();
   const url=thumbnailUrl(info?.thumburl);
   if(!license||!url||!author||author.length>500||typeof page.title!=="string")return null;
   const data=await readThumbnail(url,"commons");
   if(!data)return null;
   const photo={data,author,title:page.title,license:license.name,licenseUrl:license.url,source:"https://commons.wikimedia.org/wiki/"+encodeURIComponent(page.title.replaceAll(" ","_")).replace(/^File%3A/,"File:")};
+  if(brand){const logo={...photo,brandLogo:true,brandName:brand.name,brandKey:brand.key};return validBrandLogo(logo,brand)?logo:null;}
   if(validatePhoto(photo))return photo;
   return null;
+}
+// Store one logo per brand, independently of the branch and location.
+const brandMemory=new Map(),brandMiss=new Map();
+const brandCacheId=brand=>"brand:"+brand.key;
+async function readBrand(brand){
+ if(!brand)return null;
+ const mem=brandMemory.get(brand.key);
+ if(mem&&validBrandLogo(mem,brand))return mem;
+ const saved=await cacheRead(brandCacheId(brand));
+ if(saved&&validBrandLogo(saved.photo,brand)&&(!navigator.onLine||Date.now()-saved.at<CACHE_TTL))return saved.photo;
+ return null;
+}
+async function lookupBrand(brand){
+ if(!brand)return null;
+ const cached=await readBrand(brand);if(cached)return cached;
+ if(Date.now()<cooldown||(brandMiss.get(brand.key)||0)>Date.now())return null;
+ let files=brand.file?[brand.file]:[];
+ try{
+   if(!files.length){
+     let ids=brand.qid?[brand.qid]:[];
+     if(!ids.length){const result=await request("www.wikidata.org",{action:"wbsearchentities",search:brand.name,language:"ru",uselang:"ru",type:"item",limit:"8"});ids=[...new Set((result.search||[]).map(x=>x.id).filter(x=>QID.test(x)))];}
+     if(ids.length){
+       const r=await request("www.wikidata.org",{action:"wbgetentities",ids:ids.join("|"),props:"labels|aliases|claims",languages:"ru|en"});
+       const matches=Object.values(r.entities||{}).filter(e=>brandMatches(e,brand)&&logoFiles(e).length);
+       if(matches.length===1)files=logoFiles(matches[0]);
+     }
+   }
+   for(const file of files){
+     const logo=await getCommonsPhoto(file,brand);
+     if(logo){
+       if(brandMemory.size>=CACHE_LIMIT)brandMemory.clear();
+       brandMemory.set(brand.key,logo);
+       await cacheWrite({id:brandCacheId(brand),name:brand.name},logo);
+       return logo;
+     }
+   }
+   if(brandMiss.size>=1000)brandMiss.clear();
+   brandMiss.set(brand.key,Date.now()+3600000);
+ }catch{brandMiss.set(brand.key,Date.now()+120000);}
+ return null;
 }
 async function exactPhoto(place){
   for(const file of place.osmPhotoLink?.files||[]){
@@ -158,6 +200,7 @@ async function kartaPhoto(place){
   return null;
 }
 async function lookup(place){
+  const logo=await lookupBrand(place.brand);if(logo)return logo;
   if(Date.now()>=cooldown){
     try{const photo=await commonsPhoto(place);if(photo)return photo;}catch{}
   }
@@ -167,6 +210,7 @@ let queue=Promise.resolve();
 const inFlight=new Map(),negative=new Map();
 export async function loadPlacePhoto(place,isCurrent=()=>true){
   if(location.origin!==ORIGIN||typeof place.id!=="string"||typeof place.name!=="string"||place.name.length>80||!Number.isFinite(place.lat)||!Number.isFinite(place.lon))return null;
+  const brandLogo=await readBrand(place.brand);if(brandLogo)return brandLogo;
   const record=await cacheRead(place.id);
   const saved=record?.fingerprint===fingerprint(place)?record:null;
   if(saved&&validCachedPhoto(saved.photo)&&(!navigator.onLine||Date.now()-saved.at<CACHE_TTL))return saved.photo;
@@ -176,7 +220,7 @@ export async function loadPlacePhoto(place,isCurrent=()=>true){
   const promise=queue.then(async()=>{
     if(!isCurrent()||!navigator.onLine||(Date.now()<cooldown&&Date.now()<kartaCooldown))return null;
     try{const photo=await lookup(place);
-      if(photo){await cacheWrite(place,photo);return photo;}
+      if(photo){if(!photo.brandLogo)await cacheWrite(place,photo);return photo;}
       if(negative.size>=1000)negative.clear();
       negative.set(place.id,Date.now()+3600000);
     }catch{negative.set(place.id,Date.now()+120000);}
