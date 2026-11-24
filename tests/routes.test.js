@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  MAX_STOPS, demoBoard, minuteLabel, moveStop, readBoard, routeDetails, routeStats, stopDetails,
+  MAX_STOPS, demoBoard, emptyBoard, removeUnchangedDemo, minuteLabel, moveStop, readBoard, routeDetails, routeStats, stopDetails,
 } from "../public/routes.js";
 
 const serialized = value => JSON.stringify(value);
@@ -67,4 +67,12 @@ test("time labels cover zero, minutes and whole or partial hours", () => {
   assert.equal(minuteLabel(20), "20 мин");
   assert.equal(minuteLabel(60), "1 ч");
   assert.equal(minuteLabel(95), "1 ч 35 мин");
+});
+
+test("new users start empty and only untouched legacy sample is removed", () => {
+  assert.deepEqual(emptyBoard(), { version: 1, selected: null, routes: [] });
+  const sample = readBoard(JSON.stringify(demoBoard()));
+  assert.deepEqual(removeUnchangedDemo(sample), emptyBoard());
+  sample.routes[0].name = "Мой маршрут";
+  assert.deepEqual(removeUnchangedDemo(sample), sample);
 });

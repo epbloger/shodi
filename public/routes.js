@@ -124,3 +124,14 @@ export function demoBoard() {
     }],
   };
 }
+
+export function emptyBoard() {
+  return { version: 1, selected: null, routes: [] };
+}
+
+// Remove the untouched sample only. Preserve any route the user edited.
+export function removeUnchangedDemo(board) {
+  const sample = readBoard(JSON.stringify(demoBoard())).routes[0];
+  const routes = board.routes.filter(route => JSON.stringify(route) !== JSON.stringify(sample));
+  return { ...board, routes, selected: routes.some(route => route.id === board.selected) ? board.selected : routes[0]?.id ?? null };
+}

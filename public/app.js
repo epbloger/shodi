@@ -1,5 +1,5 @@
 import {
-  KINDS, MAX_ROUTES, MAX_STOPS, demoBoard, minuteLabel, moveStop,
+  KINDS, MAX_ROUTES, MAX_STOPS, emptyBoard, removeUnchangedDemo, minuteLabel, moveStop,
   newId, readBoard, routeDetails, routeStats, stopDetails,
 } from "./routes.js";
 import { mountGuide } from "./guide-view.js";
@@ -17,7 +17,7 @@ const fields = form.elements;
 const stopList = byId("stop-list");
 const routeList = byId("route-list");
 const guideTrigger = byId("guide-trigger");
-let board = demoBoard();
+let board = emptyBoard();
 let editorContext = null;
 let deleteContext = null;
 let storage;
@@ -46,7 +46,11 @@ function notice(message) {
 try {
   storage = window.localStorage;
   const saved = storage.getItem(KEY);
-  if (saved !== null) board = readBoard(saved);
+  if (saved !== null) {
+    const loaded = readBoard(saved);
+    board = removeUnchangedDemo(loaded);
+    if (board.routes.length !== loaded.routes.length) storage.setItem(KEY, JSON.stringify(board));
+  }
 } catch {
   storage = null;
   notice("Сохранённые маршруты недоступны. Изменения действуют до закрытия вкладки.");

@@ -58,6 +58,7 @@ try {
     await page.locator("#guide-panel").waitFor({ state: "visible", timeout: 15000 });
     assert.ok(await page.locator(".place-add").count() > 0, "Catalog must contain places");
     assert.equal(await page.locator("#guide-city").inputValue(), "Санкт-Петербург");
+    assert.equal(await page.locator("#route-list .route-link").count(), 0, "New users must start without sample routes");
     const initialCount = await page.locator(".place-add").count();
     assert.ok(initialCount <= 36, "Catalog must render at most one initial page");
     if (await page.locator("#guide-more").isVisible()) {
