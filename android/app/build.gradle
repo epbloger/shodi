@@ -1,0 +1,102 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+def env = System.getenv()
+def production = providers.gradleProperty("productionAds").orElse("false").get() == "true"
+def signingPath = env["SHODI_KEYSTORE"]
+def adIds = ["BANNER", "INTERSTITIAL", "NATIVE"]
+if (production) {
+    for (key in ["SHODI_KEYSTORE", "SHODI_STORE_PASSWORD", "SHODI_KEY_ALIAS", "SHODI_KEY_PASSWORD"]) {
+        if (!env[key]) throw new GradleException("Missing release signing configuration: " + key)
+    }
+    for (doc in ["about.html", "privacy.html", "terms.html", "consent.html", "licenses.html"]) {
+        def legal = rootProject.file("../public/" + doc).getText("UTF-8")
+        if (legal.contains("[PUBLIC_") || legal.contains("ПРОЕКТ ДОКУМЕНТА")) throw new GradleException("Legal document not approved: " + doc)
+    }
+    if (env["SHODI_LEGAL_APPROVED"] != "true") throw new GradleException("Legal review approval is required")
+    if (!file(signingPath).isFile()) throw new GradleException("Release keystore is unavailable")
+    for (kind in adIds) {
+        if (!(env["SHODI_" + kind + "_ID"] ==~ /R-M-\d+-\d+/)) throw new GradleException("Missing or invalid ad block configuration: " + kind)
+    }
+}
+android {
+    namespace 'ru.moorkis.shodi'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'ru.moorkis.shodi'
+        minSdk 26
+        targetSdk 35
+        versionCode 20000
+        versionName '2.0.0'
+        buildConfigField 'String', 'BANNER_ID', '"demo-banner-yandex"'
+        buildConfigField 'String', 'INTERSTITIAL_ID', '"demo-interstitial-yandex"'
+        buildConfigField 'String', 'NATIVE_ID', '"demo-native-content-yandex"'
+        buildConfigField 'boolean', 'PRODUCTION_ADS', 'false'
+    }
+    buildFeatures { buildConfig true }
+    signingConfigs {
+        if (production) {
+            release {
+                storeFile file(signingPath)
+                storePassword env["SHODI_STORE_PASSWORD"]
+                keyAlias env["SHODI_KEY_ALIAS"]
+                keyPassword env["SHODI_KEY_PASSWORD"]
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-test'
+        }
+        release {
+            if (production) {
+                signingConfig signingConfigs.release
+                buildConfigField 'boolean', 'PRODUCTION_ADS', 'true'
+                adIds.each { kind -> buildConfigField 'String', kind + '_ID', '"' + env["SHODI_" + kind + "_ID"] + '"' }
+            }
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = '17' }
+    sourceSets.main.assets.srcDir(layout.buildDirectory.dir("generated/webAssets"))
+}
+tasks.register("copyWeb", Copy) {
+    from(rootProject.file("../dist/shodi.html"))
+    into(layout.buildDirectory.dir("generated/webAssets"))
+    rename { "index.html" }
+    doFirst {
+        if (!rootProject.file("../dist/shodi.html").isFile()) throw new GradleException("Run npm ci && npm run build in repository root first")
+    }
+}
+tasks.register("copyLegal", Copy) {
+    from(rootProject.file("../public")) {
+        include "about.html", "privacy.html", "terms.html", "consent.html", "licenses.html"
+    }
+    into(layout.buildDirectory.dir("generated/legalAssets"))
+}
+android.sourceSets.main.assets.srcDir(layout.buildDirectory.dir("generated/legalAssets"))
+tasks.named("preBuild").configure { dependsOn("copyWeb", "copyLegal") }
+dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
+    implementation 'com.yandex.android:mobileads:8.6.0'
+}
+
+// Audit the actual resolved runtime graph, including transitive dependencies.
+tasks.register("exportRuntimeDependencies") {
+    doLast {
+        def modules = configurations.debugRuntimeClasspath.incoming.resolutionResult.allComponents
+            .collect { it.id }
+            .findAll { it instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier }
+            .collect { [name: it.group + ":" + it.module, version: it.version] }
+            .unique().sort { it.name + ":" + it.version }
+        def output = rootProject.file("../android-runtime-dependencies.json")
+        output.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(modules)) + "\n"
+    }
+}

@@ -335,3 +335,7 @@ dialog textarea { resize: vertical; }
 [data-theme="dark"] .primary { background: #a8bfff; color: #142346; }
 [data-theme="dark"] .hero { background: #24334a; }
 @media (prefers-reduced-motion: reduce) { .button, .category-chip { transition: none; } }
+
+.scroll-top{position:fixed;bottom:20px;right:16px;z-index:10;width:46px;height:46px;padding:0;border-radius:50%;box-shadow:0 5px 20px #14244b44;}
+.scroll-top .icon{width:22px;height:22px;}
+.scroll-top[hidden],#android-about[hidden],#android-share[hidden]{display:none!important;}

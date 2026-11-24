@@ -386,3 +386,18 @@ byId("add-stop").addEventListener("click", () => openEditor("stop"));
 form.querySelector("[data-dismiss]").addEventListener("click", () => editor.close());
 render();
 byId("startup-notice")?.setAttribute("hidden", "");
+
+// Only the bundled Android document can invoke the two native actions.
+const androidApp = location.origin === "https://appassets.androidplatform.net";
+if (androidApp) {
+  document.querySelector(".brand").addEventListener("click", event => { event.preventDefault(); guideTrigger.click(); window.scrollTo(0,0); });
+  for (const [id, action] of [["android-about","about"],["android-share","share"]]) {
+    const button = byId(id); button.hidden = false;
+    button.addEventListener("click", () => { location.href = "https://appassets.androidplatform.net/action/" + action; });
+  }
+}
+const scrollTop = byId("scroll-top");
+const updateTop = () => { scrollTop.hidden = window.scrollY < 420; };
+window.addEventListener("scroll", updateTop, { passive: true });
+scrollTop.addEventListener("click", () => window.scrollTo({top:0,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"}));
+updateTop();
