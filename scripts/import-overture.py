@@ -30,7 +30,7 @@ CATEGORIES = {
 }
 CATEGORY_MAP = {cat: kind for kind, cats in CATEGORIES.items() for cat in cats.split()}
 PROVIDERS = {"meta", "microsoft", "pinmeto", "krick", "renderseo", "dac", "brightquery",
-             "birdeye", "uberall", "opentravelalliance", "alltheplaces"}
+             "birdeye", "uberall", "opentravelalliance", "opentravel", "alltheplaces"}
 ALIASES = {"moscow": "Москва", "saintpetersburg": "Санкт-Петербург", "stpetersburg": "Санкт-Петербург",
            "yekaterinburg": "Екатеринбург", "ekaterinburg": "Екатеринбург",
            "nizhniynovgorod": "Нижний Новгород", "nizhnynovgorod": "Нижний Новгород",
@@ -59,27 +59,60 @@ def cities_index():
         index[alias].update(index[norm(name)])
     return {row[0]: row[1:] for row in cities}, index
 
+def permitted_sources(sources):
+    """Recognize documented provider IDs and human-readable source labels."""
+    recognized = set()
+    for source in sources or []:
+        if not source:
+            return False
+        provider = norm(source.get("provider"))
+        dataset = source.get("dataset") or ""
+        # November labels include e.g. "Meta, Overture"; provider IDs may
+        # also be encoded as provider/resource. Reject unknown licenses.
+        prefix = dataset.split("/", 1)[0]
+        labels = {norm(part) for part in re.split(r"[,;]", prefix) if part.strip()}
+        labels -= {"overture", "overturemaps", "overturemapsfoundation"}
+        if provider and provider not in {"overture", "overturemaps", "overturemapsfoundation"}:
+            labels.add(provider)
+        if not labels or not labels <= PROVIDERS:
+            # An Overture-only processing record may accompany real sources.
+            if not labels and (provider or dataset):
+                continue
+            return False
+        recognized.update(labels)
+    return bool(recognized)
+
 def make_catalog(rows, limit=20):
     cities, index = cities_index()
     groups = defaultdict(dict)
+    stats, rejected_sources, unmatched_cities = Counter(), Counter(), Counter()
     for id, name, basic, primary, hierarchy, confidence, street, locality, lat, lon, sources in rows:
+        stats["input"] += 1
         name, street, locality = clean(name), clean(street), clean(locality)
         if not name or len(name.encode("utf-16-le")) // 2 > 80 or PRIVATE.search(name) or PRIVATE.search(street):
+            stats["invalid_name_or_address"] += 1
             continue
         # Only documented permissive providers, excluding Apache/Foursquare inputs.
-        if not sources or any(norm(s.get("dataset")) not in PROVIDERS for s in sources):
+        if not permitted_sources(sources):
+            stats["source_rejected"] += 1
+            rejected_sources.update(str((source or {}).get("dataset")) for source in sources or [])
             continue
         candidates = index.get(norm(locality), set()) | index.get(latin(locality), set())
         if len(candidates) != 1 or lat is None or lon is None or not math.isfinite(lat) or not math.isfinite(lon):
+            stats["city_or_coordinates_rejected"] += 1
+            unmatched_cities[locality] += 1
             continue
         city_id = next(iter(candidates))
         city, region = cities[city_id]
         kind = next((CATEGORY_MAP[x] for x in [basic, primary, *reversed(hierarchy or [])] if x in CATEGORY_MAP), None)
         if not kind:
+            stats["category_rejected"] += 1
             continue
         address = ", ".join(dict.fromkeys(filter(None, [region, city, street])))
         if len(address) > 220:
+            stats["address_too_long"] += 1
             continue
+        stats["accepted"] += 1
         digest = hashlib.sha256(str(id).encode()).hexdigest()[:12]
         entry = [city_id + "-o" + digest, name, kind, address, round(lat, 6), round(lon, 6)]
         key = norm(name)
@@ -101,6 +134,9 @@ def make_catalog(rows, limit=20):
                 seen.add(entry[0])
                 counts[entry[2]] += 1
         result[city_id] = selected
+    print("Import counters:", dict(stats), flush=True)
+    print("Rejected source labels:", rejected_sources.most_common(12), flush=True)
+    print("Unmatched localities:", unmatched_cities.most_common(12), flush=True)
     return result
 
 def main():
@@ -119,7 +155,7 @@ def main():
                    confidence, addresses[1].freeform, addresses[1].locality,
                    bbox.ymin, bbox.xmin, sources
             FROM read_parquet(?)
-            WHERE addresses[1].country = 'RU'
+            WHERE upper(addresses[1].country) = 'RU'
               AND addresses[1].locality IS NOT NULL AND names.primary IS NOT NULL
               AND bbox.ymin BETWEEN 41 AND 82 AND bbox.xmin IS NOT NULL
               AND coalesce(confidence, 0) >= 0.65
