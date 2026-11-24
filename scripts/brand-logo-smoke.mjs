@@ -5,20 +5,26 @@ import {cities,catalogPlacesForCity} from "../public/guide.js";
 const html=await readFile("dist/shodi.html","utf8");
 const report=JSON.parse(await readFile("docs/brand-logo-coverage.json","utf8"));
 assert.ok(report.verifiedLogos>0);
-const sample=cities.flatMap(city=>catalogPlacesForCity(city.id).filter(p=>p.photo?.brandLogo).slice(0,1).map(place=>({city,place}))).at(0);
-assert.ok(sample,"No actual bundled brand logo found");
+const branded=cities.flatMap(city=>catalogPlacesForCity(city.id).filter(p=>p.photo?.brandLogo).map(place=>({city,place})));
+const byBrand=new Map();
+for(const entry of branded)if(!byBrand.has(entry.place.brand.key))byBrand.set(entry.place.brand.key,entry);
+assert.ok(byBrand.size,"No actual bundled brand logo found");
+const sample=[...byBrand.values()].slice(0,3);
+for(const key of ["Q112406961","Q177054"])if(byBrand.has(key)&&!sample.some(e=>e.place.brand.key===key))sample.push(byBrand.get(key));
 const browser=await chromium.launch({headless:true});
 try{
  const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,offline:true});
  await context.route("**/*",route=>route.request().url()==="https://appassets.androidplatform.net/assets/index.html"?route.fulfill({contentType:"text/html",body:html}):route.abort());
  const page=await context.newPage();
  await page.goto("https://appassets.androidplatform.net/assets/index.html");
- await page.locator("#guide-city").fill(sample.city.label);
+ for(const entry of sample){
+ await page.locator("#guide-city").fill(entry.city.label);
  await page.locator("#guide-city").press("Enter");
- await page.locator("#guide-search").fill(sample.place.name);
- const card=page.locator("[data-place-id="+JSON.stringify(sample.place.id)+"]");
+ await page.locator("#guide-search").fill(entry.place.name);
+ const card=page.locator("[data-place-id="+JSON.stringify(entry.place.id)+"]");
  await card.locator(".place-brand-logo").scrollIntoViewIfNeeded();
- await page.waitForFunction(id=>{const img=document.querySelector('[data-place-id="'+id+'"] .place-brand-logo img');return img?.complete&&img.naturalWidth>0;},sample.place.id);
+ await page.waitForFunction(id=>{const img=document.querySelector('[data-place-id="'+id+'"] .place-brand-logo img');return img?.complete&&img.naturalWidth>0;},entry.place.id);
  assert.match(await card.locator("figcaption").textContent(),/Логотип бренда/);
- console.log("Real bundled brand logo verified offline:",sample.place.brand.name);
+ console.log("Real bundled brand logo verified offline:",entry.place.brand.name);
+ }
 }finally{await browser.close();}

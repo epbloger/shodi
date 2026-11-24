@@ -53,12 +53,51 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+      - name: Restore catalog brand links
+        id: brand-links-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            public/data/place-brands.js
+            docs/brand-coverage.json
+          key: shodi-brand-links-v1-${{ hashFiles('public/data/current-places.js', 'docs/current-catalog.json', 'scripts/import-brand-links.py') }}
       - name: Import all brand links from the exact catalog snapshot
+        if: steps.brand-links-cache.outputs.cache-hit != 'true'
         run: |
           pip install duckdb==1.5.4
           python scripts/import-brand-links.py
+      - name: Validate brand links before reuse
+        run: node scripts/validate-brand-data.mjs --links
+      - name: Save catalog brand links
+        if: steps.brand-links-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            public/data/place-brands.js
+            docs/brand-coverage.json
+          key: ${{ steps.brand-links-cache.outputs.cache-primary-key }}
+      - name: Restore previously verified logos
+        id: logo-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            public/data/brand-logos.js
+            docs/brand-logo-coverage.json
+          key: shodi-brand-logos-v1-${{ hashFiles('public/data/current-places.js', 'scripts/import-brand-links.py', 'scripts/import-brand-logos.mjs', 'public/brands.js', 'public/photos.js') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            shodi-brand-logos-v1-${{ hashFiles('public/data/current-places.js', 'scripts/import-brand-links.py', 'scripts/import-brand-logos.mjs', 'public/brands.js', 'public/photos.js') }}-
       - name: Verify and bundle licensed brand logo thumbnails
-        run: node scripts/import-brand-logos.mjs
+        run: |
+          node --check scripts/import-brand-logos.mjs
+          node scripts/import-brand-logos.mjs
+          node scripts/validate-brand-data.mjs --logos
+      - name: Save verified logo progress before compilation
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            public/data/brand-logos.js
+            docs/brand-logo-coverage.json
+          key: ${{ steps.logo-cache.outputs.cache-primary-key }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
