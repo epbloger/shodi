@@ -363,3 +363,4 @@ byId("edit-route").addEventListener("click", () => openEditor("route", activeRou
 byId("add-stop").addEventListener("click", () => openEditor("stop"));
 form.querySelector("[data-dismiss]").addEventListener("click", () => editor.close());
 render();
+byId("startup-notice")?.setAttribute("hidden", "");

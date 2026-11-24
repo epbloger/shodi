@@ -28,12 +28,8 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm test
       - run: npm run build
-      - name: Prepare self-contained website
-        run: |
-          mkdir -p dist/site/assets
-          cp dist/shodi.html dist/site/index.html
-          cp public/sitemap.xml dist/site/
-          cp public/assets/city-guide.webp public/assets/icon.svg dist/site/assets/
+      - name: Build versioned website assets
+        run: node scripts/build-site.mjs
       - name: Install browser for smoke test
         run: |
           npm install --no-save --package-lock=false playwright
@@ -59,3 +55,21 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v5
+
+  verify-public:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm install --no-save --package-lock=false playwright
+      - run: npx playwright install --with-deps chromium
+      - name: Check published canonical URL in Chromium
+        env:
+          SHODI_PUBLIC_URL: https://epbloger.github.io/shodi/
+        run: node scripts/smoke.mjs
