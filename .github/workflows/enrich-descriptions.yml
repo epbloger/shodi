@@ -43,6 +43,34 @@ jobs:
       - name: Match catalog to Wikidata
         if: steps.reuse.outputs.reused != 'true'
         run: node scripts/enrich-descriptions.mjs
+      - name: Recover previously downloaded verified photos
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          # This successful import job was blocked only by concurrent OSM integration.
+          # Recover only photos, not its potentially stale description rows.
+          git diff --quiet 9c678307d06247b837de0e3ade01d724b63e8ec0 HEAD -- public/data/current-places.js public/photos.js public/commons-thumbnail.js scripts/photo-import-policy.mjs scripts/import-place-photos.mjs || exit 0
+          dir="$RUNNER_TEMP/recovered-photos"
+          if ! gh run download 45479557404 -n shodi-description-import -D "$dir"; then exit 0; fi
+          RECOVERY_DIR="$dir" node --input-type=module <<'JS'
+          import {readFile,writeFile} from "node:fs/promises";
+          import {validatePhoto} from "./public/photos.js";
+          import {PHOTO_LIMIT,PHOTO_BYTES_LIMIT,photoBytes} from "./scripts/photo-import-policy.mjs";
+          import {placePhotos} from "./public/data/place-photos.js";
+          const raw=await readFile(process.env.RECOVERY_DIR+"/public/data/place-photos.js","utf8");
+          const m=/^\/\/[^\n]*\nexport const placePhotos = (\{[\s\S]*\});\n?$/.exec(raw);
+          if(!m)throw Error("Invalid recovered photo manifest");
+          const recovered=JSON.parse(m[1]);
+          const report=JSON.parse(await readFile(process.env.RECOVERY_DIR+"/docs/photo-coverage.json","utf8"));
+          const entries=Object.entries(recovered);
+          if(entries.length!==444||report.photos!==entries.length||entries.some(([id,p])=>!/^Q[1-9]\d*$/.test(id)||!validatePhoto(p)||!photoBytes(p))||entries.reduce((n,[,p])=>n+photoBytes(p),0)!==report.bytes)throw Error("Recovered artifact failed validation");
+          const merged={...recovered,...placePhotos};
+          const all=Object.entries(merged);
+          if(all.length>PHOTO_LIMIT||all.some(([id,p])=>!/^Q[1-9]\d*$/.test(id)||!validatePhoto(p)||!photoBytes(p))||all.reduce((n,[,p])=>n+photoBytes(p),0)>PHOTO_BYTES_LIMIT)throw Error("Recovered photo budget exceeded");
+          await writeFile("public/data/place-photos.js","// Licensed Wikimedia Commons thumbnails.\nexport const placePhotos = "+JSON.stringify(merged)+";\n");
+          console.log("Recovered and preserved verified photo records:",all.length);
+          JS
       - name: Import licensed thumbnails
         run: node scripts/import-place-photos.mjs
       - run: npm ci --ignore-scripts && npm test && npm run build
