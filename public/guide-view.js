@@ -17,7 +17,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   const feedback = byId("guide-feedback");
   const cityHelp = byId("city-help");
   const options = byId("city-options");
-  let city = cityById("ekb");
+  let city = cityById("spb");
   let category = "all";
   let selectedTarget;
 

@@ -57,6 +57,7 @@ try {
     assert.ok(await page.locator("#city-options option").count() >= 1100, "Full city list must load");
     await page.locator("#guide-panel").waitFor({ state: "visible", timeout: 15000 });
     assert.ok(await page.locator(".place-add").count() > 0, "Catalog must contain places");
+    assert.equal(await page.locator("#guide-city").inputValue(), "Санкт-Петербург");
     const initialTheme = await page.locator("html").getAttribute("data-theme");
     const nextTheme = initialTheme === "dark" ? "light" : "dark";
     const originalBackground = await page.locator("html").evaluate(el => getComputedStyle(el).backgroundColor);
