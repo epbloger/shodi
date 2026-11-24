@@ -133,6 +133,11 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         source.target = "_blank"; source.rel = "noopener noreferrer";
         source.textContent = "Источник описания";
         description.append(document.createElement("br"), source);
+      } else if (place.descriptionKind === "catalog") {
+        const source = document.createElement("span");
+        source.className = "description-source";
+        source.textContent = "Сведения из каталога Overture Maps";
+        description.append(document.createElement("br"), source);
       }
       const cover = card.querySelector(".place-cover");
       cover.querySelector("use").setAttribute("href","#i-"+kind.icon);

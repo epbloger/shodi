@@ -17,7 +17,9 @@ const branded=places.filter(p=>p.brand);
 const verified=branded.filter(p=>bundledBrandLogo(p.brand));
 const photos=places.filter(p=>p.photo&&!p.photo.brandLogo);
 const logos=places.filter(p=>p.photo?.brandLogo);
-const descriptions=places.filter(p=>p.description&&p.descriptionSource);
+const descriptions=places.filter(p=>p.description&&p.descriptionSource&&p.descriptionKind==="wikidata");
+const summaries=places.filter(p=>p.description&&p.descriptionKind==="catalog");
+assert.equal(descriptions.length+summaries.length,places.length,"Every place must have a factual description or labeled catalog summary");
 const distinct=new Set(branded.map(p=>p.brand.key));
 assert.equal(distinct.size,report.totalBrands);
 assert.equal(branded.length,report.brandedPlaces);
@@ -30,7 +32,7 @@ const quality={
  brandedPlaces:branded.length,placesWithAvailableBrandLogo:verified.length,brandedPlacesWithoutLogo:branded.length-verified.length,
  cardsDisplayingBundledLogo:logos.length,cardsDisplayingBundledPlacePhoto:photos.length,
  cardsWithBundledImage:logos.length+photos.length,cardsWithoutBundledImage:places.length-logos.length-photos.length,
- cardsWithVerifiedDescription:descriptions.length,cardsWithoutVerifiedDescription:places.length-descriptions.length,
+ cardsWithVerifiedDescription:descriptions.length,cardsWithCatalogSummary:summaries.length,cardsWithAnyDescription:descriptions.length+summaries.length,cardsWithoutAnyDescription:places.length-descriptions.length-summaries.length,cardsWithoutVerifiedDescription:places.length-descriptions.length,
  cardsWithOsmPhotoReference:places.filter(p=>p.osmPhotoLink).length,
  cardsWithUnknownOpeningStatus:places.filter(p=>p.status==="unknown").length,
  brandStatusCounts:report.statusCounts,generatedAt:new Date().toISOString()

@@ -2,6 +2,7 @@ import {brandForPlace,bundledBrandLogo} from "./brands.js";
 import {osmPhotoLink} from "./osm-photo-links.js";
 import { photoForItem } from "./photos.js";
 import { descriptionForPlace } from "./descriptions.js";
+import { catalogSummary } from "./catalog-summary.js";
 import { russianCities } from "./data/cities.js";
 import { russianPlaces } from "./data/places.js";
 import { currentCatalog, currentPlaces } from "./data/current-places.js";
@@ -192,7 +193,7 @@ export function catalogPlacesForCity(cityId) {
     const brand=brandForPlace(id,name,kind);
     return ({
     id, name, kind, area: address || city.label, address, city: city.label,
-    description: details?.text ?? "", descriptionSource: details?.source, photo: photoForItem(details?.qid) || bundledBrandLogo(brand), photoItem: details?.qid, brand, osmPhotoLink: osmPhotoLink(id), lat, lon, budget: { type: "unknown" },
+    description: details?.text ?? catalogSummary({kind,address,city:city.label,brand}), descriptionSource: details?.source, descriptionKind: details ? "wikidata" : "catalog", photo: photoForItem(details?.qid) || bundledBrandLogo(brand), photoItem: details?.qid, brand, osmPhotoLink: osmPhotoLink(id), lat, lon, budget: { type: "unknown" },
     source: currentCatalog.release, status: status ?? "unknown",
     });
   });
