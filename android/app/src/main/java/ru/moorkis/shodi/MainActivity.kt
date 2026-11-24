@@ -98,6 +98,15 @@ class MainActivity : Activity() {
                 val u = request.url
                 if (u.scheme == "https" && u.host == "appassets.androidplatform.net" && u.port == -1 && u.userInfo == null && u.path == "/assets/index.html")
                     loader.shouldInterceptRequest(u)?.let { return it }
+                if (!request.isForMainFrame && request.method == "GET" && u.scheme == "https" && u.port == -1 && u.userInfo == null && u.fragment == null) {
+                    val api = u.host in setOf("www.wikidata.org", "commons.wikimedia.org") && u.path == "/w/api.php" &&
+                        u.getQueryParameter("origin") == "*" && u.getQueryParameter("format") == "json" &&
+                        ((u.host == "www.wikidata.org" && u.getQueryParameter("action") in setOf("wbsearchentities", "wbgetentities")) ||
+                         (u.host == "commons.wikimedia.org" && u.getQueryParameter("action") == "query" && u.getQueryParameter("prop") == "imageinfo"))
+                    val image = u.host in setOf("upload.wikimedia.org", "thumb.wikimedia.org") &&
+                        u.path?.startsWith("/wikipedia/commons/") == true && u.query == null
+                    if (api || image) return null
+                }
                 if (u.scheme == "data") return null
                 return WebResourceResponse("text/plain", "UTF-8", 403, "Blocked", emptyMap(), java.io.ByteArrayInputStream(ByteArray(0)))
             }

@@ -1,3 +1,4 @@
+import {loadPlacePhoto} from "./online-photos.js";
 import {
   budgetLabel, cities, cityById, cityByQuery, cityMatches, findPlaces,
   mapLink, PLACE_CATEGORIES, reviewLabel, catalogSource,
@@ -117,7 +118,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         source.textContent = "Источник описания";
         description.append(document.createElement("br"), source);
       }
-      if (place.photo) {
+      const renderPhoto = photo => {
         const figure = card.querySelector(".place-photo");
         const image = figure.querySelector("img");
         const caption = figure.querySelector("figcaption");
@@ -127,9 +128,18 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         };
         image.alt = place.name;
         image.addEventListener("error", () => { figure.hidden = true; }, {once:true});
-        caption.append(link(place.photo.source,place.photo.author+" · Wikimedia Commons")," · ",link(place.photo.licenseUrl,place.photo.license)," · уменьшенная копия");
-        image.src = place.photo.data;
+        caption.replaceChildren(link(photo.source,photo.author+" · Wikimedia Commons")," · ",link(photo.licenseUrl,photo.license)," · уменьшенная копия");
+        image.src = photo.data;
         figure.hidden = false;
+      };
+      if(place.photo) renderPhoto(place.photo);
+      else if(location.origin==="https://appassets.androidplatform.net") {
+        const observer=new IntersectionObserver(entries=>{
+          if(!entries.some(entry=>entry.isIntersecting))return;
+          observer.disconnect();
+          loadPlacePhoto(place).then(photo=>{if(photo&&card.isConnected)renderPhoto(photo);}).catch(()=>{});
+        },{rootMargin:"100px"});
+        observer.observe(card);
       }
       const budget = card.querySelector(".place-budget");
       budget.hidden = place.budget.type === "unknown";

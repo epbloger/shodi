@@ -29,7 +29,7 @@ html = containsTag(html, "</body>", "<script>" + script + "</script>\n</body>");
 html = html.replace(
   /content="default-src 'none'; script-src [^"]+"/,
   'content="default-src \'none\'; script-src ' + sha(script) +
-    "; style-src " + sha(style) + "; font-src data:; img-src data:; base-uri 'none'; form-action 'none'\"",
+    "; style-src " + sha(style) + "; font-src data:; img-src data:; connect-src https://www.wikidata.org/w/api.php https://commons.wikimedia.org/w/api.php https://upload.wikimedia.org/wikipedia/commons/ https://thumb.wikimedia.org/wikipedia/commons/; base-uri 'none'; form-action 'none'\"",
 );
 for (const [file, type] of [["icon.svg", "image/svg+xml"], ["embankment.webp", "image/webp"], ["city-guide.webp", "image/webp"]]) {
   const bytes = await readFile(root + "public/assets/" + file);
