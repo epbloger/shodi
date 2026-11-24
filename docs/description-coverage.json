@@ -1,0 +1,12 @@
+{
+  "catalogPlaces": 55716,
+  "uniqueLabels": 47130,
+  "queriedLabels": 46530,
+  "failedLabels": 600,
+  "unqueriedLabels": 0,
+  "coveredPlaces": 645,
+  "importedRecords": 678,
+  "license": "CC0",
+  "source": "https://www.wikidata.org/",
+  "generatedAt": "2026-11-24T17:07:15.467Z"
+}
