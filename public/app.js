@@ -203,6 +203,9 @@ function renderStops(route) {
     const edit = item.querySelector(".edit-stop");
     setLabel(edit, "Редактировать: " + stop.name);
     edit.addEventListener("click", () => openEditor("stop", stop));
+    const remove = item.querySelector(".remove-stop");
+    setLabel(remove, "Удалить остановку: " + stop.name);
+    remove.addEventListener("click", () => confirmDelete("stop", route.id, stop.id));
     fragment.append(item);
   });
   stopList.replaceChildren(fragment);

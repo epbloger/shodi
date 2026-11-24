@@ -312,3 +312,9 @@ dialog textarea { resize: vertical; }
 }
 
 .route-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.remove-stop { color: #a33d33; }
+.remove-stop:hover:not(:disabled) { color: #852d25; background: #f9e9e5; border-color: #ead0ca; }
+[data-theme="dark"] .remove-stop { color: #ffb4a7; }
+[data-theme="dark"] .remove-stop:hover:not(:disabled) { color: #ffd0c8; background: #49302c; border-color: #794c43; }
+.order-actions { flex-wrap: wrap; }
