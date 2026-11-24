@@ -1,6 +1,7 @@
 // Verify all discovered brands, not just popular chains. Never execute remote SVG.
 import {readFile,writeFile} from "node:fs/promises";
 import {thumbnailUrl} from "../public/commons-thumbnail.js";
+import {brandLabelVariants} from "./catalog-match-helpers.mjs";
 import {priorAttempts,unresolvedFirst} from "./brand-import-progress.mjs";
 import {currentPlaces} from "../public/data/current-places.js";
 import {brandForPlace,brandMatches,brandNameKey,logoFiles,brandLicense,validBrandLogo} from "../public/brands.js";
@@ -124,7 +125,7 @@ for(let i=0;i<pending.length;i+=20){
  if(!available("query.wikidata.org")||!available("www.wikidata.org"))break;
  const batch=pending.slice(i,i+20);
  attempted(batch);
- const labels=[...new Set(batch.flatMap(({brand})=>[brand.name,brandNameKey(brand.name)]))].filter(Boolean);
+ const labels=[...new Set(batch.flatMap(({brand})=>[...brandLabelVariants(brand.name),...brandLabelVariants(brandNameKey(brand.name))]))].filter(Boolean);
  const values=labels.flatMap(name=>["ru","en"].map(lang=>JSON.stringify(name)+"@"+lang)).join(" ");
  const query="SELECT DISTINCT ?item ?label WHERE { VALUES ?label { "+values+" } { ?item rdfs:label ?label } UNION { ?item skos:altLabel ?label } }";
  try{

@@ -2,7 +2,7 @@ name: Enrich place descriptions
 on:
   push:
     branches: [android-v2]
-    paths: ['scripts/enrich-descriptions.mjs', 'scripts/import-place-photos.mjs', 'scripts/photo-import-policy.mjs', '.github/workflows/enrich-descriptions.yml']
+    paths: ['scripts/enrich-descriptions.mjs', 'scripts/import-place-photos.mjs', 'scripts/photo-import-policy.mjs', 'scripts/catalog-match-helpers.mjs', 'public/data/osm-photo-links.js', '.github/workflows/enrich-descriptions.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -32,9 +32,10 @@ jobs:
           prior="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/enrich-descriptions.yml/runs?branch=android-v2&status=success&per_page=1" --jq '.workflow_runs[0] | [.id,.head_sha] | @tsv' || true)"
           if [ -z "$prior" ]; then exit 0; fi
           read -r id sha <<< "$prior"
-          if ! git diff --quiet "$sha" HEAD -- public/data/current-places.js public/data/place-descriptions.js scripts/enrich-descriptions.mjs; then exit 0; fi
+          if ! git diff --quiet "$sha" HEAD -- public/data/current-places.js public/data/place-descriptions.js scripts/enrich-descriptions.mjs scripts/catalog-match-helpers.mjs public/data/osm-photo-links.js; then exit 0; fi
           dir="$RUNNER_TEMP/previous-descriptions"
           if gh run download "$id" -n shodi-description-import -D "$dir" && test -s "$dir/docs/description-coverage.json" && test -s "$dir/public/data/imported-descriptions.js"; then
+            if ! node -e 'const r=require(process.argv[1]);process.exit(r.failedLabels===0&&r.unqueriedLabels===0&&r.linkedErrors===0?0:1)' "$dir/docs/description-coverage.json"; then exit 0; fi
             cp "$dir/docs/description-coverage.json" docs/
             cp "$dir/public/data/imported-descriptions.js" public/data/
             echo "reused=true" >> "$GITHUB_OUTPUT"
@@ -79,7 +80,7 @@ jobs:
       - name: Validate and integrate only catalog data
         id: commit
         run: |
-          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js public/data/place-descriptions.js public/data/imported-descriptions.js public/data/place-photos.js public/photos.js public/commons-thumbnail.js scripts/enrich-descriptions.mjs scripts/import-place-photos.mjs scripts/photo-import-policy.mjs
+          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js public/data/place-descriptions.js public/data/imported-descriptions.js public/data/place-photos.js public/photos.js public/commons-thumbnail.js scripts/enrich-descriptions.mjs scripts/import-place-photos.mjs scripts/photo-import-policy.mjs scripts/catalog-match-helpers.mjs public/data/osm-photo-links.js
           node --input-type=module <<'JS'
           import {readFile,writeFile} from "node:fs/promises";
           import {validatePhoto} from "./public/photos.js";
