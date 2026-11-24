@@ -1,5 +1,6 @@
 // Verify all discovered brands, not just popular chains. Never execute remote SVG.
 import {readFile,writeFile} from "node:fs/promises";
+import {thumbnailUrl} from "../public/commons-thumbnail.js";
 import {priorAttempts,unresolvedFirst} from "./brand-import-progress.mjs";
 import {currentPlaces} from "../public/data/current-places.js";
 import {brandForPlace,brandMatches,brandNameKey,logoFiles,brandLicense,validBrandLogo} from "../public/brands.js";
@@ -93,8 +94,14 @@ for(let i=0;i<files.length;i+=20){
    const author=String(info?.extmetadata?.Artist?.value||(license?.name==="Public domain"?"Автор не указан":"")).replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();
    if(!license||!author||author.length>500){for(const key of keys)states[key]="license-or-attribution";continue;}
    try{
-    const u=new URL(info.thumburl);
-    if(u.protocol!=="https:"||!["upload.wikimedia.org","thumb.wikimedia.org"].includes(u.hostname)||u.port||u.username||u.password||u.search||u.hash||!u.pathname.startsWith("/wikipedia/commons/"))throw Error("Unexpected thumbnail URL");
+    const safeUrl=thumbnailUrl(info.thumburl);
+    if(!safeUrl){
+     const raw=typeof info.thumburl==="string"?info.thumburl:"";
+     let detail="missing or invalid URL";
+     try{const rejected=new URL(raw);detail=rejected.hostname+" "+rejected.pathname.slice(0,120)+" parameters:"+[...rejected.searchParams.keys()].join(",").slice(0,100);}catch{}
+     throw Error("Unexpected thumbnail URL: "+detail);
+    }
+    const u=new URL(safeUrl);
     if(!available(u.hostname)){for(const key of keys)states[key]="source-cooldown";continue;}
     const image=await get(u.href,true);
     for(const key of keys){

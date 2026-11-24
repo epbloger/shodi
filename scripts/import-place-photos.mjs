@@ -1,4 +1,5 @@
 import {writeFile} from "node:fs/promises";
+import {thumbnailUrl} from "../public/commons-thumbnail.js";
 import {placePhotos as previous} from "../public/data/place-photos.js";
 import {validatePhoto,unrestrictedPhotoLicense} from "../public/photos.js";
 import {currentPlaces} from "../public/data/current-places.js";
@@ -55,8 +56,8 @@ for(let i=0;i<qids.length&&Object.keys(out).length<100&&bytes<5000000&&attempts<
       const license=licensed.name;
       const author=v("Artist").replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();
       if(!author||author.length>500)continue;
-      const thumb=new URL(info.thumburl);
-      if(thumb.protocol!=="https:"||!["upload.wikimedia.org","thumb.wikimedia.org"].includes(thumb.hostname)||thumb.port||thumb.username||thumb.password)continue;
+      const thumb=thumbnailUrl(info.thumburl);
+      if(!thumb)continue;
       const source="https://commons.wikimedia.org/wiki/"+encodeURIComponent(page.title.replaceAll(" ","_")).replace(/^File%3A/,"File:");
       const image=await get(thumb,false);
       const photo={data:image.data,author,title:page.title,license,licenseUrl:licensed.url,source};

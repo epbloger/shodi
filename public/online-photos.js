@@ -1,4 +1,6 @@
 import {brandMatches,logoFiles,brandLicense,validBrandLogo} from "./brands.js";
+import {thumbnailUrl} from "./commons-thumbnail.js";
+export {thumbnailUrl} from "./commons-thumbnail.js";
 import {KARTA_API,kartaCandidates,kartaRecord,validKartaPhoto} from "./kartaview-photos.js";
 import {validatePhoto,unrestrictedPhotoLicense} from "./photos.js";
 const ORIGIN="https://appassets.androidplatform.net";
@@ -55,12 +57,6 @@ export function matchingEntity(entity,place){
     if(!Number.isFinite(p?.latitude)||!Number.isFinite(p?.longitude)||p.globe!=="http://www.wikidata.org/entity/Q2")return false;
     return Math.hypot((place.lat-p.latitude)*111320,(place.lon-p.longitude)*111320*Math.cos(place.lat*Math.PI/180))<=100;
   });
-}
-export function thumbnailUrl(value){
-  try{const u=new URL(value);
-    if(u.protocol!=="https:"||!["upload.wikimedia.org","thumb.wikimedia.org"].includes(u.hostname)||u.port||u.username||u.password||u.search||u.hash||!u.pathname.startsWith("/wikipedia/commons/"))return null;
-    return u.href;
-  }catch{return null;}
 }
 async function readThumbnail(url,provider){
   const response=await fetch(url,{credentials:"omit",referrerPolicy:"no-referrer",redirect:"error",signal:AbortSignal.timeout(12000)});

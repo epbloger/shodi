@@ -10,7 +10,8 @@ const {city,place}=entry;
 const kartaMode=process.argv.includes("--karta");
 const kartaThumb="https://storage13.openstreetcam.org/files/photo/2022/10/6/lth/123_ab.jpg";
 const qid="Q987654321",file="SHODI integration fixture.png";
-const thumb="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/SHODI_fixture.png/330px-SHODI_fixture.png";
+const thumb="https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/SHODI_fixture.png/330px-SHODI_fixture.png";
+const apiThumb=thumb+"?utm_source=commons.wikimedia.org&utm_campaign=api&utm_content=thumbnail";
 const png=Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jWZkAAAAASUVORK5CYII=","base64");
 const entity={id:qid,labels:{ru:{value:place.name}},aliases:{},claims:{P625:[{rank:"normal",mainsnak:{datavalue:{value:{latitude:place.lat,longitude:place.lon,globe:"http://www.wikidata.org/entity/Q2"}}}}],P18:[{rank:"normal",mainsnak:{datavalue:{value:file}}}]}};
 const metadata={LicenseShortName:{value:"CC BY-SA 4.0"},LicenseUrl:{value:"https://creativecommons.org/licenses/by-sa/4.0/"},Restrictions:{value:[]},Artist:{value:"Fixture author"}};
@@ -37,7 +38,7 @@ try {
       return respond({result:{data:Math.abs(lat-place.lat)<0.00001&&Math.abs(lng-place.lon)<0.00001?[{lat:place.lat,lng:place.lon,visibility:"public",status:"active",autoImgProcessingStatus:"FINISHED",autoImgProcessingResult:"BLURRED",sequenceId:"123",fileurlLTh:kartaThumb,storage:"storage13",shotDate:"2022-10-06"}]:[]}});
     }
     if(kartaMode&&url.href===kartaThumb)return route.fulfill({contentType:"image/png",headers,body:png});
-    if(url.hostname==="commons.wikimedia.org"&&url.searchParams.get("titles")==="File:"+file)return respond({query:{pages:[{title:"File:"+file,imageinfo:[{thumburl:thumb,extmetadata:metadata}]}]}});
+    if(url.hostname==="commons.wikimedia.org"&&url.searchParams.get("titles")==="File:"+file)return respond({query:{pages:[{title:"File:"+file,imageinfo:[{thumburl:apiThumb,extmetadata:metadata}]}]}});
     if(url.href===thumb)return route.fulfill({contentType:"image/png",headers,body:png});
     return route.abort();
   });

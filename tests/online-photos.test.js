@@ -20,3 +20,12 @@ test("nearby photos require actual geotags within 100 meters and image files",()
  assert.deepEqual(nearbyPhotoCandidates(p,rows),[{filename:"Street.jpg",meters:11}]);
 });
 
+
+test("Commons API tracking parameters do not prevent safe raster downloads",()=>{
+ const old="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Logo.svg/330px-Logo.svg.png";
+ const canonical=old.replace("upload.wikimedia.org","thumb.wikimedia.org");
+ assert.equal(thumbnailUrl(old),canonical);
+ assert.equal(thumbnailUrl(canonical+"?utm_source=commons.wikimedia.org&utm_campaign=api&utm_content=thumbnail"),canonical);
+ assert.equal(thumbnailUrl("https://upload.wikimedia.org/wikipedia/commons/a/ab/Test.jpg?utm_source=commons.wikimedia.org"),"https://upload.wikimedia.org/wikipedia/commons/a/ab/Test.jpg");
+ for(const value of [canonical+"?redirect=https://evil.test",canonical+"#hash",canonical.replace("Logo.svg.png","Logo.svg"),canonical.replace("thumb.wikimedia.org","evil.test"),canonical.replace("thumb.wikimedia.org","user@thumb.wikimedia.org"),canonical.replace("thumb.wikimedia.org","thumb.wikimedia.org:444"),"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Logo.svg/330px-Logo.svg.png?utm_source=x&other=y",null,undefined])assert.equal(thumbnailUrl(value),null);
+});

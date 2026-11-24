@@ -1,4 +1,5 @@
 import {writeFile} from "node:fs/promises";
+import {thumbnailUrl} from "../public/commons-thumbnail.js";
 import {currentPlaces} from "../public/data/current-places.js";
 import {unrestrictedPhotoLicense} from "../public/photos.js";
 import {KARTA_API,kartaCandidates} from "../public/kartaview-photos.js";
@@ -39,8 +40,8 @@ async function commons(p){
  const pages=r.data?.query?.pages||[];
  for(const page of pages.slice(0,10)){
    const c=page.imageinfo?.[0];if(!c||!unrestrictedPhotoLicense(c.extmetadata)||!String(c.extmetadata?.Artist?.value||"").trim())continue;
-   try{const u=new URL(c.thumburl);if(u.protocol!=="https:"||!["upload.wikimedia.org","thumb.wikimedia.org"].includes(u.hostname)||u.port||u.username||u.password||u.search||u.hash||!u.pathname.startsWith("/wikipedia/commons/"))continue;
-     const img=await get(u.href,true);if(!img.error)return {available:true,webviewCors:r.webviewCors&&img.webviewCors,bytes:img.bytes};return img;
+   try{const u=thumbnailUrl(c.thumburl);if(!u)continue;
+     const img=await get(u,true);if(!img.error)return {available:true,webviewCors:r.webviewCors&&img.webviewCors,bytes:img.bytes};return img;
    }catch{}
  }
  return {available:false,candidates:pages.length};
