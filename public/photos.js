@@ -18,3 +18,20 @@ export function photoForItem(qid) {
   const photo = Object.hasOwn(placePhotos,qid) ? placePhotos[qid] : null;
   return validatePhoto(photo) ? photo : null;
 }
+
+// Commons metadata can encode restrictions as a string or an array.
+export function unrestrictedPhotoLicense(metadata) {
+  const value = key => metadata?.[key]?.value;
+  const restrictions = value("Restrictions");
+  if (restrictions != null && !(typeof restrictions === "string" && !restrictions.trim()) && !(Array.isArray(restrictions) && restrictions.length === 0)) return null;
+  const name = value("LicenseShortName");
+  if (typeof name !== "string" || !Object.hasOwn(licenses,name)) return null;
+  const url = value("LicenseUrl");
+  if (typeof url !== "string") return null;
+  try {
+    const actual = new URL(url), expected = new URL(licenses[name]);
+    if (!["http:","https:"].includes(actual.protocol) || actual.hostname !== expected.hostname || actual.port || actual.username || actual.password || actual.search || actual.hash) return null;
+    if (actual.pathname.replace(/\/+$/,"") !== expected.pathname.replace(/\/+$/,"")) return null;
+    return {name,url:licenses[name]};
+  } catch {return null;}
+}

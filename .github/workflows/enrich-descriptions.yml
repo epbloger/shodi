@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: shodi-descriptions
   cancel-in-progress: false
@@ -13,7 +14,7 @@ jobs:
   enrich:
     if: github.ref == 'refs/heads/android-v2'
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 110
     steps:
       - uses: actions/checkout@v6
         with:
@@ -31,7 +32,7 @@ jobs:
           prior="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/enrich-descriptions.yml/runs?branch=android-v2&status=success&per_page=1" --jq '.workflow_runs[0] | [.id,.head_sha] | @tsv' || true)"
           if [ -z "$prior" ]; then exit 0; fi
           read -r id sha <<< "$prior"
-          if ! git diff --quiet "$sha" HEAD -- public/data/current-places.js public/data/place-descriptions.js public/data/imported-descriptions.js scripts/enrich-descriptions.mjs; then exit 0; fi
+          if ! git diff --quiet "$sha" HEAD -- public/data/current-places.js public/data/place-descriptions.js scripts/enrich-descriptions.mjs; then exit 0; fi
           dir="$RUNNER_TEMP/previous-descriptions"
           if gh run download "$id" -n shodi-description-import -D "$dir" && test -s "$dir/docs/description-coverage.json" && test -s "$dir/public/data/imported-descriptions.js"; then
             cp "$dir/docs/description-coverage.json" docs/
@@ -99,7 +100,7 @@ jobs:
           const photos=JSON.parse(photoMatch[1]);
           const entries=Object.entries(photos);
           const photoReport=JSON.parse(await readFile("import-snapshot/docs/photo-coverage.json","utf8"));
-          if(entries.length>100||entries.some(([id,p])=>!/^Q[1-9]\d*$/.test(id)||!validatePhoto(p))||photoReport.photos!==entries.length||!Number.isInteger(photoReport.coveredPlaces)||photoReport.coveredPlaces<0||photoReport.coveredPlaces>photoReport.catalogPlaces||photoReport.bytes>5000000)throw Error("Invalid photo data");
+          if(entries.length===0||entries.length>100||entries.some(([id,p])=>!/^Q[1-9]\d*$/.test(id)||!validatePhoto(p))||photoReport.photos!==entries.length||!Number.isInteger(photoReport.coveredPlaces)||photoReport.coveredPlaces<=0||photoReport.coveredPlaces>photoReport.catalogPlaces||photoReport.bytes>5000000)throw Error("Invalid photo data");
           await writeFile("public/data/place-photos.js","// Licensed Wikimedia Commons thumbnails.\nexport const placePhotos = "+JSON.stringify(photos)+";\n");
           await writeFile("docs/photo-coverage.json",JSON.stringify(photoReport,null,2)+"\n");
           JS
