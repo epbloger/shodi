@@ -9,6 +9,11 @@ on:
       - 'tests/**'
       - 'package*.json'
       - '.github/workflows/android.yml'
+  workflow_call:
+    inputs:
+      checkout_ref:
+        type: string
+        required: false
   workflow_dispatch:
     inputs:
       production:
@@ -28,6 +33,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+          ref: ${{ inputs.checkout_ref || github.sha }}
       - uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -56,7 +62,10 @@ jobs:
         run: npm audit --audit-level=high
       - run: gradle -p android :app:assembleDebug :app:lintDebug --no-daemon
       - name: Android dependency inventory
-        run: gradle -p android :app:dependencies --configuration debugRuntimeClasspath --no-daemon > android-dependencies.txt
+        run: |
+          gradle -p android :app:dependencies --configuration debugRuntimeClasspath --no-daemon > android-dependencies.txt
+          gradle -p android :app:exportRuntimeDependencies --no-daemon
+          node scripts/audit-android.mjs
       - name: Verify test APK
         run: |
           apk=android/app/build/outputs/apk/debug/app-debug.apk
@@ -67,7 +76,127 @@ jobs:
           if grep -E 'ACCESS_(FINE|COARSE)_LOCATION|com.google.android.gms.permission.AD_ID|READ_CONTACTS|READ_PHONE_STATE|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|RECORD_AUDIO|android.permission.CAMERA|QUERY_ALL_PACKAGES' android-permissions.txt; then
             echo "Unexpected sensitive permission"; exit 1
           fi
-          if unzip -p "$apk" classes.dex | strings | grep -Eq 'R-M-[0-9]+-[0-9]+'; then echo "Unexpected production ad ID"; exit 1; fi
+          python - <<'PY'
+          import pathlib,re
+          configs=list(pathlib.Path("android/app/build/generated").rglob("BuildConfig.java"))
+          assert configs, "Missing generated BuildConfig"
+          for p in configs:
+              assert not re.search(r"R-M-\d+-\d+",p.read_text()), "Production ad ID in test app configuration"
+          PY
+          if git grep -IlE 'R-M-[0-9]+-[0-9]+|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----' -- public android ':!android/.gitignore'; then
+            echo "Potential production ID or key in source"; exit 1
+          fi
+          if git ls-files | grep -Ei '\.(jks|keystore|p12|pfx|key)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shodi-android-security-report
+          path: |
+            android-dependencies.txt
+            android-runtime-dependencies.json
+            android-osv-report.json
+            android-permissions.txt
+            android/app/build/reports/lint-results-debug.html
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-android-test
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
+  emulator:
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.checkout_ref || github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-android-test
+          path: apk
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: python scripts/android-device-smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shodi-emulator-report
+          path: |
+            android-about.png
+            android-offline.png
+          retention-days: 7
+  production:
+    if: github.event_name == 'workflow_dispatch' && inputs.production && github.ref == 'refs/heads/main'
+    needs: [test, emulator]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: android-release
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+          cache-disabled: true
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: "platform-tools platforms;android-35 build-tools;35.0.0"
+          log-accepted-android-sdk-licenses: false
+      - run: npm ci --ignore-scripts && npm test && npm run build
+      - name: Assemble signed production APK
+        env:
+          KEYSTORE_B64: ${{ secrets.SHODI_KEYSTORE_B64 }}
+          SHODI_STORE_PASSWORD: ${{ secrets.SHODI_STORE_PASSWORD }}
+          SHODI_KEY_ALIAS: ${{ secrets.SHODI_KEY_ALIAS }}
+          SHODI_KEY_PASSWORD: ${{ secrets.SHODI_KEY_PASSWORD }}
+          SHODI_LEGAL_APPROVED: ${{ vars.SHODI_LEGAL_APPROVED }}
+          SHODI_BANNER_ID: ${{ secrets.SHODI_BANNER_ID }}
+          SHODI_INTERSTITIAL_ID: ${{ secrets.SHODI_INTERSTITIAL_ID }}
+          SHODI_NATIVE_ID: ${{ secrets.SHODI_NATIVE_ID }}
+        shell: bash
+        run: |
+          set -eu
+          umask 077
+          export SHODI_KEYSTORE="$RUNNER_TEMP/shodi-signing.jks"
+          trap 'rm -f "$SHODI_KEYSTORE"' EXIT
+          test -n "$KEYSTORE_B64"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$SHODI_KEYSTORE"
+          unset KEYSTORE_B64
+          gradle -p android :app:assembleRelease :app:lintRelease -PproductionAds=true --no-daemon
+          apk=android/app/build/outputs/apk/release/app-release.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='ru.moorkis.shodi'"
+          mkdir -p android-release-output
+          cp "$apk" android-release-output/shodi-2.0.0.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-rustore-apk
+          path: android-release-output/shodi-2.0.0.apk
+          if-no-files-found: error
+          retention-days: 3
+; then
+            echo "Potential checked-in key file"; exit 1
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

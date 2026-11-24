@@ -87,3 +87,16 @@ dependencies {
     implementation 'androidx.webkit:webkit:1.12.1'
     implementation 'com.yandex.android:mobileads:8.6.0'
 }
+
+// Audit the actual resolved runtime graph, including transitive dependencies.
+tasks.register("exportRuntimeDependencies") {
+    doLast {
+        def modules = configurations.debugRuntimeClasspath.incoming.resolutionResult.allComponents
+            .collect { it.id }
+            .findAll { it instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier }
+            .collect { [name: it.group + ":" + it.module, version: it.version] }
+            .unique().sort { it.name + ":" + it.version }
+        def output = rootProject.file("../android-runtime-dependencies.json")
+        output.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(modules)) + "\n"
+    }
+}

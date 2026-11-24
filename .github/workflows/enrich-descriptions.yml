@@ -17,11 +17,29 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v6
         with:
           node-version: 24
+      - name: Reuse completed import if catalog and importer did not change
+        id: reuse
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "reused=false" >> "$GITHUB_OUTPUT"
+          prior="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/enrich-descriptions.yml/runs?branch=android-v2&status=success&per_page=1" --jq '.workflow_runs[0] | [.id,.head_sha] | @tsv' || true)"
+          if [ -z "$prior" ]; then exit 0; fi
+          read -r id sha <<< "$prior"
+          if ! git diff --quiet "$sha" HEAD -- public/data/current-places.js public/data/place-descriptions.js public/data/imported-descriptions.js scripts/enrich-descriptions.mjs; then exit 0; fi
+          dir="$RUNNER_TEMP/previous-descriptions"
+          if gh run download "$id" -n shodi-description-import -D "$dir" && test -s "$dir/docs/description-coverage.json" && test -s "$dir/public/data/imported-descriptions.js"; then
+            cp "$dir/docs/description-coverage.json" docs/
+            cp "$dir/public/data/imported-descriptions.js" public/data/
+            echo "reused=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Match catalog to Wikidata
+        if: steps.reuse.outputs.reused != 'true'
         run: node scripts/enrich-descriptions.mjs
       - run: npm ci --ignore-scripts && npm test && npm run build
       - uses: actions/upload-artifact@v4
@@ -33,3 +51,59 @@ jobs:
             docs/description-coverage.json
           if-no-files-found: error
           retention-days: 7
+  integrate:
+    needs: enrich
+    if: github.ref == 'refs/heads/android-v2'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      revision: ${{ steps.commit.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: android-v2
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-description-import
+          path: import-snapshot
+      - name: Validate and integrate only catalog data
+        id: commit
+        run: |
+          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js public/data/place-descriptions.js public/data/imported-descriptions.js scripts/enrich-descriptions.mjs
+          node --input-type=module <<'JS'
+          import {readFile,writeFile} from "node:fs/promises";
+          const raw=await readFile("import-snapshot/public/data/imported-descriptions.js","utf8");
+          const m=/^\/\/[^\n]*\nexport const importedDescriptions = (\[[\s\S]*\]);\n?$/.exec(raw);
+          if(!m)throw Error("Generated data is not a plain JSON array");
+          const rows=JSON.parse(m[1]);
+          for(const row of rows){
+            if(!Array.isArray(row)||row.length!==5||typeof row[0]!=="string"||!Number.isFinite(row[1])||Math.abs(row[1])>90||!Number.isFinite(row[2])||Math.abs(row[2])>180||typeof row[3]!=="string"||row[3].length>360||!/^Q[1-9]\d*$/.test(row[4]))throw Error("Malformed imported row");
+          }
+          const report=JSON.parse(await readFile("import-snapshot/docs/description-coverage.json","utf8"));
+          if(!Number.isInteger(report.queriedLabels)||report.queriedLabels<=0||report.importedRecords!==rows.length||report.coveredPlaces>report.catalogPlaces)throw Error("Incomplete or inconsistent description import");
+          await writeFile("public/data/imported-descriptions.js","// Generated from Wikidata CC0; matched by label and coordinates.\nexport const importedDescriptions = "+JSON.stringify(rows)+";\n");
+          await writeFile("docs/description-coverage.json",JSON.stringify(report,null,2)+"\n");
+          JS
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+          git add public/data/imported-descriptions.js docs/description-coverage.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "data(catalog): integrate verified Wikidata descriptions and coverage"
+            git push origin HEAD:android-v2
+          fi
+          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  verify-apk:
+    needs: integrate
+    uses: ./.github/workflows/android.yml
+    with:
+      checkout_ref: ${{ needs.integrate.outputs.revision }}
+    permissions:
+      contents: read
