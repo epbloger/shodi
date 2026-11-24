@@ -310,3 +310,5 @@ dialog textarea { resize: vertical; }
   .sidebar-tools { width: 100%; }
   .sidebar-tools > .button { flex: 1; justify-content: center; }
 }
+
+.route-actions { display: flex; flex-wrap: wrap; gap: 8px; }

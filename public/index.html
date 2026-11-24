@@ -29,6 +29,7 @@
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 10-7 10s-7-5-7-10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></symbol>
     <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.9 13.35A9 9 0 0 1 10.65 3.1a9 9 0 1 0 10.25 10.25Z"/></symbol>
     <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></symbol>
     <symbol id="i-edit" viewBox="0 0 24 24"><path d="m13 6 5 5M4 20l1-5L16 4a2 2 0 0 1 3 0l1 1a2 2 0 0 1 0 3L9 19l-5 1Z"/></symbol>
     <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 18V6m-5 5 5-5 5 5"/></symbol>
     <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 6v12m-5-5 5 5 5-5"/></symbol>
@@ -129,9 +130,14 @@
             </p>
             <h1 id="route-title"></h1>
             <p id="route-description" class="description" hidden></p>
-            <button id="edit-route" class="button secondary" type="button">
-              <svg class="icon"><use href="#i-edit"/></svg> Изменить маршрут
-            </button>
+            <div class="route-actions">
+              <button id="edit-route" class="button secondary" type="button">
+                <svg class="icon"><use href="#i-edit"/></svg> Изменить маршрут
+              </button>
+              <button id="remove-route" class="button danger-text" type="button">
+                <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg> Удалить маршрут
+              </button>
+            </div>
           </div>
           <div class="hero-visual" aria-hidden="true">
             <span class="contour contour-one"></span>

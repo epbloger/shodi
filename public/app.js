@@ -19,6 +19,7 @@ const routeList = byId("route-list");
 const guideTrigger = byId("guide-trigger");
 let board = demoBoard();
 let editorContext = null;
+let deleteContext = null;
 let storage;
 let showingGuide = location.hash !== "#route";
 const refreshGuide = mountGuide({
@@ -309,8 +310,7 @@ form.addEventListener("submit", event => {
   }
 });
 
-byId("delete-item").addEventListener("click", () => {
-  const { type, routeId, itemId } = editorContext;
+function confirmDelete(type, routeId, itemId = null) {
   const noun = type === "route" ? "маршрут" : "остановку";
   const route = board.routes.find(entry => entry.id === routeId);
   const item = type === "route" ? route : route?.stops.find(stop => stop.id === itemId);
@@ -319,8 +319,18 @@ byId("delete-item").addEventListener("click", () => {
   text(byId("delete-message"), type === "route"
     ? "«" + item.name + "» будет удалён вместе с остановками."
     : "Остановка «" + item.name + "» будет удалена из маршрута.");
+  deleteContext = { type, routeId, itemId };
   removeDialog.returnValue = "cancel";
   removeDialog.showModal();
+}
+
+byId("delete-item").addEventListener("click", () => {
+  const { type, routeId, itemId } = editorContext;
+  confirmDelete(type, routeId, itemId);
+});
+byId("remove-route").addEventListener("click", () => {
+  const route = activeRoute();
+  if (route) confirmDelete("route", route.id);
 });
 
 byId("delete-form").addEventListener("submit", event => {
@@ -329,10 +339,12 @@ byId("delete-form").addEventListener("submit", event => {
 });
 
 removeDialog.addEventListener("close", () => {
-  if (removeDialog.returnValue !== "confirm") return;
-  const { type, routeId, itemId } = editorContext;
+  const pending = deleteContext;
+  deleteContext = null;
+  if (!pending || removeDialog.returnValue !== "confirm") return;
+  const { type, routeId, itemId } = pending;
   const route = board.routes.find(entry => entry.id === routeId);
-  editor.close();
+  if (editor.open) editor.close();
   if (!route) return;
   if (type === "route") {
     const routes = board.routes.filter(entry => entry.id !== routeId);
