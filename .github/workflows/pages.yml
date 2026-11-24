@@ -28,10 +28,22 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm test
       - run: npm run build
+      - name: Prepare self-contained website
+        run: |
+          mkdir -p dist/site/assets
+          cp dist/shodi.html dist/site/index.html
+          cp public/sitemap.xml dist/site/
+          cp public/assets/city-guide.webp public/assets/icon.svg dist/site/assets/
+      - name: Install browser for smoke test
+        run: |
+          npm install --no-save --package-lock=false playwright
+          npx playwright install --with-deps chromium
+      - name: Verify website and standalone HTML in Chromium
+        run: node scripts/smoke.mjs
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: public
+          path: dist/site
 
   deploy:
     needs: build
