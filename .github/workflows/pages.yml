@@ -112,3 +112,18 @@ jobs:
           TAG: ${{ steps.version.outputs.tag }}
         run: |
           gh release create "$TAG" dist/shodi.html --target "$GITHUB_SHA" --title "Сходи $TAG" --generate-notes
+      - name: Update local badge to the actual latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch origin main
+          git checkout -B main origin/main
+          tag="$(gh release view --json tagName --jq .tagName)"
+          node scripts/update-release-badge.mjs "$tag"
+          git add docs/release-badge.svg
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "docs: sync release badge with published version"
+            git push origin HEAD:main
+          fi

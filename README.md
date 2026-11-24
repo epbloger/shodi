@@ -14,7 +14,7 @@
 ![Города](https://img.shields.io/badge/Города-1117-34785B)
 ![Места](https://img.shields.io/badge/Места-5132-34785B)
 ![Категории](https://img.shields.io/badge/Категории-15-34785B)
-[![Версия](https://img.shields.io/github/v/release/epbloger/shodi?label=версия&color=496780)](https://github.com/epbloger/shodi/releases/latest)
+[![Последний релиз](docs/release-badge.svg)](https://github.com/epbloger/shodi/releases/latest)
 
 Бесплатно · Без регистрации · На компьютере и смартфоне
 
