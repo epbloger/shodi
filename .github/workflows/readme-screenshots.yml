@@ -1,0 +1,89 @@
+name: Refresh published README screenshots
+on:
+  push:
+    paths:
+      - '.github/workflows/readme-screenshots.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Verify published release and successful deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$(gh release view --json tagName --jq .tagName)" = v1.6.0
+          test "$(gh release view v1.6.0 --json targetCommitish --jq .targetCommitish)" = 7ee207d214a671c24248a7ba95723920e26f9c1f
+          for id in 45429514957 45428068127; do
+            test "$(gh run view "$id" --json conclusion --jq .conclusion)" = success
+          done
+          gh release download v1.6.0 --pattern shodi.html --dir /tmp/shodi-release
+          test -s /tmp/shodi-release/shodi.html
+          test "$(git hash-object README.md)" = 0597b3682edefe81ffd52a9195e6861e496e5c2b
+      - run: npm install --no-save --package-lock=false playwright
+      - run: npx playwright install --with-deps chromium
+      - name: Capture real public website
+        run: |
+          mkdir -p docs/screenshots
+          node --input-type=module <<'JS'
+          import {chromium} from 'playwright';
+          import assert from 'node:assert/strict';
+          const browser = await chromium.launch();
+          const url = 'https://epbloger.github.io/shodi/';
+          async function open(options) {
+            const context = await browser.newContext(options);
+            const page = await context.newPage();
+            assert.ok((await page.goto(url)).ok());
+            assert.equal(await page.locator('meta[name="shodi-revision"]').getAttribute('content'), '7ee207d214a671c24248a7ba95723920e26f9c1f');
+            await page.locator('#guide-panel').waitFor({state:'visible'});
+            await page.locator('.place-add').first().waitFor();
+            await page.evaluate(()=>document.fonts.ready);
+            assert.equal(await page.locator('#guide-city').inputValue(),'Санкт-Петербург');
+            assert.equal(await page.locator('#route-list .route-link').count(),0);
+            return page;
+          }
+          try {
+            const p = await open({viewport:{width:1440,height:1050},colorScheme:'light'});
+            if(await p.locator('html').getAttribute('data-theme')==='dark') await p.locator('#theme-toggle').click();
+            await p.screenshot({path:'docs/screenshots/catalog-light.png',animations:'disabled'});
+            await p.locator('#theme-toggle').click();
+            assert.equal(await p.locator('html').getAttribute('data-theme'),'dark');
+            await p.screenshot({path:'docs/screenshots/catalog-dark.png',animations:'disabled'});
+            await p.locator('#theme-toggle').click();
+            await p.locator('#guide-target').selectOption('');
+            await p.locator('.place-add').first().click();
+            await p.locator('.place-add').nth(1).click();
+            await p.locator('#open-guide-route').click();
+            await p.locator('#active-route').waitFor({state:'visible'});
+            await p.screenshot({path:'docs/screenshots/route.png',animations:'disabled'});
+            const m = await open({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1,colorScheme:'light'});
+            await m.screenshot({path:'docs/screenshots/mobile.png',animations:'disabled'});
+          } finally {await browser.close();}
+          JS
+      - name: Refresh README from verified catalog
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const c=JSON.parse(fs.readFileSync('docs/current-catalog.json','utf8'));
+          let s=fs.readFileSync('README.md','utf8');
+          const fmt=n=>n.toLocaleString('ru-RU');
+          s=s.replace('**Городской путеводитель и планировщик прогулок по России**','**Городской путеводитель и планировщик прогулок по России · v1.6.0**');
+          s=s.replace(/!\[Главный экран[^\n]+/,'![Каталог Санкт-Петербурга — светлая тема](docs/screenshots/catalog-light.png)\n\n## Интерфейс\n\nСине-графитовая палитра, светлая и тёмная темы. При первом запуске открывается каталог Санкт-Петербурга, список маршрутов пуст.\n\n![Тёмная тема](docs/screenshots/catalog-dark.png)\n\n![Пример маршрута, созданного для снимка](docs/screenshots/route.png)\n\n<img src="docs/screenshots/mobile.png" width="390" alt="Мобильная версия">');
+          s=s.replace(/<!-- current-catalog -->[\s\S]*?<!-- \/current-catalog -->/,'<!-- current-catalog -->\n**Снимок '+c.release+':** '+fmt(c.cities)+' городов с каталогом, '+fmt(c.places)+' мест. Санкт-Петербург — '+fmt(c.saint_petersburg)+' мест. Все 15 категорий представлены только в '+c.cities_with_all_categories+' городах. В поиске доступны '+fmt(c.all_city_count)+' городов. [Покрытие по городам и категориям](docs/catalog-coverage.json).\n<!-- /current-catalog -->');
+          const names={active:'Активный отдых',architecture:'Архитектура',books:'Книги',coffee:'Кофейни',family:'С детьми',food:'Рестораны',gallery:'Галереи и арт',live:'Концерты',market:'Рынки',museum:'Музеи',night:'Бары',park:'Парки',theater:'Театры',view:'Смотровые',walk:'Прогулки'};
+          s=s.replace('## 🧭 Как собрать прогулку','### Фактическое наполнение каталога\n\n| Категория | Россия | Санкт-Петербург |\n| --- | ---: | ---: |\n'+Object.entries(c.categories).map(([k,v])=>'| '+names[k]+' | '+fmt(v)+' | '+fmt(c.saint_petersburg_categories[k])+' |').join('\n')+'\n\n## 🧭 Как собрать прогулку');
+          s=s.replace('Перед визитом уточняйте стоимость, часы работы и наличие заведения.','Статус работы неизвестен для '+fmt(c.unknown_status)+' мест; подтверждённо открытых в данных — '+fmt(c.open_status)+'. Это не означает, что заведения закрыты. Перед визитом проверяйте адрес, часы работы и наличие заведения в Яндекс Картах или у самого заведения.');
+          fs.writeFileSync('README.md',s);
+          JS
+          git add README.md docs/screenshots
+          git diff --cached --quiet && exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'docs: refresh README and screenshots for published release'
+          git push
