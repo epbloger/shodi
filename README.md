@@ -8,13 +8,15 @@
 
 Куда сходить на выходных? Где выпить кофе, что посмотреть в новом городе и как спланировать день? Найдите интересные места, соберите собственный маршрут и отправляйтесь гулять.
 
-[![Открыть сайт](https://img.shields.io/badge/Открыть_сайт-онлайн-34785B?style=for-the-badge)](https://epbloger.github.io/shodi/)
-[![Скачать HTML](https://img.shields.io/badge/Скачать-HTML_файл-496780?style=for-the-badge)](https://github.com/epbloger/shodi/releases/latest/download/shodi.html)
+[![Открыть сайт](docs/badges/online.svg)](https://epbloger.github.io/shodi/)
+[![Скачать HTML](docs/badges/download.svg)](https://github.com/epbloger/shodi/releases/latest/download/shodi.html)
 
-![Города](https://img.shields.io/badge/Города-1117-34785B)
-![Места](https://img.shields.io/badge/Места-54799-34785B)
-![Категории](https://img.shields.io/badge/Категории-15-34785B)
+![Города](docs/badges/cities.svg)
+![Места](docs/badges/places.svg)
+![Категории](docs/badges/categories.svg)
 [![Последний релиз](docs/release-badge.svg)](https://github.com/epbloger/shodi/releases/latest)
+
+[Открыть сайт](https://epbloger.github.io/shodi/) · [Скачать HTML](https://github.com/epbloger/shodi/releases/latest/download/shodi.html) · [Последний релиз](https://github.com/epbloger/shodi/releases/latest)
 
 Бесплатно · Без регистрации · На компьютере и смартфоне
 
