@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Тихий маршрут — планировщик прогулок с остановками и отметками о посещении.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>Тихий маршрут</title>
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <svg class="symbols" aria-hidden="true">
+    <symbol id="i-route" viewBox="0 0 24 24"><path d="M10 18h6a4 4 0 0 0 0-8H8a3 3 0 0 1 0-6h3"/><circle cx="7" cy="18" r="3"/><circle cx="14" cy="4" r="2"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 10-7 10s-7-5-7-10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.2"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="m13 6 5 5M4 20l1-5L16 4a2 2 0 0 1 3 0l1 1a2 2 0 0 1 0 3L9 19l-5 1Z"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 18V6m-5 5 5-5 5 5"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 6v12m-5-5 5 5 5-5"/></symbol>
+    <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 9h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9Zm13 1h2a2 2 0 0 1 0 4h-2M8 6V4m4 2V4m-9 17h17"/></symbol>
+    <symbol id="i-park" viewBox="0 0 24 24"><path d="M12 3 6 12h3l-4 5h14l-4-5h3l-6-9Zm0 14v4"/></symbol>
+    <symbol id="i-culture" viewBox="0 0 24 24"><path d="m3 9 9-5 9 5H3Zm2 11h14M7 12v5m5-5v5m5-5v5"/></symbol>
+    <symbol id="i-view" viewBox="0 0 24 24"><path d="M2 18 9 7l4 6 3-4 6 9H2Z"/><circle cx="17" cy="5" r="1.2"/></symbol>
+  </svg>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="brand" href="./" aria-label="Тихий маршрут, главная">
+        <span class="brand-mark"><svg class="icon"><use href="#i-route"/></svg></span>
+        <span>Тихий<br>маршрут</span>
+      </a>
+      <nav aria-label="Мои маршруты">
+        <p class="nav-title">Мои маршруты</p>
+        <div id="route-list" class="route-list"></div>
+      </nav>
+      <button id="add-route" class="button sidebar-add" type="button">
+        <svg class="icon"><use href="#i-plus"/></svg> Новый маршрут
+      </button>
+    </aside>
+
+    <main id="main">
+      <div id="storage-notice" class="notice" role="status" hidden></div>
+      <section id="active-route" aria-labelledby="route-title" hidden>
+        <header class="hero">
+          <div class="hero-copy">
+            <p id="city-line" class="city" hidden>
+              <svg class="icon"><use href="#i-pin"/></svg>
+              <span id="route-city"></span>
+            </p>
+            <h1 id="route-title"></h1>
+            <p id="route-description" class="description" hidden></p>
+            <button id="edit-route" class="button secondary" type="button">
+              <svg class="icon"><use href="#i-edit"/></svg> Изменить маршрут
+            </button>
+          </div>
+          <div class="hero-visual" aria-hidden="true">
+            <span class="contour contour-one"></span>
+            <span class="contour contour-two"></span>
+            <svg class="icon"><use href="#i-route"/></svg>
+            <img id="demo-image" src="./assets/embankment.webp" alt="" width="1440" height="1080" hidden>
+          </div>
+        </header>
+
+        <dl class="stats">
+          <div><dt>Остановки</dt><dd id="stop-count"></dd></div>
+          <div><dt>Время на местах</dt><dd id="route-time"></dd></div>
+          <div class="progress-stat">
+            <dt>Посещено</dt>
+            <dd><span id="visited-count"></span><progress id="route-progress" max="1" value="0" aria-label="Доля посещённых остановок"></progress></dd>
+          </div>
+        </dl>
+
+        <section class="itinerary" aria-labelledby="itinerary-title">
+          <header class="section-header">
+            <h2 id="itinerary-title">Остановки</h2>
+            <button id="add-stop" class="button primary" type="button">
+              <svg class="icon"><use href="#i-plus"/></svg> Добавить остановку
+            </button>
+          </header>
+          <p id="no-stops" class="empty-card" hidden>Добавьте первое место для прогулки.</p>
+          <ol id="stop-list" class="stop-list"></ol>
+        </section>
+      </section>
+
+      <section id="empty-board" class="empty-board" aria-labelledby="empty-title" hidden>
+        <span class="brand-mark"><svg class="icon"><use href="#i-route"/></svg></span>
+        <h1 id="empty-title">Куда пойдём?</h1>
+        <p>Создайте маршрут и добавьте места, которые хотите посетить.</p>
+        <button id="empty-add" class="button primary" type="button"><svg class="icon"><use href="#i-plus"/></svg> Новый маршрут</button>
+      </section>
+      <p id="announcement" class="sr-only" role="status"></p>
+      <noscript>Для работы планировщика включите JavaScript в браузере.</noscript>
+    </main>
+  </div>
+
+  <dialog id="editor" aria-labelledby="editor-title">
+    <form id="edit-form" method="dialog">
+      <h2 id="editor-title"></h2>
+      <label>Название
+        <input id="name" name="name" type="text" maxlength="80" required autocomplete="off">
+      </label>
+      <label id="city-field">Город
+        <input name="city" type="text" maxlength="60" autocomplete="off">
+      </label>
+      <div id="stop-fields" class="form-row">
+        <label>Категория
+          <select name="kind">
+            <option value="view">Вид</option>
+            <option value="park">Парк</option>
+            <option value="culture">Культура</option>
+            <option value="coffee">Кофе</option>
+            <option value="other">Другое</option>
+          </select>
+        </label>
+        <label>Минуты на месте
+          <input name="minutes" type="number" min="0" max="720" step="1" value="0">
+        </label>
+      </div>
+      <label><span id="note-label">Описание</span>
+        <textarea name="note" maxlength="400" rows="3"></textarea>
+      </label>
+      <p id="form-error" class="form-error" role="alert" hidden></p>
+      <div class="dialog-actions">
+        <button id="delete-item" class="button danger-text" type="button" hidden>Удалить</button>
+        <div class="save-actions">
+          <button class="button secondary" type="button" data-dismiss>Отмена</button>
+          <button class="button primary" type="submit">Сохранить</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-message">
+    <form id="delete-form" method="dialog">
+      <h2 id="delete-title"></h2>
+      <p id="delete-message"></p>
+      <div class="dialog-actions">
+        <div class="save-actions">
+          <button class="button secondary" value="cancel" autofocus>Отмена</button>
+          <button class="button danger" value="confirm">Удалить</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="route-template">
+    <button class="route-link" type="button">
+      <span class="route-link-icon"><svg class="icon"><use href="#i-pin"/></svg></span>
+      <span class="route-link-copy"><span class="route-name"></span><span class="route-city"></span></span>
+      <span class="route-summary"></span>
+    </button>
+  </template>
+
+  <template id="stop-template">
+    <li class="stop">
+      <span class="stop-number"></span>
+      <article class="stop-card">
+        <span class="stop-kind"><svg class="icon"><use/></svg></span>
+        <div class="stop-copy">
+          <h3 class="stop-title"></h3>
+          <p class="stop-detail"></p>
+          <p class="stop-note" hidden></p>
+        </div>
+        <div class="stop-actions">
+          <div class="order-actions">
+            <button class="icon-button move-up" type="button"><svg class="icon"><use href="#i-up"/></svg></button>
+            <button class="icon-button move-down" type="button"><svg class="icon"><use href="#i-down"/></svg></button>
+            <button class="icon-button edit-stop" type="button"><svg class="icon"><use href="#i-edit"/></svg></button>
+          </div>
+          <label class="visit"><input class="visit-toggle" type="checkbox"><span class="visit-label">Посещено</span></label>
+        </div>
+      </article>
+    </li>
+  </template>
+</body>
+</html>
