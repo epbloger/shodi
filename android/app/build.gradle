@@ -1,0 +1,77 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+def env = System.getenv()
+def production = providers.gradleProperty("productionAds").orElse("false").get() == "true"
+def signingPath = env["SHODI_KEYSTORE"]
+def adIds = ["BANNER", "INTERSTITIAL", "NATIVE"]
+if (production) {
+    for (key in ["SHODI_KEYSTORE", "SHODI_STORE_PASSWORD", "SHODI_KEY_ALIAS", "SHODI_KEY_PASSWORD"]) {
+        if (!env[key]) throw new GradleException("Missing release signing configuration: " + key)
+    }
+    if (!file(signingPath).isFile()) throw new GradleException("Release keystore is unavailable")
+    for (kind in adIds) {
+        if (!(env["SHODI_" + kind + "_ID"] ==~ /R-M-\d+-\d+/)) throw new GradleException("Missing or invalid ad block configuration: " + kind)
+    }
+}
+android {
+    namespace 'ru.moorkis.shodi'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'ru.moorkis.shodi'
+        minSdk 26
+        targetSdk 35
+        versionCode 20000
+        versionName '2.0.0'
+        buildConfigField 'String', 'BANNER_ID', '"demo-banner-yandex"'
+        buildConfigField 'String', 'INTERSTITIAL_ID', '"demo-interstitial-yandex"'
+        buildConfigField 'String', 'NATIVE_ID', '"demo-native-content-yandex"'
+        buildConfigField 'boolean', 'PRODUCTION_ADS', 'false'
+    }
+    buildFeatures { buildConfig true }
+    signingConfigs {
+        if (production) {
+            release {
+                storeFile file(signingPath)
+                storePassword env["SHODI_STORE_PASSWORD"]
+                keyAlias env["SHODI_KEY_ALIAS"]
+                keyPassword env["SHODI_KEY_PASSWORD"]
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-test'
+        }
+        release {
+            if (production) {
+                signingConfig signingConfigs.release
+                buildConfigField 'boolean', 'PRODUCTION_ADS', 'true'
+                adIds.each { kind -> buildConfigField 'String', kind + '_ID', '"' + env["SHODI_" + kind + "_ID"] + '"' }
+            }
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = '17' }
+    sourceSets.main.assets.srcDir(layout.buildDirectory.dir("generated/webAssets"))
+}
+tasks.register("copyWeb", Copy) {
+    from(rootProject.file("../dist/shodi.html"))
+    into(layout.buildDirectory.dir("generated/webAssets"))
+    rename { "index.html" }
+    doFirst {
+        if (!rootProject.file("../dist/shodi.html").isFile()) throw new GradleException("Run npm ci && npm run build in repository root first")
+    }
+}
+tasks.named("preBuild").configure { dependsOn("copyWeb") }
+dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
+    implementation 'com.yandex.android:mobileads:8.6.0'
+}
