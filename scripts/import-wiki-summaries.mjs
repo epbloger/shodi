@@ -3,7 +3,7 @@ import {createHash} from "node:crypto";
 import {currentPlaces} from "../public/data/current-places.js";
 import {descriptionForPlace} from "../public/descriptions.js";
 import {brandForPlace} from "../public/brands.js";
-import {validWikiSummary,exactNearbyArticle} from "../public/wiki-summary.js";
+import {validWikiSummary,exactNearbyArticle,wikipediaTextLicense} from "../public/wiki-summary.js";
 import {wikiSummaries as previous} from "../public/data/wiki-summaries.js";
 const deadline=Date.now()+7*60000,pause=ms=>new Promise(r=>setTimeout(r,ms));
 const ua="SHODI/2.0 guide (https://github.com/epbloger/shodi; helpmoorkis@yandex.ru)";
@@ -28,8 +28,15 @@ for(const [id,row] of Object.entries(previous))if(validWikiSummary(row)&&(ids.ge
 const hash=createHash("sha256").update(JSON.stringify([...places.values()])).digest("hex");
 let completed=new Set(),checkedIds=new Set();
 try{const r=JSON.parse(await readFile("docs/wiki-summary-coverage.json","utf8"));if(r.catalogHash===hash){completed=new Set(r.completedTitles||[]);checkedIds=new Set(r.checkedIds||[]);}}catch{}
-const rights=await api("ru.wikipedia.org",{action:"query",meta:"siteinfo",siprop:"rightsinfo"});
-if(!/creativecommons\.org\/licenses\/by-sa\/4\.0\/?$/.test(rights.query?.rightsinfo?.url||""))throw Error("Unexpected Wikipedia text license");
+let licenseConfirmed=false;
+try{
+ const rights=await api("ru.wikipedia.org",{action:"query",meta:"siteinfo",siprop:"rightsinfo"});
+ const url=rights.query?.rightsinfo?.url;
+ licenseConfirmed=wikipediaTextLicense(url);
+ if(!licenseConfirmed)console.warn("Wikipedia text license not recognized; preserving previous verified records only:",JSON.stringify(rights.query?.rightsinfo??null));
+}catch(e){console.warn("Wikipedia license metadata unavailable:",String(e));}
+if(!licenseConfirmed)errors++;
+
 function extract(page,max=360){
  if(!page||Object.hasOwn(page.pageprops||{},"disambiguation"))return null;
  const text=String(page.extract||"").trim().replace(/\s+/g," ").replace(/\[\d+\]/g,"").trim();
@@ -40,7 +47,7 @@ function extract(page,max=360){
 const queryPages=async titles=>(await api("ru.wikipedia.org",{action:"query",titles:titles.join("|"),prop:"extracts|pageprops|coordinates|info",exintro:"1",explaintext:"1",exchars:"500",exlimit:"20",ppprop:"wikibase_item|disambiguation",colimit:"max"})).query?.pages||[];
 const pending=[...new Set([...ids].filter(([k])=>!out[k]&&!checkedIds.has(k)).map(([,q])=>q))];
 let added=0,directAdded=0;
-for(let i=0;i<pending.length&&Date.now()<deadline&&Date.now()>=cooldown;i+=40){
+for(let i=0;licenseConfirmed&&i<pending.length&&Date.now()<deadline&&Date.now()>=cooldown;i+=40){
  const batch=pending.slice(i,i+40);
  try{
   const entity=(await api("www.wikidata.org",{action:"wbgetentities",ids:batch.join("|"),props:"sitelinks",sitefilter:"ruwiki"})).entities||{};
@@ -60,7 +67,7 @@ for(const p of places.values()){
  byTitle.get(p.name).push(p);
 }
 const titles=[...byTitle.keys()];
-for(let i=0;i<titles.length&&Date.now()<deadline&&Date.now()>=cooldown&&errors<4;i+=20){
+for(let i=0;licenseConfirmed&&i<titles.length&&Date.now()<deadline&&Date.now()>=cooldown&&errors<4;i+=20){
  const batch=titles.slice(i,i+20);
  try{
   for(const page of await queryPages(batch)){
@@ -70,7 +77,7 @@ for(let i=0;i<titles.length&&Date.now()<deadline&&Date.now()>=cooldown&&errors<4
   for(const title of batch)completed.add(title);
  }catch(e){errors++;console.warn("Wiki title batch",String(e));}
 }
-const report={catalogHash:hash,articles:Object.keys(out).length,added,directAdded,errors,completedTitles:[...completed],checkedIds:[...checkedIds],license:"CC BY-SA 4.0"};
+const report={catalogHash:hash,licenseConfirmed,articles:Object.keys(out).length,added,directAdded,errors,completedTitles:[...completed],checkedIds:[...checkedIds],license:"CC BY-SA 4.0"};
 await writeFile("public/data/wiki-summaries.js","// Russian Wikipedia excerpts, CC BY-SA 4.0.\nexport const wikiSummaries = "+JSON.stringify(out)+";\n");
 await writeFile("docs/wiki-summary-coverage.json",JSON.stringify(report,null,2)+"\n");
 console.log(JSON.stringify({...report,completedTitles:completed.size,checkedIds:checkedIds.size}));

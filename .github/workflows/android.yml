@@ -56,6 +56,10 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+      - name: Prepare verified real Saint Petersburg photograph
+        run: |
+          python -m pip install Pillow==11.3.0
+          python scripts/prepare-hero-photo.py
       - name: Restore catalog brand links
         id: brand-links-cache
         uses: actions/cache/restore@v4
@@ -179,6 +183,7 @@ jobs:
             public/data/place-taxonomy.js
             public/data/wiki-summaries.js
             docs/wiki-summary-coverage.json
+            public/assets/city-guide.webp
           if-no-files-found: error
           retention-days: 7
       - run: npm ci --ignore-scripts && npm test && npm run build

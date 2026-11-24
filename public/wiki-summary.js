@@ -18,3 +18,10 @@ export function wikiSummaryForPlace(id,details,brand){
 export function exactNearbyArticle(page,place){
  return Boolean(page&&Array.isArray(page.coordinates)&&/^Q[1-9]\d*$/.test(page.pageprops?.wikibase_item||"")&&!Object.hasOwn(page.pageprops||{},"disambiguation")&&norm(page.title)===norm(place.name)&&page.coordinates.some(c=>c.globe==="earth"&&Number.isFinite(c.lat)&&Number.isFinite(c.lon)&&Math.hypot((place.lat-c.lat)*111320,(place.lon-c.lon)*111320*Math.cos(place.lat*Math.PI/180))<=180));
 }
+
+export function wikipediaTextLicense(url){
+ try{
+  const u=new URL(url,"https://ru.wikipedia.org");
+  return ["https:","http:"].includes(u.protocol)&&u.hostname==="creativecommons.org"&&!u.username&&!u.password&&!u.port&&!u.search&&!u.hash&&/^\/licenses\/by-sa\/4\.0(?:\/(?:deed(?:\.[a-zA-Z-]+)?|legalcode(?:\.[a-zA-Z-]+)?))?\/?$/.test(u.pathname);
+ }catch{return false;}
+}

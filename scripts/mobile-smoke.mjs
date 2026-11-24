@@ -22,7 +22,7 @@ try {
   await page.goto("https://appassets.androidplatform.net/assets/index.html");
   await page.locator("#guide-panel").waitFor({state:"visible"});
   assert.equal(await page.locator(".place-card").count(),10);
-  assert.ok(await page.locator(".hero-mobile").isVisible());
+  assert.ok(await page.locator(".hero-desktop").isVisible());
   assert.ok(!await page.locator(".hero-desktop").isVisible());
   assert.equal(await page.locator(".place-description:visible").count(),10);
   assert.ok((await page.locator(".place-map").first().textContent()).includes("Подробнее на картах"));
