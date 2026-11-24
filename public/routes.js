@@ -1,7 +1,10 @@
+import { PLACE_CATEGORIES } from "./guide.js";
+
 export const MAX_ROUTES = 30;
 export const MAX_STOPS = 32;
 
 export const KINDS = Object.freeze({
+  ...Object.fromEntries(Object.entries(PLACE_CATEGORIES).map(([kind, category]) => [kind, category.name])),
   view: "Вид",
   park: "Парк",
   culture: "Культура",
@@ -70,7 +73,10 @@ export function readBoard(raw) {
     ...routeDetails(route),
     stops: records(route.stops, MAX_STOPS, stop => {
       if (typeof stop.visited !== "boolean") throw new Error("Некорректная отметка посещения.");
-      return { id: id(stop.id), ...stopDetails(stop), visited: stop.visited };
+      return {
+        id: id(stop.id), ...stopDetails(stop), visited: stop.visited,
+        ...(stop.placeId === undefined ? {} : { placeId: id(stop.placeId) }),
+      };
     }),
   }));
   const selected = routes.some(route => route.id === data.selected) ? data.selected : routes[0]?.id ?? null;

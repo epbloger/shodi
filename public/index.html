@@ -43,7 +43,7 @@
         <span class="brand-mark"><svg class="icon"><use href="#i-pin"/></svg></span>
         <span>сходи<span class="brand-dot">.</span></span>
       </a>
-      <nav aria-label="Мои маршруты">
+      <nav aria-label="Места и маршруты">
         <button id="guide-trigger" class="guide-link" type="button">
           <svg class="icon"><use href="#i-pin"/></svg> Места в городе
         </button>
@@ -63,7 +63,7 @@
             <h1 id="guide-title">Куда сходить?</h1>
             <p>Выберите город и найдите места для следующей прогулки.</p>
           </div>
-          <img src="./assets/city-guide.webp" alt="" width="1440" height="1080">
+          <img src="./assets/city-guide.webp" alt="" width="1440" height="960">
         </header>
         <div class="guide-controls">
           <label class="guide-field">Город
@@ -74,6 +74,12 @@
               <input id="guide-search" type="search" placeholder="Название, район или интерес" maxlength="100" autocomplete="off">
             </span>
           </label>
+          <div class="guide-destination">
+            <label class="guide-field">Добавлять в маршрут
+              <select id="guide-target"></select>
+            </label>
+            <button id="open-guide-route" class="button secondary" type="button" hidden>Открыть маршрут</button>
+          </div>
         </div>
         <div id="guide-categories" class="categories" role="group" aria-label="Категории мест"></div>
         <header class="guide-results-header">
@@ -81,6 +87,7 @@
           <p id="guide-count" role="status"></p>
         </header>
         <p class="guide-price-note">Цены указаны ориентировочно на одного человека. Перед визитом проверьте тарифы и часы работы.</p>
+        <p id="guide-feedback" class="guide-feedback" role="status" hidden></p>
         <div id="guide-places" class="place-grid"></div>
         <div id="guide-empty" class="empty-card guide-empty" hidden>
           <p>Нет мест по этим фильтрам.</p>
@@ -151,13 +158,7 @@
       </label>
       <div id="stop-fields" class="form-row">
         <label>Категория
-          <select name="kind">
-            <option value="view">Вид</option>
-            <option value="park">Парк</option>
-            <option value="culture">Культура</option>
-            <option value="coffee">Кофе</option>
-            <option value="other">Другое</option>
-          </select>
+          <select name="kind"></select>
         </label>
         <label>Минуты на месте
           <input name="minutes" type="number" min="0" max="720" step="1" value="0">
@@ -211,6 +212,7 @@
         <p class="place-budget"></p>
         <a class="place-map" target="_blank" rel="noopener noreferrer">На карте <svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
       </div>
+      <button class="button secondary place-add" type="button"><svg class="icon"><use href="#i-plus"/></svg><span>В маршрут</span></button>
     </article>
   </template>
 
@@ -223,6 +225,7 @@
           <h3 class="stop-title"></h3>
           <p class="stop-detail"></p>
           <p class="stop-note" hidden></p>
+          <a class="place-map stop-map" target="_blank" rel="noopener noreferrer" hidden>На карте <svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
         </div>
         <div class="stop-actions">
           <div class="order-actions">

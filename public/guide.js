@@ -1,8 +1,8 @@
 export const PLACE_CATEGORIES = Object.freeze({
   museum: { label: "Музеи", name: "Музей", icon: "culture" },
   gallery: { label: "Галереи и арт", name: "Галерея", icon: "art" },
-  coffee: { label: "Кофейни", name: "Кофейня", icon: "coffee" },
-  food: { label: "Рестораны", name: "Ресторан", icon: "food" },
+  coffee: { label: "Кофейни", name: "Кофейня", icon: "coffee", keywords: "кафе кофе завтрак" },
+  food: { label: "Рестораны", name: "Ресторан", icon: "food", keywords: "кафе еда обед ужин" },
   park: { label: "Парки", name: "Парк", icon: "park" },
   architecture: { label: "Архитектура", name: "Архитектура", icon: "culture" },
   walk: { label: "Прогулки", name: "Прогулка", icon: "route" },
@@ -139,12 +139,21 @@ function normalized(value) {
   return value.toLocaleLowerCase("ru").replaceAll("ё", "е").trim();
 }
 
+export function cityMatches(name, city) {
+  return normalized(name) === normalized(city);
+}
+
+export function placeById(id) {
+  return placesForCity(id.split("-")[0]).find(place => place.id === id);
+}
+
 export function findPlaces({ cityId, category = "all", query = "" }) {
   const terms = normalized(query).split(/\s+/).filter(Boolean);
   return placesForCity(cityId).filter(place => {
     if (category !== "all" && category !== place.kind) return false;
     if (!terms.length) return true;
-    const description = normalized([place.name, place.area, place.description, PLACE_CATEGORIES[place.kind].label].join(" "));
+    const kind = PLACE_CATEGORIES[place.kind];
+    const description = normalized([place.name, place.city, place.area, place.description, kind.label, kind.keywords].join(" "));
     return terms.every(term => description.includes(term));
   });
 }

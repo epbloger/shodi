@@ -3,6 +3,7 @@ import {
   newId, readBoard, routeDetails, routeStats, stopDetails,
 } from "./routes.js";
 import { mountGuide } from "./guide-view.js";
+import { budgetLabel, cityMatches, mapLink, placeById, PLACE_CATEGORIES } from "./guide.js";
 
 const KEY = "weekend-atlas/v1";
 const byId = id => document.getElementById(id);
@@ -17,7 +18,15 @@ let board = demoBoard();
 let editorContext = null;
 let storage;
 let showingGuide = location.hash !== "#route";
-mountGuide();
+const refreshGuide = mountGuide({
+  getRoutes: () => board.routes,
+  selectedRoute: () => activeRoute(),
+  addPlace: addSuggestedStop,
+  openRoute,
+});
+for (const [kind, name] of Object.entries(KINDS)) {
+  fields.kind.add(new Option(name, kind));
+}
 
 function showView(guide) {
   showingGuide = guide;
@@ -68,6 +77,28 @@ function replaceRoute(updated, message) {
   }, message);
 }
 
+function addSuggestedStop(place, routeId) {
+  let route = board.routes.find(entry => entry.id === routeId);
+  if (routeId && (!route || !cityMatches(route.city, place.city))) {
+    throw new Error("Выберите маршрут для этого города.");
+  }
+  if (!route && board.routes.length >= MAX_ROUTES) throw new Error("Достигнут лимит маршрутов.");
+  if (route?.stops.some(stop => stop.placeId === place.id)) return route.id;
+  if (route?.stops.length >= MAX_STOPS) throw new Error("Маршрут уже содержит максимум остановок.");
+
+  const create = !route;
+  route ??= { id: newId(), name: place.city + " — прогулка", city: place.city, note: "", stops: [] };
+  const note = place.description + "\n" + budgetLabel(place.budget);
+  const stop = {
+    id: newId(), placeId: place.id, visited: false,
+    ...stopDetails({ name: place.name, kind: place.kind, note, minutes: 0 }),
+  };
+  const updated = { ...route, stops: [...route.stops, stop] };
+  const routes = create ? [...board.routes, updated] : board.routes.map(item => item.id === route.id ? updated : item);
+  save({ ...board, selected: route.id, routes }, "Место добавлено в маршрут.");
+  return route.id;
+}
+
 function text(element, value) {
   element.textContent = value;
 }
@@ -88,15 +119,19 @@ function renderRoutes() {
     city.hidden = !route.city;
     const { visited } = routeStats(route.stops);
     text(link.querySelector(".route-summary"), visited + "/" + route.stops.length);
-    link.addEventListener("click", () => {
-      showView(false);
-      if (board.selected === route.id) render();
-      else save({ ...board, selected: route.id }, "Открыт маршрут «" + route.name + "».");
-      focusRoute(route.id);
-    });
+    link.addEventListener("click", () => openRoute(route.id));
     fragment.append(link);
   }
   routeList.replaceChildren(fragment);
+}
+
+function openRoute(id) {
+  const route = board.routes.find(entry => entry.id === id);
+  if (!route) return;
+  showView(false);
+  if (board.selected === id) render();
+  else save({ ...board, selected: id }, "Открыт маршрут «" + route.name + "».");
+  focusRoute(id);
 }
 
 function focusRoute(id) {
@@ -130,7 +165,15 @@ function renderStops(route) {
     note.hidden = !stop.note;
     const kind = item.querySelector(".stop-kind");
     kind.dataset.kind = stop.kind;
-    kind.querySelector("use").setAttribute("href", "#i-" + (stop.kind === "other" ? "pin" : stop.kind));
+    const icon = PLACE_CATEGORIES[stop.kind]?.icon ?? (stop.kind === "culture" ? "culture" : "pin");
+    kind.querySelector("use").setAttribute("href", "#i-" + icon);
+    const place = stop.placeId ? placeById(stop.placeId) : null;
+    if (place) {
+      const map = item.querySelector(".stop-map");
+      map.href = mapLink(place);
+      map.hidden = false;
+      map.setAttribute("aria-label", place.name + " на карте, откроется в новой вкладке");
+    }
     const toggle = item.querySelector(".visit-toggle");
     toggle.checked = stop.visited;
     setLabel(toggle, "Посещено: " + stop.name);
@@ -163,12 +206,16 @@ function renderStops(route) {
 function render() {
   renderRoutes();
   const route = activeRoute();
-  guideTrigger.toggleAttribute("aria-current", showingGuide);
   if (showingGuide) guideTrigger.setAttribute("aria-current", "page");
+  else guideTrigger.removeAttribute("aria-current");
   byId("guide-panel").hidden = !showingGuide;
   byId("active-route").hidden = showingGuide || !route;
   byId("empty-board").hidden = showingGuide || Boolean(route);
   byId("add-route").disabled = board.routes.length >= MAX_ROUTES;
+  if (showingGuide) {
+    refreshGuide();
+    return;
+  }
   if (!route) {
     stopList.replaceChildren();
     return;
@@ -198,6 +245,7 @@ function openEditor(type, existing = null) {
   form.reset();
   byId("form-error").hidden = true;
   const editingRoute = type === "route";
+  fields.kind.value = "view";
   text(byId("editor-title"), editingRoute
     ? (existing ? "Редактировать маршрут" : "Новый маршрут")
     : (existing ? "Редактировать остановку" : "Новая остановка"));
