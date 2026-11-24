@@ -1,3 +1,4 @@
+import {KARTA_API,kartaCandidates,kartaRecord,validKartaPhoto} from "./kartaview-photos.js";
 import {validatePhoto,unrestrictedPhotoLicense} from "./photos.js";
 const ORIGIN="https://appassets.androidplatform.net";
 const QID=/^Q[1-9]\d*$/;
@@ -29,7 +30,8 @@ async function cacheWrite(place,photo){
     tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
   });}catch{}
 }
-let cooldown=0,lastRequest=0;
+let cooldown=0,lastRequest=0,kartaCooldown=0;
+const validCachedPhoto=p=>validatePhoto(p)||validKartaPhoto(p);
 async function request(host,params){
   if(Date.now()<cooldown)throw Error("Photo source cooldown");
   const wait=lastRequest+1200-Date.now();if(wait>0)await delay(wait);
@@ -59,16 +61,9 @@ export function thumbnailUrl(value){
     return u.href;
   }catch{return null;}
 }
-async function getCommonsPhoto(filename){
-  if(typeof filename!=="string"||filename.length>350||!/\.(jpe?g|png)$/i.test(filename))return null;
-  const result=await request("commons.wikimedia.org",{action:"query",titles:"File:"+filename,prop:"imageinfo",iiprop:"url|mime|extmetadata",iiurlwidth:"330",formatversion:"2"});
-  const page=result.query?.pages?.[0],info=page?.imageinfo?.[0];
-  const license=unrestrictedPhotoLicense(info?.extmetadata);
-  const author=String(info?.extmetadata?.Artist?.value||"").replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();
-  const url=thumbnailUrl(info?.thumburl);
-  if(!license||!url||!author||author.length>500||typeof page.title!=="string")return null;
+async function readThumbnail(url,provider){
   const response=await fetch(url,{credentials:"omit",referrerPolicy:"no-referrer",redirect:"error",signal:AbortSignal.timeout(12000)});
-  if(response.status===429){cooldown=Date.now()+60000;throw Error("Thumbnail rate limit");}
+  if(response.status===429||response.status===503){if(provider==="kartaview")kartaCooldown=Date.now()+3600000;else cooldown=Date.now()+60000;throw Error("Thumbnail rate limit");}
   if(!response.ok)return null;
   const type=response.headers.get("content-type")?.split(";")[0];
   if(!["image/jpeg","image/png"].includes(type))return null;
@@ -79,7 +74,19 @@ async function getCommonsPhoto(filename){
   if(type==="image/jpeg"&&!(bytes[0]===255&&bytes[1]===216&&bytes[2]===255))return null;
   if(type==="image/png"&&![137,80,78,71,13,10,26,10].every((n,i)=>bytes[i]===n))return null;
   let binary="";for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
-  const photo={data:"data:"+type+";base64,"+btoa(binary),author,title:page.title,license:license.name,licenseUrl:license.url,source:"https://commons.wikimedia.org/wiki/"+encodeURIComponent(page.title.replaceAll(" ","_")).replace(/^File%3A/,"File:")};
+  return "data:"+type+";base64,"+btoa(binary);
+}
+async function getCommonsPhoto(filename){
+  if(typeof filename!=="string"||filename.length>350||!/\.(jpe?g|png)$/i.test(filename))return null;
+  const result=await request("commons.wikimedia.org",{action:"query",titles:"File:"+filename,prop:"imageinfo",iiprop:"url|mime|extmetadata",iiurlwidth:"330",formatversion:"2"});
+  const page=result.query?.pages?.[0],info=page?.imageinfo?.[0];
+  const license=unrestrictedPhotoLicense(info?.extmetadata);
+  const author=String(info?.extmetadata?.Artist?.value||"").replace(/<[^>]*>/g," ").replace(/&amp;/g,"&").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();
+  const url=thumbnailUrl(info?.thumburl);
+  if(!license||!url||!author||author.length>500||typeof page.title!=="string")return null;
+  const data=await readThumbnail(url,"commons");
+  if(!data)return null;
+  const photo={data,author,title:page.title,license:license.name,licenseUrl:license.url,source:"https://commons.wikimedia.org/wiki/"+encodeURIComponent(page.title.replaceAll(" ","_")).replace(/^File%3A/,"File:")};
   if(validatePhoto(photo))return photo;
   return null;
 }
@@ -115,7 +122,7 @@ export function nearbyPhotoCandidates(place,rows){
     .filter(row=>row.meters<=100)
     .sort((a,b)=>a.meters-b.meters||a.filename.localeCompare(b.filename)).slice(0,3);
 }
-async function lookup(place){
+async function commonsPhoto(place){
   const exact=await exactPhoto(place);
   if(exact)return exact;
   const result=await request("commons.wikimedia.org",{action:"query",list:"geosearch",gscoord:place.lat.toFixed(5)+"|"+place.lon.toFixed(5),gsradius:"100",gsnamespace:"6",gsprimary:"all",gslimit:"20"});
@@ -125,24 +132,55 @@ async function lookup(place){
   }
   return null;
 }
+// The public KartaView API permits 100 requests/hour; budget less than that.
+function kartaBudget(){
+  try{
+    const key="shodi-karta-request-times";
+    const now=Date.now();
+    const raw=JSON.parse(localStorage.getItem(key)||"[]");
+    const used=Array.isArray(raw)?raw.filter(t=>Number.isFinite(t)&&t>now-3600000&&t<=now):[];
+    if(used.length>=80)return false;
+    used.push(now);localStorage.setItem(key,JSON.stringify(used));return true;
+  }catch{return false;}
+}
+async function kartaPhoto(place){
+  if(!navigator.onLine||Date.now()<kartaCooldown||!kartaBudget())return null;
+  const u=new URL(KARTA_API);
+  u.search=new URLSearchParams({lat:place.lat.toFixed(5),lng:place.lon.toFixed(5),radius:"100",itemsPerPage:"10"});
+  const r=await fetch(u,{credentials:"omit",referrerPolicy:"no-referrer",redirect:"error",signal:AbortSignal.timeout(10000)});
+  if(r.status===429||r.status===503){const h=Number(r.headers.get("Retry-After"));kartaCooldown=Date.now()+Math.max(3600000,Number.isFinite(h)?h*1000:0);return null;}
+  if(!r.ok)return null;
+  const result=await r.json();
+  for(const candidate of kartaCandidates(place,result.result?.data)){
+    const data=await readThumbnail(candidate.url,"kartaview");
+    if(data){const photo=kartaRecord(candidate,data);if(validKartaPhoto(photo))return photo;}
+  }
+  return null;
+}
+async function lookup(place){
+  if(Date.now()>=cooldown){
+    try{const photo=await commonsPhoto(place);if(photo)return photo;}catch{}
+  }
+  try{return await kartaPhoto(place);}catch{return null;}
+}
 let queue=Promise.resolve();
 const inFlight=new Map(),negative=new Map();
 export async function loadPlacePhoto(place,isCurrent=()=>true){
   if(location.origin!==ORIGIN||typeof place.id!=="string"||typeof place.name!=="string"||place.name.length>80||!Number.isFinite(place.lat)||!Number.isFinite(place.lon))return null;
   const record=await cacheRead(place.id);
   const saved=record?.fingerprint===fingerprint(place)?record:null;
-  if(saved&&validatePhoto(saved.photo)&&(!navigator.onLine||Date.now()-saved.at<CACHE_TTL))return saved.photo;
-  if(!navigator.onLine||Date.now()<cooldown||(negative.get(place.id)||0)>Date.now())return saved&&validatePhoto(saved.photo)?saved.photo:null;
+  if(saved&&validCachedPhoto(saved.photo)&&(!navigator.onLine||Date.now()-saved.at<CACHE_TTL))return saved.photo;
+  if(!navigator.onLine||(Date.now()<cooldown&&Date.now()<kartaCooldown)||(negative.get(place.id)||0)>Date.now())return saved&&validCachedPhoto(saved.photo)?saved.photo:null;
   if(inFlight.has(place.id))return inFlight.get(place.id);
   if(inFlight.size>=20)return null;
   const promise=queue.then(async()=>{
-    if(!isCurrent()||!navigator.onLine||Date.now()<cooldown)return null;
+    if(!isCurrent()||!navigator.onLine||(Date.now()<cooldown&&Date.now()<kartaCooldown))return null;
     try{const photo=await lookup(place);
       if(photo){await cacheWrite(place,photo);return photo;}
       if(negative.size>=1000)negative.clear();
       negative.set(place.id,Date.now()+3600000);
     }catch{negative.set(place.id,Date.now()+120000);}
-    return saved&&validatePhoto(saved.photo)?saved.photo:null;
+    return saved&&validCachedPhoto(saved.photo)?saved.photo:null;
   });
   inFlight.set(place.id,promise);
   queue=promise.catch(()=>null);

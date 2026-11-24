@@ -146,7 +146,11 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         };
         image.alt = photo.nearby === true ? "Окрестности: "+place.name : place.name;
         image.addEventListener("error", () => { figure.hidden = true; cover.hidden = false; }, {once:true});
-        caption.replaceChildren(link(photo.source,photo.author+" · Wikimedia Commons")," · ",link(photo.licenseUrl,photo.license)," · уменьшенная копия");
+        caption.replaceChildren(link(photo.source,photo.provider==="kartaview"?photo.author:photo.author+" · Wikimedia Commons")," · ",link(photo.licenseUrl,photo.license)," · уменьшенная копия");
+        if(photo.provider==="kartaview"){
+          caption.append(" · ",link(photo.sequenceUrl,"KartaView"));
+          if(photo.captureDate)caption.append(" · "+photo.captureDate);
+        }
         if(typeof photo.osmSource==="string"&&/^(node|way|relation)\/[1-9]\d*$/.test(photo.osmSource))caption.append(" · ",link("https://www.openstreetmap.org/"+photo.osmSource,"© OpenStreetMap contributors"));
         if(photo.nearby===true) {
           const note=document.createElement("strong");

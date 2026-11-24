@@ -7,6 +7,8 @@ const origin="https://appassets.androidplatform.net";
 const entry=cities.flatMap(city=>catalogPlacesForCity(city.id).filter(p=>!p.photo&&!p.photoItem&&p.name.length>4&&p.name.length<60).slice(0,1).map(place=>({city,place}))).find(x=>x.city.id!=="spb"&&x.city.id!=="msk");
 assert.ok(entry,"Missing non-bundled photo test place");
 const {city,place}=entry;
+const kartaMode=process.argv.includes("--karta");
+const kartaThumb="https://storage13.openstreetcam.org/files/photo/2022/10/6/lth/123_ab.jpg";
 const qid="Q987654321",file="SHODI integration fixture.png";
 const thumb="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/SHODI_fixture.png/330px-SHODI_fixture.png";
 const png=Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jWZkAAAAASUVORK5CYII=","base64");
@@ -24,11 +26,17 @@ try {
     const respond=body=>route.fulfill({contentType:"application/json",headers,body:JSON.stringify(body)});
     if(url.hostname==="www.wikidata.org"&&url.pathname==="/w/api.php"){
       if(url.searchParams.get("action")==="wbsearchentities"){
-        if(url.searchParams.get("search")===place.name){matchedRequests++;return respond({search:[{id:qid}]});}
+        if(url.searchParams.get("search")===place.name){matchedRequests++;return respond({search:kartaMode?[]:[{id:qid}]});}
         return respond({search:[]});
       }
       if(url.searchParams.get("action")==="wbgetentities")return respond({entities:url.searchParams.get("ids")===qid?{[qid]:entity}:{}});
     }
+    if(kartaMode&&url.hostname==="commons.wikimedia.org"&&url.searchParams.get("list")==="geosearch")return respond({query:{geosearch:[]}});
+    if(kartaMode&&url.hostname==="api.kartaview.org"&&url.pathname==="/2.0/photo/"){
+      const lat=Number(url.searchParams.get("lat")),lng=Number(url.searchParams.get("lng"));
+      return respond({result:{data:Math.abs(lat-place.lat)<0.00001&&Math.abs(lng-place.lon)<0.00001?[{lat:place.lat,lng:place.lon,visibility:"public",status:"active",autoImgProcessingStatus:"FINISHED",autoImgProcessingResult:"BLURRED",sequenceId:"123",fileurlLTh:kartaThumb,storage:"storage13",shotDate:"2022-10-06"}]:[]}});
+    }
+    if(kartaMode&&url.href===kartaThumb)return route.fulfill({contentType:"image/png",headers,body:png});
     if(url.hostname==="commons.wikimedia.org"&&url.searchParams.get("titles")==="File:"+file)return respond({query:{pages:[{title:"File:"+file,imageinfo:[{thumburl:thumb,extmetadata:metadata}]}]}});
     if(url.href===thumb)return route.fulfill({contentType:"image/png",headers,body:png});
     return route.abort();
@@ -50,14 +58,14 @@ try {
   await card.locator(".place-photo").waitFor({state:"visible",timeout:90000});
   await page.waitForFunction(id=>{const img=document.querySelector('[data-place-id="'+id+'"] .place-photo img');return img?.complete&&img.naturalWidth>0;},place.id);
   assert.ok(matchedRequests>=1,"No online place lookup performed");
-  assert.match(await card.locator(".place-photo figcaption").textContent(),/Fixture author.*CC BY-SA 4.0/);
+  assert.match(await card.locator(".place-photo figcaption").textContent(),kartaMode?/Фото рядом с местом.*Grab and KartaView Contributors.*CC BY-SA 4.0/:/Fixture author.*CC BY-SA 4.0/);
   assert.match(await card.locator(".place-photo img").getAttribute("src"),/^data:image\/png;base64,/);
   await context.setOffline(true);offline=true;
   card=await select();
   await card.locator(".place-photo").waitFor({state:"visible",timeout:30000});
   await page.waitForFunction(id=>{const img=document.querySelector('[data-place-id="'+id+'"] .place-photo img');return img?.complete&&img.naturalWidth>0;},place.id);
-  assert.match(await card.locator(".place-photo figcaption").textContent(),/Fixture author/);
+  assert.match(await card.locator(".place-photo figcaption").textContent(),kartaMode?/Grab and KartaView Contributors/:/Fixture author/);
   assert.equal(offlineExternal,0,"Offline page attempted external network");
   assert.deepEqual(errors,[]);
-  console.log("Online photo lookup, licensed thumbnail, persistent cache and offline restart passed (mock Wikimedia responses)");
+  console.log("Online photo lookup, licensed thumbnail, persistent cache and offline restart passed (mock provider responses)");
 }finally{await browser.close();}

@@ -59,6 +59,7 @@ jobs:
           node scripts/smoke.mjs
           node scripts/mobile-smoke.mjs
           node scripts/online-photo-smoke.mjs
+          node scripts/online-photo-smoke.mjs --karta
       - name: Audit npm dependencies
         run: npm audit --audit-level=high
       - run: gradle -p android :app:assembleDebug :app:lintDebug --no-daemon
@@ -105,6 +106,24 @@ jobs:
         with:
           name: shodi-android-test
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
+  photo-sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.checkout_ref || github.sha }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: node scripts/probe-photo-coverage.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-live-photo-source-report
+          path: photo-source-probe.json
           if-no-files-found: error
           retention-days: 7
   emulator:

@@ -106,7 +106,14 @@ class MainActivity : Activity() {
                          (u.host == "commons.wikimedia.org" && u.getQueryParameter("action") == "query" && (u.getQueryParameter("prop") == "imageinfo" || (u.getQueryParameter("list") == "geosearch" && u.getQueryParameter("gsnamespace") == "6" && u.getQueryParameter("gsradius") == "100" && u.getQueryParameter("gslimit") == "20"))))
                     val image = u.host in setOf("upload.wikimedia.org", "thumb.wikimedia.org") &&
                         u.path?.startsWith("/wikipedia/commons/") == true && u.query == null
-                    if (api || image) return null
+                    val kartaApi = u.host == "api.kartaview.org" && u.path == "/2.0/photo/" &&
+                        u.queryParameterNames == setOf("lat", "lng", "radius", "itemsPerPage") &&
+                        u.getQueryParameter("lat")?.toDoubleOrNull()?.let { it in -90.0..90.0 } == true &&
+                        u.getQueryParameter("lng")?.toDoubleOrNull()?.let { it in -180.0..180.0 } == true &&
+                        u.getQueryParameter("radius") == "100" && u.getQueryParameter("itemsPerPage") == "10"
+                    val kartaImage = u.host?.matches(Regex("storage[1-9][0-9]*[.]openstreetcam[.]org")) == true &&
+                        u.query == null && u.path?.matches(Regex("/files/photo/[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/(lth|th)/[A-Za-z0-9_-]+[.](jpg|jpeg|png)", RegexOption.IGNORE_CASE)) == true
+                    if (api || image || kartaApi || kartaImage) return null
                 }
                 if (u.scheme == "data") return null
                 return WebResourceResponse("text/plain", "UTF-8", 403, "Blocked", emptyMap(), java.io.ByteArrayInputStream(ByteArray(0)))

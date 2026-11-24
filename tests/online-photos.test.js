@@ -19,3 +19,4 @@ test("nearby photos require actual geotags within 100 meters and image files",()
  const rows=[{title:"File:Street.jpg",lat:55.7501,lon:37.62},{title:"File:Distant.jpg",lat:55.76,lon:37.62},{title:"File:Wrong.svg",lat:55.75,lon:37.62},{title:"File:Unknown.jpg"}];
  assert.deepEqual(nearbyPhotoCandidates(p,rows),[{filename:"Street.jpg",meters:11}]);
 });
+
