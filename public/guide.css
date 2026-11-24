@@ -305,3 +305,8 @@
  .place-footer{flex-wrap:wrap;gap:8px;}
  .place-map{overflow-wrap:anywhere;}
 }
+
+.place-photo{margin:12px 0 4px;min-width:0;}
+.place-photo img{display:block;width:100%;height:auto;aspect-ratio:8/5;object-fit:contain;border-radius:12px;background:var(--tag);}
+.place-photo figcaption{font-size:.67rem;line-height:1.45;color:var(--muted);margin-top:5px;overflow-wrap:anywhere;}
+.place-photo a{color:inherit;text-decoration:underline;}

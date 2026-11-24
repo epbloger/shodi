@@ -117,6 +117,20 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         source.textContent = "Источник описания";
         description.append(document.createElement("br"), source);
       }
+      if (place.photo) {
+        const figure = card.querySelector(".place-photo");
+        const image = figure.querySelector("img");
+        const caption = figure.querySelector("figcaption");
+        const link = (url, text) => {
+          const a = document.createElement("a"); a.href=url; a.textContent=text;
+          a.target="_blank"; a.rel="noopener noreferrer"; return a;
+        };
+        image.alt = place.name;
+        image.addEventListener("error", () => { figure.hidden = true; }, {once:true});
+        caption.append(link(place.photo.source,place.photo.author+" · Wikimedia Commons")," · ",link(place.photo.licenseUrl,place.photo.license)," · уменьшенная копия");
+        image.src = place.photo.data;
+        figure.hidden = false;
+      }
       const budget = card.querySelector(".place-budget");
       budget.hidden = place.budget.type === "unknown";
       budget.textContent = budget.hidden ? "" : budgetLabel(place.budget);

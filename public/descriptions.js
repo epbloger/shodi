@@ -18,5 +18,5 @@ export function descriptionForPlace(name,lat,lon) {
   });
   if (new Set(matches.map(row=>row[4])).size !== 1) return null;
   const row=matches[0];
-  return {text:row[3],source:"https://www.wikidata.org/wiki/"+row[4]};
+  return {text:row[3],source:"https://www.wikidata.org/wiki/"+row[4],qid:row[4]};
 }

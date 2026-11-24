@@ -41,6 +41,8 @@ jobs:
       - name: Match catalog to Wikidata
         if: steps.reuse.outputs.reused != 'true'
         run: node scripts/enrich-descriptions.mjs
+      - name: Import licensed thumbnails
+        run: node scripts/import-place-photos.mjs
       - run: npm ci --ignore-scripts && npm test && npm run build
       - uses: actions/upload-artifact@v4
         if: always()
@@ -49,6 +51,8 @@ jobs:
           path: |
             public/data/imported-descriptions.js
             docs/description-coverage.json
+            public/data/place-photos.js
+            docs/photo-coverage.json
           if-no-files-found: error
           retention-days: 7
   integrate:
@@ -74,9 +78,10 @@ jobs:
       - name: Validate and integrate only catalog data
         id: commit
         run: |
-          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js public/data/place-descriptions.js public/data/imported-descriptions.js scripts/enrich-descriptions.mjs
+          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js public/data/place-descriptions.js public/data/imported-descriptions.js public/data/place-photos.js public/photos.js scripts/enrich-descriptions.mjs scripts/import-place-photos.mjs
           node --input-type=module <<'JS'
           import {readFile,writeFile} from "node:fs/promises";
+          import {validatePhoto} from "./public/photos.js";
           const raw=await readFile("import-snapshot/public/data/imported-descriptions.js","utf8");
           const m=/^\/\/[^\n]*\nexport const importedDescriptions = (\[[\s\S]*\]);\n?$/.exec(raw);
           if(!m)throw Error("Generated data is not a plain JSON array");
@@ -88,11 +93,20 @@ jobs:
           if(!Number.isInteger(report.queriedLabels)||report.queriedLabels<=0||report.importedRecords!==rows.length||report.coveredPlaces>report.catalogPlaces)throw Error("Incomplete or inconsistent description import");
           await writeFile("public/data/imported-descriptions.js","// Generated from Wikidata CC0; matched by label and coordinates.\nexport const importedDescriptions = "+JSON.stringify(rows)+";\n");
           await writeFile("docs/description-coverage.json",JSON.stringify(report,null,2)+"\n");
+          const photoRaw=await readFile("import-snapshot/public/data/place-photos.js","utf8");
+          const photoMatch=/^\/\/[^\n]*\nexport const placePhotos = (\{[\s\S]*\});\n?$/.exec(photoRaw);
+          if(!photoMatch)throw Error("Invalid photo manifest");
+          const photos=JSON.parse(photoMatch[1]);
+          const entries=Object.entries(photos);
+          const photoReport=JSON.parse(await readFile("import-snapshot/docs/photo-coverage.json","utf8"));
+          if(entries.length>100||entries.some(([id,p])=>!/^Q[1-9]\d*$/.test(id)||!validatePhoto(p))||photoReport.photos!==entries.length||photoReport.bytes>5000000)throw Error("Invalid photo data");
+          await writeFile("public/data/place-photos.js","// Licensed Wikimedia Commons thumbnails.\nexport const placePhotos = "+JSON.stringify(photos)+";\n");
+          await writeFile("docs/photo-coverage.json",JSON.stringify(photoReport,null,2)+"\n");
           JS
           npm ci --ignore-scripts
           npm test
           npm run build
-          git add public/data/imported-descriptions.js docs/description-coverage.json
+          git add public/data/imported-descriptions.js docs/description-coverage.json public/data/place-photos.js docs/photo-coverage.json
           if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
