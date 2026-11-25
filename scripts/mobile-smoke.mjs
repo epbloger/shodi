@@ -22,8 +22,13 @@ try {
   await page.goto("https://appassets.androidplatform.net/assets/index.html");
   await page.locator("#guide-panel").waitFor({state:"visible"});
   assert.equal(await page.locator(".place-card").count(),10);
-  assert.ok(await page.locator(".hero-desktop").isVisible());
-  assert.ok(!await page.locator(".hero-desktop").isVisible());
+  const hero=page.locator(".guide-hero .hero-desktop");
+  assert.equal(await hero.count(),1,"one mobile hero photograph");
+  assert.ok(await hero.isVisible(),"mobile hero photograph is visible");
+  assert.equal(await page.locator(".hero-mobile").count(),0,"old illustration removed");
+  await hero.evaluate(img=>img.decode());
+  assert.deepEqual(await hero.evaluate(img=>[img.naturalWidth,img.naturalHeight]),[1440,960]);
+  assert.match(await hero.getAttribute("src"),/^data:image\/webp;base64,/,"hero photograph bundled offline");
   assert.equal(await page.locator(".place-description:visible").count(),10);
   assert.ok((await page.locator(".place-map").first().textContent()).includes("Подробнее на картах"));
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),"no horizontal overflow");
