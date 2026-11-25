@@ -1,0 +1,106 @@
+name: Import Wikivoyage descriptions
+on:
+  push:
+    branches: [android-v2]
+    paths: ['scripts/import-voyage-places.py', '.github/workflows/import-voyage.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: shodi-voyage
+  cancel-in-progress: false
+jobs:
+  extract:
+    if: github.ref == 'refs/heads/android-v2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Download licensed Wikimedia data dump
+        run: |
+          set -eu
+          python -m pip install mwparserfromhell==0.7.2 duckdb==1.5.4
+          python -m py_compile scripts/import-voyage-places.py
+          cd "$RUNNER_TEMP"
+          curl --fail --location --retry 2 --max-time 180 -o dump.bz2 https://dumps.wikimedia.org/ruwikivoyage/latest/ruwikivoyage-latest-pages-articles.xml.bz2
+          curl --fail --location --retry 2 --max-time 60 -o checksums https://dumps.wikimedia.org/ruwikivoyage/latest/ruwikivoyage-latest-sha1sums.txt
+          grep ' ruwikivoyage-latest-pages-articles.xml.bz2$' checksums | sed 's/ruwikivoyage-latest-pages-articles.xml.bz2$/dump.bz2/' > dump.sha1
+          sha1sum --check dump.sha1
+      - name: Match and validate exact catalog records
+        run: |
+          python scripts/import-voyage-places.py "$RUNNER_TEMP/dump.bz2" --output public/data/voyage-places.js
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-voyage
+          path: public/data/voyage-places.js
+          if-no-files-found: error
+          retention-days: 7
+  integrate:
+    needs: extract
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      revision: ${{ steps.integrate.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: android-v2
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-voyage
+          path: import-snapshot
+      - name: Validate JSON manifest before integrating
+        id: integrate
+        run: |
+          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js public/data/voyage-places.js public/voyage-places.js scripts/import-voyage-places.py
+          node --input-type=module <<'JS'
+          import assert from "node:assert/strict";
+          import {readFile,writeFile} from "node:fs/promises";
+          import {currentPlaces} from "./public/data/current-places.js";
+          import {validateVoyage} from "./public/voyage-places.js";
+          const raw=await readFile("import-snapshot/voyage-places.js","utf8");
+          const m=/^\/\/[^\n]*\nexport const voyagePlaces = (\{[\s\S]*\});\n?$/.exec(raw);
+          assert.ok(m);
+          const data=JSON.parse(m[1]),rows=new Map(Object.values(currentPlaces).flat().map(([id,name,kind,,lat,lon])=>[id,{id,name,kind,lat,lon}]));
+          assert.ok(Object.keys(data).length);
+          for(const [id,row] of Object.entries(data))assert.ok(rows.has(id)&&validateVoyage(row,rows.get(id)));
+          await writeFile("public/data/voyage-places.js",raw);
+          await writeFile("docs/voyage-coverage.json",JSON.stringify({catalogPlaces:rows.size,descriptions:Object.keys(data).length,imageReferences:Object.values(data).filter(r=>r.image).length,license:"CC BY-SA 4.0"},null,2)+"\n");
+          JS
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+          git add public/data/voyage-places.js docs/voyage-coverage.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "data(catalog): integrate licensed geographically matched Wikivoyage descriptions"
+            git push origin HEAD:android-v2
+          fi
+          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  verify-apk:
+    needs: integrate
+    uses: ./.github/workflows/android.yml
+    with:
+      checkout_ref: ${{ needs.integrate.outputs.revision }}
+    permissions:
+      contents: read
+      actions: read

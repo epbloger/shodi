@@ -7,6 +7,7 @@ import { catalogSummary } from "./catalog-summary.js";
 import {createNearbyContext} from "./catalog-context.js";
 import { wikiSummaryForPlace } from "./wiki-summary.js";
 import { editorialGuide } from "./editorial-guide.js";
+import {voyagePlace} from "./voyage-places.js";
 import { russianCities } from "./data/cities.js";
 import { russianPlaces } from "./data/places.js";
 import { currentCatalog, currentPlaces } from "./data/current-places.js";
@@ -202,7 +203,8 @@ export function catalogPlacesForCity(cityId) {
     const wiki=wikiSummaryForPlace(id,details??(osmLink?.qid?{qid:osmLink.qid}:null),brand);
     const editorial=editorialGuide({name,kind,lat,lon,brand});
     const context=nearby([id,name,kind,address,lat,lon,status]);
-    const best=editorial?.kind==="editorial-place"?editorial:wiki?.kind==="wikipedia-place"?wiki:osmDesc??(details?{...details,kind:"wikidata"}:editorial??wiki);
+    const voyage=voyagePlace({id,name,kind,lat,lon});
+    const best=editorial?.kind==="editorial-place"?editorial:voyage??(wiki?.kind==="wikipedia-place"?wiki:osmDesc??(details?{...details,kind:"wikidata"}:editorial??wiki));
     return ({
     id, name, kind, area: address || city.label, address, city: city.label,
     description: best?.text ?? catalogSummary({id,kind,address,city:city.label,brand,context:context?.text}), nearbyContext:context?.text, descriptionSource: best?.source, descriptionKind: best?.kind ?? "catalog", descriptionLicense: best?.license, descriptionTitle: best?.title, photo: photoForItem(details?.qid??osmLink?.qid) || bundledBrandLogo(brand), photoItem: details?.qid??osmLink?.qid, brand, osmPhotoLink: osmLink, lat, lon, budget: { type: "unknown" },

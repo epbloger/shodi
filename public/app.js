@@ -97,7 +97,7 @@ function addSuggestedStop(place, routeId) {
   const create = !route;
   route ??= { id: newId(), name: place.city + " — прогулка", city: place.city, note: "", stops: [] };
   const detail = place.budget.type === "unknown" ? reviewLabel(place) : budgetLabel(place.budget);
-  const note = [place.descriptionKind?.startsWith("wikipedia") ? "" : place.description, detail].filter(Boolean).join("\n");
+  const note = [place.descriptionLicense ? "" : place.description, detail].filter(Boolean).join("\n");
   const stop = {
     id: newId(), placeId: place.id, visited: false,
     ...stopDetails({ name: place.name, kind: place.kind, note, minutes: 0 }),

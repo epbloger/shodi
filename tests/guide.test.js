@@ -116,7 +116,7 @@ test("fresh catalog records preserve routes and do not invent reviews or prices"
       assert.equal(place.budget.type, "unknown");
       assert.equal(reviewLabel(place), "");
       assert.ok(place.description.trim().length>0&&place.description.length<=360);
-      assert.ok(["wikidata","catalog","wikipedia-place","wikipedia-brand","editorial-place","editorial-brand","osm-facts"].includes(place.descriptionKind));
+      assert.ok(["wikidata","catalog","wikipedia-place","wikipedia-brand","editorial-place","editorial-brand","osm-facts","wikivoyage-place"].includes(place.descriptionKind));
       assert.equal(Boolean(place.descriptionSource),place.descriptionKind!=="catalog");
       assert.deepEqual(placeById(place.id), place);
       assert.doesNotThrow(() => stopDetails({ name: place.name, kind: place.kind, note: place.description, minutes: 0 }));
