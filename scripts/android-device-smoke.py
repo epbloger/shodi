@@ -133,9 +133,10 @@ def run():
     launch()
     find_text("О приложении")
     tap("Санкт-Петербург — прогулка",prefix=True)
-    tap_node(scroll_to("Удалить маршрут",direction=-1))
+    # Reopening a saved route starts at the top; its actions are below the viewport.
+    tap_node(scroll_to("Удалить маршрут"))
     tap("Отмена")
-    tap_node(scroll_to("Удалить маршрут",direction=-1))
+    tap_node(scroll_to("Удалить маршрут"))
     tap("Удалить")
     find_text("Куда пойдём?")
     adb("shell","am","force-stop",PACKAGE)
