@@ -10,6 +10,8 @@ import { editorialGuide } from "./editorial-guide.js";
 import {voyagePlace} from "./voyage-places.js";
 import {archiveForPlace} from "./archive-context.js";
 import {brandArticleFor} from "./brand-articles.js";
+import {wikiSummaries} from "./data/wiki-summaries.js";
+import {validWikiSummary} from "./wiki-summary.js";
 import { russianCities } from "./data/cities.js";
 import { russianPlaces } from "./data/places.js";
 import { currentCatalog, currentPlaces } from "./data/current-places.js";
@@ -207,10 +209,12 @@ export function catalogPlacesForCity(cityId) {
     const context=nearby([id,name,kind,address,lat,lon,status]);
     const voyage=voyagePlace({id,name,kind,lat,lon});
     const archive=archiveForPlace(id);
+    const directWiki=wikiSummaries[id];
+    const photoQid=details?.qid??osmLink?.qid??(validWikiSummary(directWiki)?directWiki.qid:null);
     const best=editorial?.kind==="editorial-place"?editorial:voyage??(wiki?.kind==="wikipedia-place"?wiki:osmDesc??(details?{...details,kind:"wikidata"}:editorial??wiki??brandArticleFor(brand,kind)??archive));
     return ({
     id, name, kind, area: address || city.label, address, city: city.label,
-    description: best?.text ?? catalogSummary({id,kind,address,city:city.label,brand,context:context?.text}), nearbyContext:context?.text, descriptionSource: best?.source, descriptionKind: best?.kind ?? "catalog", descriptionLicense: best?.license, descriptionTitle: best?.title, photo: photoForItem(details?.qid??osmLink?.qid) || bundledBrandLogo(brand), photoItem: details?.qid??osmLink?.qid, brand, osmPhotoLink: osmLink, lat, lon, budget: { type: "unknown" },
+    description: best?.text ?? catalogSummary({id,kind,address,city:city.label,brand,context:context?.text}), nearbyContext:context?.text, descriptionSource: best?.source, descriptionKind: best?.kind ?? "catalog", descriptionLicense: best?.license, descriptionTitle: best?.title, photo: photoForItem(photoQid) || bundledBrandLogo(brand), photoItem: photoQid, brand, osmPhotoLink: osmLink, lat, lon, budget: { type: "unknown" },
     source: currentCatalog.release, status: status ?? "unknown",
     });
   });

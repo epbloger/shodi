@@ -1,5 +1,5 @@
 // Bound the offline photo bundle; count actual decoded bytes, not Base64 overhead.
-export const PHOTO_LIMIT=500;
+export const PHOTO_LIMIT=650;
 export const PHOTO_BYTES_LIMIT=24_000_000;
 export function photoBytes(photo){
  const data=photo?.data;

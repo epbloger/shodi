@@ -26,12 +26,12 @@ concurrency:
   group: android-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  test:
+  catalog-inputs:
     permissions:
       contents: read
       actions: read
     runs-on: ubuntu-latest
-    timeout-minutes: 65
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v6
         with:
@@ -40,19 +40,6 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
-      - uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '17'
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.11.1'
-          cache-read-only: true
-      - uses: android-actions/setup-android@v3
-        with:
-          packages: "platform-tools platforms;android-35 build-tools;35.0.0"
-          log-accepted-android-sdk-licenses: false
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
@@ -127,6 +114,64 @@ jobs:
         with:
           path: public/data/place-taxonomy.js
           key: ${{ steps.taxonomy-cache.outputs.cache-primary-key }}
+      - name: Restore Wikipedia descriptions
+        id: wiki-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            public/data/wiki-summaries.js
+            docs/wiki-summary-coverage.json
+          key: shodi-wiki-v2-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'public/wiki-summary.js') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            shodi-wiki-v2-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'public/wiki-summary.js') }}-
+      - name: Recover previously verified article data before importing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -eu
+          test "$(git rev-parse HEAD:public/data/current-places.js)" = b772116cc742991504bf97d467023ef788d44844 || exit 0
+          dirs=()
+          for run in 45557762959 45551541614 45551209831 45550723512 45484239544; do
+            dir="$RUNNER_TEMP/wiki-$run"
+            if gh run download "$run" --repo "$GITHUB_REPOSITORY" --name shodi-brand-coverage --dir "$dir" && test -s "$dir/public/data/wiki-summaries.js" && test -s "$dir/docs/wiki-summary-coverage.json" && test -s "$dir/public/data/place-brands.js"; then
+              dirs+=("$dir")
+            fi
+          done
+          node scripts/recover-wiki-progress.mjs "${dirs[@]}"
+      - name: Ensure optional prior article checkpoint exists
+        run: test -f docs/wiki-summary-coverage.json || printf '%s\n' '{}' > docs/wiki-summary-coverage.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-catalog-inputs
+          path: |
+            public/data/place-brands.js
+            docs/brand-coverage.json
+            public/data/place-taxonomy.js
+            public/data/wiki-summaries.js
+            docs/wiki-summary-coverage.json
+            public/assets/city-guide.webp
+          if-no-files-found: error
+          retention-days: 7
+  brand-logos:
+    needs: catalog-inputs
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.checkout_ref || github.sha }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-catalog-inputs
+          path: .
       - name: Restore previously verified logos
         id: logo-cache
         uses: actions/cache/restore@v4
@@ -149,33 +194,44 @@ jobs:
             public/data/brand-logos.js
             docs/brand-logo-coverage.json
           key: ${{ steps.logo-cache.outputs.cache-primary-key }}
-      - name: Restore Wikipedia descriptions
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-parallel-logos
+          path: |
+            public/data/brand-logos.js
+            docs/brand-logo-coverage.json
+          if-no-files-found: error
+          retention-days: 7
+  descriptions:
+    needs: catalog-inputs
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.checkout_ref || github.sha }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-catalog-inputs
+          path: .
+      - name: Import licensed Wikipedia descriptions
+        run: node scripts/import-wiki-summaries.mjs
+      - name: Restore Wikipedia cache key for save
         id: wiki-cache
         uses: actions/cache/restore@v4
         with:
+          lookup-only: true
           path: |
             public/data/wiki-summaries.js
             docs/wiki-summary-coverage.json
           key: shodi-wiki-v2-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'public/wiki-summary.js') }}-${{ github.run_id }}-${{ github.run_attempt }}
-          restore-keys: |
-            shodi-wiki-v2-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'public/wiki-summary.js') }}-
-      - name: Recover previously verified article data before importing
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -eu
-          test "$(git rev-parse HEAD:public/data/current-places.js)" = b772116cc742991504bf97d467023ef788d44844 || exit 0
-          dirs=()
-          for run in 45551541614 45551209831 45550723512 45484239544; do
-            dir="$RUNNER_TEMP/wiki-$run"
-            if gh run download "$run" --repo "$GITHUB_REPOSITORY" --name shodi-brand-coverage --dir "$dir" && test -s "$dir/public/data/wiki-summaries.js" && test -s "$dir/docs/wiki-summary-coverage.json" && test -s "$dir/public/data/place-brands.js"; then
-              dirs+=("$dir")
-            fi
-          done
-          node scripts/recover-wiki-progress.mjs "${dirs[@]}"
-      - name: Import licensed Wikipedia descriptions
-        run: node scripts/import-wiki-summaries.mjs
       - name: Save Wikipedia progress
         uses: actions/cache/save@v4
         with:
@@ -205,6 +261,113 @@ jobs:
             public/data/brand-articles.js
             docs/brand-article-coverage.json
           key: ${{ steps.brand-article-cache.outputs.cache-primary-key }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-parallel-descriptions
+          path: |
+            public/data/wiki-summaries.js
+            docs/wiki-summary-coverage.json
+            public/data/brand-articles.js
+            docs/brand-article-coverage.json
+          if-no-files-found: error
+          retention-days: 7
+  place-photos:
+    needs: catalog-inputs
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.checkout_ref || github.sha }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-catalog-inputs
+          path: .
+      - name: Restore previous verified place photo progress
+        id: place-photo-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            public/data/place-photos.js
+            docs/photo-coverage.json
+          key: shodi-place-photos-v3-${{ hashFiles('public/data/current-places.js', 'public/data/place-photos.js') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            shodi-place-photos-v3-${{ hashFiles('public/data/current-places.js', 'public/data/place-photos.js') }}-
+      - name: Import licensed photographs of significant places
+        run: |
+          node --check scripts/import-place-photos.mjs
+          node scripts/import-place-photos.mjs
+      - name: Save verified place photo progress
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            public/data/place-photos.js
+            docs/photo-coverage.json
+          key: ${{ steps.place-photo-cache.outputs.cache-primary-key }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-parallel-photos
+          path: |
+            public/data/place-photos.js
+            docs/photo-coverage.json
+          if-no-files-found: error
+          retention-days: 7
+  test:
+    needs: [catalog-inputs, brand-logos, descriptions, place-photos]
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.checkout_ref || github.sha }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+          cache-read-only: true
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: "platform-tools platforms;android-35 build-tools;35.0.0"
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-catalog-inputs
+          path: .
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-parallel-logos
+          path: .
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-parallel-descriptions
+          path: .
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-parallel-photos
+          path: .
+      - name: Validate merged catalog assets
+        run: |
+          node scripts/validate-brand-data.mjs --logos
+          node scripts/validate-place-taxonomy.mjs
+          node scripts/validate-place-photos.mjs
       - name: Measure actual offline catalog quality
         run: node scripts/catalog-quality.mjs
       - uses: actions/upload-artifact@v4
@@ -217,6 +380,8 @@ jobs:
             public/data/brand-logos.js
             docs/brand-logo-coverage.json
             docs/catalog-quality.json
+            public/data/place-photos.js
+            docs/photo-coverage.json
             docs/priority-content-backlog.json
             public/data/brand-articles.js
             docs/brand-article-coverage.json
