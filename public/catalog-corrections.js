@@ -3,6 +3,31 @@
 // may have fixed the record independently or changed its identity.
 const entries = [
   {
+    id: "kzn-oeb16ffdc1b10", cityId: "kzn",
+    before: ["Казанский татарский государственный театр юного зрителя им. Г. Кариева", "theater", "Республика Татарстан, Казань, улица Гладилова 49", 55.808907, 49.068401],
+    after: { address: "Республика Татарстан, Казань, Петербургская улица 55Б", lat: 55.7807, lon: 49.1367 },
+    sources: ["https://karievteatr.ru/contacts", "https://kzn.bebeshka.info/kazan/kazanskiy-tatarskiy-gosudarstvennyy-teatr-yunogo-zritelya-imeni-gabdully-karieva-437341/"],
+  },
+  {
+    id: "kzn-o05753d6efb94", cityId: "kzn",
+    before: ["Памятник зодчим Казанского кремля", "architecture", "Республика Татарстан, Казань, Кот Казанский, Кремлёвская улица 15/25", 55.799408, 49.106209],
+    after: { address: "Республика Татарстан, Казань, Казанский Кремль, у Благовещенского собора" },
+    sources: ["https://go.kzn.ru/places/pamiatnik-zodcim-kazanskogo-kremlia", "https://www.russian-goldenring.ru/sights/3820/"],
+  },
+  {
+    id: "msk-o20dba94845a0", cityId: "msk",
+    before: ["Вднх, Павильон #13 Музей Востока", "museum", "Москва, Павильон 13, Подъёмная улица 12А", 55.830982, 37.627995],
+    after: { address: "Москва, проспект Мира 119, павильон 13" },
+    photoQid: "Q48948839",
+    sources: ["https://vdnh.ru/places/pavilon-13-muzey-vostoka/", "https://www.3dcheck.zkir.ru/regions/RU-MOW/W28852156", "https://www.wikidata.org/wiki/Q48948839"],
+  },
+  {
+    id: "msk-o86e7cab7c588", cityId: "msk",
+    before: ["Московский Государственный Музей Дом Бурганова", "museum", "Москва, Большой Афанасьевский переулок 15 стр 1", 55.746811, 37.596676],
+    after: { address: "Москва, Большой Афанасьевский переулок 15, стр. 9", lat: 55.7465386, lon: 37.5971869 },
+    sources: ["https://burganov.ru/kontakty/", "https://www.tourister.ru/world/europe/russia/city/moscow/museum/12608"],
+  },
+  {
     id: "kzn-o5ff02a5244f4", cityId: "kzn",
     before: ["Казанский Кремль", "museum", "Республика Татарстан, Казань, проезд Шейкмана", 55.783298, 49.166698],
     after: { lat: 55.799453, lon: 49.106460 },

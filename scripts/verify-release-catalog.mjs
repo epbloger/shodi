@@ -12,6 +12,9 @@ const paths=[
   "public/data/brand-articles.js", "public/data/brand-logos.js", "public/data/current-places.js",
   "public/data/place-brands.js", "public/data/place-photos.js", "public/data/place-taxonomy.js",
   "public/data/voyage-photos.js", "public/data/wiki-summaries.js",
+  "public/data/archive-context.js", "public/data/cities.js", "public/data/imported-descriptions.js",
+  "public/data/osm-photo-links.js", "public/data/osm-place-facts.js", "public/data/place-descriptions.js",
+  "public/data/places.js", "public/data/voyage-places.js", "public/catalog-corrections.js", "public/editorial-guide.js",
 ];
 const manifest="docs/release-catalog-blobs.txt";
 const git=(...args)=>execFileSync("git",args,{encoding:"utf8"}).trim();

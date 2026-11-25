@@ -28,6 +28,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   const more = byId("guide-more");
   let photoObserver;
   let photoRenderVersion = 0;
+  const photoTasks = new Map();
 
   const cityChoices = document.createDocumentFragment();
   for (const entry of cities) {
@@ -65,11 +66,15 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     categories.append(button);
   }
 
-  function render() {
-    photoObserver?.disconnect();
-    const photoVersion = ++photoRenderVersion;
-    const photoTasks = new Map();
-    if(location.origin === "https://appassets.androidplatform.net") {
+  function render(append = false) {
+    if(!append){
+      photoObserver?.disconnect();
+      photoObserver = undefined;
+      photoTasks.clear();
+      photoRenderVersion++;
+    }
+    const photoVersion = photoRenderVersion;
+    if(!photoObserver && location.origin === "https://appassets.androidplatform.net") {
       photoObserver = new IntersectionObserver(entries => {
         for(const entry of entries) {
           if(!entry.isIntersecting)continue;
@@ -79,8 +84,8 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         }
       },{rootMargin:"100px"});
     }
-    const places = findPlaces({ cityId: city.id, category, query: search.value });
     const allPlaces = findPlaces({ cityId: city.id, query: search.value });
+    const places = category === "all" ? allPlaces : allPlaces.filter(place => place.kind === category);
     const routes = getRoutes().filter(route => cityMatches(route.city, city.label));
     const routeId = selectedTarget ?? selectedRoute()?.id;
     target.replaceChildren(...routes.map(route => new Option(route.name, route.id)), new Option("Создать новый маршрут", ""));
@@ -112,7 +117,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     updateCategories(allPlaces);
 
     const fragment = document.createDocumentFragment();
-    for (const place of places.slice(0, visibleLimit)) {
+    for (const place of places.slice(append ? grid.children.length : 0, visibleLimit)) {
       const card = template.content.firstElementChild.cloneNode(true);
       const kind = PLACE_CATEGORIES[place.kind];
       card.dataset.category = place.kind;
@@ -206,7 +211,8 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
       }
       fragment.append(card);
     }
-    grid.replaceChildren(fragment);
+    if(append)grid.append(fragment);
+    else grid.replaceChildren(fragment);
     for(const card of photoTasks.keys())photoObserver.observe(card);
   }
 
@@ -256,7 +262,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   more.addEventListener("click", () => {
     const firstNew = visibleLimit;
     visibleLimit += pageSize();
-    render();
+    render(true);
     grid.children[firstNew]?.querySelector(".place-map")?.focus();
   });
   byId("clear-filters").addEventListener("click", () => {
@@ -264,6 +270,6 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     search.focus();
   });
   mobile.addEventListener('change', () => { visibleLimit = pageSize(); render(); });
-  window.addEventListener("online",render);
+  window.addEventListener("online",()=>render());
   return render;
 }

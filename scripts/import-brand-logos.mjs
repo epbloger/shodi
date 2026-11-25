@@ -17,6 +17,7 @@ for(const [id,name,kind,,,,status] of Object.values(currentPlaces).flat()){
 }
 const scope=JSON.parse(await readFile("docs/release-priority-scope.json","utf8"));
 const priority=new Set(scope.brands.map(b=>b.key));
+const verifiedOnly=process.argv.includes("--verified-identity-only");
 const out={},states={},candidates=new Map(),errors=[];
 let previousReport=null;
 try{previousReport=JSON.parse(await readFile("docs/brand-logo-coverage.json","utf8"));}
@@ -63,9 +64,18 @@ const recordError=(stage,e)=>{if(errors.length<60)errors.push({stage,error:Strin
 for(const {brand} of brands.values()){
  const p=previous[brand.key];
  if(p&&validBrandLogo({...p,brandName:brand.name},brand)){out[brand.key]=p;states[brand.key]="retained";}
- if(brand.file)candidates.set(brand.key,[brand.file]);
+ if(brand.file&&!verifiedOnly)candidates.set(brand.key,[brand.file]);
 }
-const known=unresolvedFirst([...brands.values()].filter(x=>priority.has(x.brand.key)&&x.brand.qid&&!out[x.brand.key]&&!attempts.has(x.brand.key)),attempts);
+// Manually disambiguated identity: operating Russian Cinnabon network,
+// https://cinnabonrussia.com/; exact current P154 is verified on every import.
+for(const [key,qid,file] of [["name:cinnabon","Q1092539","Cinnabon logo.svg"]]){
+ const brand=brands.get(key)?.brand;
+ if(!brand||out[key])continue;
+ const e=(await entities([qid])).entities?.[qid];
+ if(!brandMatches(e,brand)||!logoFiles(e).includes(file))throw Error("Verified brand identity changed: "+key);
+ candidates.set(key,[file]);
+}
+const known=verifiedOnly?[]:unresolvedFirst([...brands.values()].filter(x=>priority.has(x.brand.key)&&x.brand.qid&&!out[x.brand.key]&&!attempts.has(x.brand.key)),attempts);
 for(let i=0;i<known.length;i+=40){
  if(!available("www.wikidata.org"))break;
  const batch=known.slice(i,i+40);
@@ -132,7 +142,7 @@ for(let i=0;i<files.length;i+=20){
 await importCandidates();
 // Batch exact labels and aliases via the public Wikidata query service.
 // This replaces hundreds of one-by-one search requests, while keeping ambiguity checks.
-const pending=unresolvedFirst([...brands.values()].filter(({brand})=>priority.has(brand.key)&&!brand.qid&&!out[brand.key]&&!attempts.has(brand.key)),attempts);
+const pending=verifiedOnly?[]:unresolvedFirst([...brands.values()].filter(({brand})=>priority.has(brand.key)&&!brand.qid&&!out[brand.key]&&!attempts.has(brand.key)),attempts);
 for(let i=0;i<pending.length;i+=20){
  if(!available("query.wikidata.org")||!available("www.wikidata.org"))break;
  const batch=pending.slice(i,i+20);
@@ -179,7 +189,7 @@ await importCandidates();
 // Require both a verified entity link and a standalone exact-name logo file.
 candidates.clear();
 let directChecked=0,directCandidates=0;
-const direct=unresolvedFirst([...brands.values()].filter(x=>priority.has(x.brand.key)&&resolvedQids.has(x.brand.key)&&!out[x.brand.key]),directAttempts);
+const direct=verifiedOnly?[]:unresolvedFirst([...brands.values()].filter(x=>priority.has(x.brand.key)&&resolvedQids.has(x.brand.key)&&!out[x.brand.key]),directAttempts);
 for(const {brand} of direct.slice(0,120)){
  if(!available("commons.wikimedia.org"))break;
  if(Date.now()-(directAttempts.get(brand.key)||0)<7*86400000)continue;
@@ -201,7 +211,7 @@ for(const {brand} of direct.slice(0,120)){
 await importCandidates();
 // Recover P373 categories for verified QIDs even if earlier P154 attempts are on cooldown.
 candidates.clear();
-const categoryPending=[...brands.values()].filter(({brand})=>priority.has(brand.key)&&!out[brand.key]&&resolvedQids.has(brand.key)&&Date.now()-(categoryAttempts.get(brand.key)||0)>=7*86400000);
+const categoryPending=verifiedOnly?[]:[...brands.values()].filter(({brand})=>priority.has(brand.key)&&!out[brand.key]&&resolvedQids.has(brand.key)&&Date.now()-(categoryAttempts.get(brand.key)||0)>=7*86400000);
 for(let i=0;i<categoryPending.length;i+=40){
  if(!available("www.wikidata.org"))break;
  const group=categoryPending.slice(i,i+40),ids=[...new Set(group.map(({brand})=>resolvedQids.get(brand.key)))];
@@ -239,7 +249,7 @@ function creditMatches(meta,host){
  }
  return false;
 }
-for(const [key,[host,...names]] of Object.entries(official)){
+for(const [key,[host,...names]] of verifiedOnly?[]:Object.entries(official)){
  if(!priority.has(key)||out[key]||!brands.has(key)||!available("commons.wikimedia.org"))continue;
  officialChecked++;
  try{

@@ -4,11 +4,11 @@
   "brandGroups": 67,
   "brandCards": 5927,
   "brandCardsWithoutDescription": 0,
-  "brandsWithoutLogo": 61,
+  "brandsWithoutLogo": 60,
   "culturalCandidates": 652,
-  "culturalWithoutDescription": 302,
-  "culturalWithoutSubstantive": 314,
-  "culturalWithoutPhoto": 414,
+  "culturalWithoutDescription": 296,
+  "culturalWithoutSubstantive": 308,
+  "culturalWithoutPhoto": 413,
   "groups": [
     {
       "key": "Q3442874",
@@ -366,9 +366,9 @@
       "name": "Cinnabon",
       "described": 16,
       "brandDescribed": 15,
-      "logo": false,
+      "logo": true,
       "missing": [],
-      "logoStatus": "ambiguous-brand"
+      "logoStatus": "verified"
     },
     {
       "key": "name:coffee moose",
@@ -823,9 +823,9 @@
       ],
       "city": "Екатеринбург",
       "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {
@@ -1024,16 +1024,16 @@
       "id": "kzn-oeb16ffdc1b10",
       "name": "Казанский татарский государственный театр юного зрителя им. Г. Кариева",
       "kind": "theater",
-      "lat": 55.808907,
-      "lon": 49.068401,
+      "lat": 55.7807,
+      "lon": 49.1367,
       "reasons": [
         "public-institution-name"
       ],
       "city": "Казань",
-      "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "corrected": true,
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {
@@ -1046,10 +1046,10 @@
         "landmark-name"
       ],
       "city": "Казань",
-      "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "corrected": true,
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {
@@ -1736,11 +1736,11 @@
         "landmark-name"
       ],
       "city": "Москва",
-      "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
-      "photo": false
+      "corrected": true,
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
+      "photo": true
     },
     {
       "id": "msk-o44c5fa0ba243",
@@ -1762,16 +1762,16 @@
       "id": "msk-o86e7cab7c588",
       "name": "Московский Государственный Музей Дом Бурганова",
       "kind": "museum",
-      "lat": 55.746811,
-      "lon": 37.596676,
+      "lat": 55.7465386,
+      "lon": 37.5971869,
       "reasons": [
         "public-institution-name"
       ],
       "city": "Москва",
-      "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "corrected": true,
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {
@@ -2249,9 +2249,9 @@
       ],
       "city": "Москва",
       "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {

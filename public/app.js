@@ -178,6 +178,9 @@ function renderStops(route) {
     kind.querySelector("use").setAttribute("href", "#i-" + icon);
     const place = stop.placeId ? placeById(stop.placeId) : null;
     if (place) {
+      const address = item.querySelector(".stop-address");
+      text(address, place.address ? "Адрес по каталогу: " + place.address : "");
+      address.hidden = !place.address;
       const map = item.querySelector(".stop-map");
       map.href = mapLink(place);
       map.hidden = false;

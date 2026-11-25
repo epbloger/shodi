@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       production:
-        description: 'Build signed RuStore APK (protected environment, main only)'
+        description: 'Build signed RuStore APK (protected environment, android-v2 only)'
         type: boolean
         default: false
 permissions:
@@ -460,6 +460,13 @@ jobs:
           node scripts/online-photo-smoke.mjs
           node scripts/online-photo-smoke.mjs --karta
           node scripts/brand-logo-smoke.mjs
+          node scripts/rustore-assets.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-rustore-assets
+          path: dist/rustore-assets/
+          if-no-files-found: error
+          retention-days: 7
       - name: Audit npm dependencies
         run: npm audit --audit-level=high
       - run: gradle -p android :app:assembleDebug :app:lintDebug --no-daemon
@@ -471,12 +478,18 @@ jobs:
       - name: Verify test APK
         run: |
           apk=android/app/build/outputs/apk/debug/app-debug.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$apk"
+          unzip -tq "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$apk" > android-apk-info.txt
+          sha256sum "$apk" >> android-apk-info.txt
+          git rev-parse HEAD >> android-apk-info.txt
           for doc in index about privacy terms consent licenses; do unzip -l "$apk" | grep "assets/$doc.html"; done
           unzip -p "$apk" assets/index.html | cmp - dist/shodi.html
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='ru.moorkis.shodi.debug'"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" > android-badging.txt
+          grep "package: name='ru.moorkis.shodi.debug'.*versionCode='20000'.*versionName='2.0.0-test'" android-badging.txt
+          grep "sdkVersion:'26'" android-badging.txt
+          grep "targetSdkVersion:'35'" android-badging.txt
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump permissions "$apk" > android-permissions.txt
-          if grep -E 'ACCESS_(FINE|COARSE)_LOCATION|com.google.android.gms.permission.AD_ID|READ_CONTACTS|READ_PHONE_STATE|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|RECORD_AUDIO|android.permission.CAMERA|QUERY_ALL_PACKAGES' android-permissions.txt; then
+          if grep -E 'ACCESS_(FINE|COARSE)_LOCATION|com.google.android.gms.permission.AD_ID|READ_CONTACTS|READ_PHONE_STATE|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|READ_MEDIA_(IMAGES|VIDEO|AUDIO|VISUAL_USER_SELECTED)|RECORD_AUDIO|android.permission.CAMERA|QUERY_ALL_PACKAGES' android-permissions.txt; then
             echo "Unexpected sensitive permission"; exit 1
           fi
           python - <<'PY'
@@ -501,6 +514,8 @@ jobs:
             android-runtime-dependencies.json
             android-osv-report.json
             android-permissions.txt
+            android-apk-info.txt
+            android-badging.txt
             android/app/build/reports/lint-results-debug.html
           retention-days: 7
       - uses: actions/upload-artifact@v4
@@ -561,13 +576,15 @@ jobs:
             android-consent.png
             android-about.png
             android-offline.png
+            android-catalog-places.png
+            android-route.png
             android-failure.png
             android-launcher-anr.png
             android-failure.xml
             android-failure-log.txt
           retention-days: 7
   production:
-    if: github.event_name == 'workflow_dispatch' && inputs.production && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && inputs.production && github.ref == 'refs/heads/android-v2'
     needs: [test, emulator]
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -598,8 +615,10 @@ jobs:
           path: .
       - name: Validate the same catalog data used by the tested APK
         run: |
+          node scripts/verify-release-catalog.mjs
           node scripts/validate-brand-data.mjs --logos
           node scripts/validate-place-taxonomy.mjs
+          node scripts/validate-place-photos.mjs
       - run: npm ci --ignore-scripts && npm test && npm run build
       - name: Assemble signed production APK
         env:
@@ -622,8 +641,13 @@ jobs:
           unset KEYSTORE_B64
           gradle -p android :app:assembleRelease :app:lintRelease -PproductionAds=true --no-daemon
           apk=android/app/build/outputs/apk/release/app-release.apk
+          unzip -tq "$apk"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$apk"
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep "package: name='ru.moorkis.shodi'"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" > release-badging.txt
+          grep "package: name='ru.moorkis.shodi'.*versionCode='20000'.*versionName='2.0.0'" release-badging.txt
+          if grep -q '^application-debuggable' release-badging.txt; then exit 1; fi
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump permissions "$apk" > release-permissions.txt
+          if grep -E 'ACCESS_(FINE|COARSE)_LOCATION|com.google.android.gms.permission.AD_ID|READ_CONTACTS|READ_PHONE_STATE|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|READ_MEDIA_(IMAGES|VIDEO|AUDIO|VISUAL_USER_SELECTED)|RECORD_AUDIO|android.permission.CAMERA|QUERY_ALL_PACKAGES' release-permissions.txt; then exit 1; fi
           unzip -p "$apk" assets/index.html | cmp - dist/shodi.html
           mkdir -p android-release-output
           cp "$apk" android-release-output/shodi-2.0.0.apk

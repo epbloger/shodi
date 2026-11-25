@@ -4,7 +4,10 @@ import {chromium} from "playwright";
 import {cities,catalogPlacesForCity} from "../public/guide.js";
 import {hasUsefulDescription} from "../public/catalog-presentation.js";
 const html=await readFile("dist/shodi.html","utf8");
-const browser=await chromium.launch({headless:true});
+function findSample(predicate){
+  for(const city of cities){const place=catalogPlacesForCity(city.id).find(predicate);if(place)return {city,place};}
+}
+const browser=await chromium.launch({headless:true, ...(process.env.SHODI_BROWSER_EXECUTABLE ? {executablePath:process.env.SHODI_BROWSER_EXECUTABLE} : {})});
 try {
   const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:"reduce"});
   const page=await context.newPage();
@@ -40,12 +43,16 @@ try {
     assert.equal(await card.locator(".place-cover").isVisible(),false,"No empty cover on ordinary cards");
     assert.ok(await card.locator(".place-map").isVisible(),"Map detail remains available for every place");
   }
-  const ordinary=cities.flatMap(city=>catalogPlacesForCity(city.id).filter(p=>!p.brand&&!p.photo&&!hasUsefulDescription(p)&&p.kind==="food").slice(0,1).map(place=>({city,place}))).at(0);
+  const ordinary=findSample(p=>!p.brand&&!p.photo&&!hasUsefulDescription(p)&&p.kind==="food");
   assert.ok(ordinary,"Expected at least one map-only venue");
   assert.ok((await page.locator(".place-map").first().textContent()).includes("Подробнее на картах"));
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),"no horizontal overflow");
+  const firstCard=await page.locator(".place-card").first().elementHandle();
   await page.locator("#guide-more").click();
   assert.equal(await page.locator(".place-card").count(),20);
+  assert.ok(await firstCard.evaluate(card=>card.isConnected && card===document.querySelector(".place-card")),"Pagination preserves existing cards");
+  assert.equal(new Set(await page.locator(".place-card").evaluateAll(cards=>cards.map(c=>c.dataset.placeId))).size,20);
+  assert.ok(await page.locator(".place-add").first().evaluate(b=>b.getBoundingClientRect().height>=44),"Touch target is at least 44 CSS pixels");
   await page.evaluate(()=>window.scrollTo(0,document.body.scrollHeight));
   await page.locator("#scroll-top").waitFor({state:"visible"});
   await page.locator("#scroll-top").click();
@@ -56,11 +63,27 @@ try {
   await page.waitForFunction(()=>document.readyState==="complete");
   assert.ok(actions.includes("/action/about"));
   await page.locator("#guide-target").selectOption("");
+  const mapHref=await page.locator(".place-map").first().getAttribute("href");
   await page.locator(".place-add").first().click();
   await page.locator("#open-guide-route").click();
+  assert.equal(await page.locator(".stop-map").getAttribute("href"),mapHref);
+  const savedPlace=initialPlaces.get(initialIds[0]);
+  assert.equal(await page.locator(".stop-address").textContent(),savedPlace.address ? "Адрес по каталогу: "+savedPlace.address : "");
   await page.locator("#android-share").click();
   await page.waitForFunction(()=>document.readyState==="complete");
   assert.ok(actions.includes("/action/share"));
+  await context.setOffline(true);
+  await page.reload();
+  await page.locator(".stop-card").waitFor({state:"visible"});
+  assert.equal(await page.locator(".stop-map").getAttribute("href"),mapHref);
+  await page.locator("#remove-route").click();
+  await page.locator("#delete-form button[value=cancel]").click();
+  assert.equal(await page.locator(".stop-card").count(),1);
+  await page.locator("#remove-route").click();
+  await page.locator("#delete-form button[value=confirm]").click();
+  await page.locator("#empty-board").waitFor({state:"visible"});
+  await page.reload();
+  assert.equal(await page.locator(".stop-card").count(),0);
   await page.locator("#guide-trigger").click();
   assert.ok(await page.locator("#guide-panel").isVisible());
   await context.setOffline(true);
@@ -77,12 +100,12 @@ try {
   assert.equal(await ordinaryCard.locator(".place-cover").isVisible(),false);
   assert.ok(await ordinaryCard.locator(".place-map").isVisible());
   assert.match(await ordinaryCard.locator(".place-map").getAttribute("href"),/^https:\/\//);
-  const sample = cities.flatMap(city => catalogPlacesForCity(city.id).filter(p=>p.photo).map(place=>({city,place}))).at(0);
+  const sample = findSample(p=>p.photo);
   if(sample){
     await page.locator("#guide-city").fill(sample.city.label);
     await page.locator("#guide-city").press("Enter");
     await page.locator("#guide-search").fill(sample.place.name.slice(0,100));
-    const card=page.locator(".place-card").filter({has:page.locator(".place-name",{hasText:sample.place.name})}).filter({has:page.locator(".place-photo:visible")}).first();
+    const card=page.locator("[data-place-id="+JSON.stringify(sample.place.id)+"]");
     const image=card.locator(".place-photo img");
     await image.scrollIntoViewIfNeeded();
     await page.waitForFunction(()=>Array.from(document.querySelectorAll(".place-photo:not([hidden]) img")).some(img=>img.complete&&img.naturalWidth>0));
@@ -91,5 +114,9 @@ try {
     console.log("Imported photo verified offline:",sample.place.name);
   }else console.log("No imported photos yet; offline photo UI coverage deferred");
   assert.deepEqual(errors,[]);
+  for(const width of [320,760,844]){
+    await page.setViewportSize({width,height:640});
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`horizontal overflow at ${width}px`);
+  }
   console.log("Mobile standalone UI passed (390px, virtual Android origin, offline interactions)");
 } finally {await browser.close();}

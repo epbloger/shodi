@@ -1,8 +1,5 @@
 name: Enrich place descriptions
 on:
-  push:
-    branches: [android-v2]
-    paths: ['scripts/enrich-descriptions.mjs', 'scripts/import-place-photos.mjs', 'scripts/photo-import-policy.mjs', 'scripts/catalog-match-helpers.mjs', 'public/data/osm-photo-links.js', 'public/data/osm-place-facts.js']
   workflow_dispatch:
 permissions:
   contents: read
@@ -23,6 +20,12 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
+      - name: Protect the frozen release catalog
+        run: |
+          if test -f docs/release-catalog-blobs.txt; then
+            echo 'Release catalog is frozen. Enrichment requires a separately reviewed snapshot update.'
+            exit 1
+          fi
       - name: Reuse completed import if catalog and importer did not change
         id: reuse
         env:

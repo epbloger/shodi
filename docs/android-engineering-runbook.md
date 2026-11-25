@@ -22,6 +22,8 @@ Recorded 2026-11-25. These are actual prior incidents, not a checklist of hypoth
 - Prior fully green APK: run 45551541614, revision 899e6e2271c02bac72e65601c2a5d8cccec274b7; artifact 14995885142 (outdated).
 
 ## Iteration gate
+Latest completed run at the start of this pass: 45646645431, commit 75e4abc60721a47bc035560730969ac49db69357. All seven test/data/emulator jobs succeeded; debug APK artifact 15039441053 (37,051,084 bytes), extracted SHA-256 dc79b961f856e8bff6a5ec00398607234a6f06e0aed6a5cb9950bbfe0027c267. Do not use that artifact as evidence for later commits. Automatic enrichment was cancelled before integration (45646645983); enrichment is now explicit and the frozen snapshot must be deliberately reviewed before any import.
+
 1. Read HEAD and this ledger, fetch current workflow jobs and failed logs. Determine whether the same failure has already been solved on newer revision.
 2. Reuse successful artifacts and source checksums. Do not redo completed scans unless input or matching policy changes. Validate schema, source, identity, coordinates and attribution before merging.
 3. Inspect the whole change, including import paths, script invocation directory, shell quoting, YAML paths, manifest filenames, input data shape, and regression expectations. Run node --check, Python compile and focused tests before full build where runtime permits.

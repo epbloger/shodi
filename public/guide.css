@@ -319,3 +319,10 @@
 .place-photo img{object-fit:cover;}
 
 .place-photo.place-brand-logo img{object-fit:contain;background:#fff;padding:14px;aspect-ratio:3/2;}
+
+@media(max-width:760px){
+ .guide-link,.guide-destination .button,.category-chip,.place-add,.place-map{min-height:44px;}
+ .place-add{margin-top:0;}
+ .place-footer{gap:8px;}
+ .place-area{overflow-wrap:anywhere;}
+}

@@ -16,7 +16,7 @@ def hierarchy():
     return ET.fromstring(adb("shell", "cat", "/sdcard/shodi-window.xml"))
 def matches(node, text):
     return any(normalized(node.get(attr,"")) == normalized(text) for attr in ("text","content-desc"))
-def find_text(text, timeout=90, dialog_button=None, dialog_title=None, recover_launcher=False):
+def find_text(text, timeout=90, dialog_button=None, dialog_title=None, recover_launcher=False, prefix=False):
     end=time.monotonic()+timeout
     seen=[]
     recovered=False
@@ -36,7 +36,7 @@ def find_text(text, timeout=90, dialog_button=None, dialog_title=None, recover_l
                 time.sleep(3)
                 continue
             for node in nodes:
-                if matches(node,text):
+                if matches(node,text) or (prefix and any(normalized(node.get(attr,"" )).startswith(normalized(text)) for attr in ("text","content-desc"))):
                     return node
             if dialog_button and any(matches(n,dialog_title) for n in nodes):
                 for node in nodes:
@@ -48,11 +48,27 @@ def find_text(text, timeout=90, dialog_button=None, dialog_title=None, recover_l
             pass
         time.sleep(2)
     raise AssertionError("Android UI element not found: "+text+"; visible nodes: "+str(seen[:80]))
-def tap(text, **kwargs):
-    node=find_text(text, **kwargs)
+def tap_node(node):
     x1,y1,x2,y2=map(int,re.findall(r"\d+",node.get("bounds")))
     assert x2>x1 and y2>y1,"Empty touch bounds"
     adb("shell","input","tap",str((x1+x2)//2),str((y1+y2)//2))
+def tap(text, **kwargs):
+    tap_node(find_text(text, **kwargs))
+def scroll_to(text, prefix=False, direction=1):
+    # Use actual screen dimensions; WebView exposes only visible accessible nodes.
+    w,h=map(int,re.findall(r"(\d+)x(\d+)",adb("shell","wm","size"))[-1])
+    for _ in range(8):
+        for n in hierarchy().iter("node"):
+            if n.get("package")!=PACKAGE: continue
+            values=[normalized(n.get(attr,"")) for attr in ("text","content-desc")]
+            if matches(n,text) or (prefix and any(v.startswith(normalized(text)) for v in values)):
+                bounds=list(map(int,re.findall(r"\d+",n.get("bounds",""))))
+                if len(bounds)==4 and bounds[2]>bounds[0] and bounds[3]>bounds[1]:return n
+        y1,y2=int(h*.75),int(h*.28)
+        if direction<0:y1,y2=y2,y1
+        adb("shell","input","swipe",str(w//2),str(y1),str(w//2),str(y2),"450")
+        time.sleep(1)
+    raise AssertionError("Cannot scroll to: "+text)
 def wait_for_boot():
     deadline = time.monotonic() + 120
     while time.monotonic() < deadline:
@@ -104,12 +120,38 @@ def run():
     find_text("О приложении")
     assert_refusal()
     capture("android-offline.png")
+    # Real WebView route creation from the bundled catalog, offline.
+    add=scroll_to("Добавить в маршрут:",prefix=True)
+    capture("android-catalog-places.png")
+    tap_node(add)
+    tap_node(scroll_to("Открыть маршрут",direction=-1))
+    scroll_to("Удалить маршрут")
+    address=scroll_to("Адрес по каталогу:",prefix=True)
+    assert address is not None
+    capture("android-route.png")
+    adb("shell","am","force-stop",PACKAGE)
+    launch()
+    find_text("О приложении")
+    tap("Санкт-Петербург — прогулка",prefix=True)
+    tap_node(scroll_to("Удалить маршрут",direction=-1))
+    tap("Отмена")
+    tap_node(scroll_to("Удалить маршрут",direction=-1))
+    tap("Удалить")
+    find_text("Куда пойдём?")
+    adb("shell","am","force-stop",PACKAGE)
+    launch()
+    find_text("О приложении")
+    assert not any(any(normalized(n.get(a,"" )).startswith(normalized("Санкт-Петербург — прогулка")) for a in ("text","content-desc")) for n in hierarchy().iter("node")),"Deleted route persisted"
+    # Full reset is an Android system operation, performed only on the test app.
+    assert "Success" in adb("shell","pm","clear",PACKAGE)
+    launch()
+    find_text("Персонализация рекламы")
     assert adb("shell","pidof",PACKAGE).strip(),"Application process stopped"
     log=adb("logcat","-d","-s","AndroidRuntime:E")
     assert "Process: "+PACKAGE not in log,"Android runtime crash: "+log[-3000:]
     anrs=adb("logcat","-d","-b","events","-s","am_anr:I")
     assert not any(PACKAGE in line for line in anrs.splitlines()),"SHODI ANR: "+anrs[-3000:]
-    print("Android emulator: launch, legal section, persisted refusal and offline restart passed")
+    print("Android emulator: launch, legal section, persisted refusal, offline catalog route/address, deletion and full reset passed")
 try:
     run()
 except Exception:

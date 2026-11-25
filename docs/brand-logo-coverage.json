@@ -1,18 +1,19 @@
 {
   "totalBrands": 607,
   "brandedPlaces": 7356,
-  "verifiedLogos": 13,
-  "coveredPlaces": 3552,
+  "verifiedLogos": 14,
+  "coveredPlaces": 3568,
   "statusCounts": {
     "retained": 13,
+    "verified": 1,
     "no-logo-claim": 481,
-    "ambiguous-brand": 75,
+    "ambiguous-brand": 74,
     "no-verified-logo-claim": 38
   },
   "directChecked": 0,
   "directCandidates": 0,
   "categoryChecked": 0,
-  "officialChecked": 22,
+  "officialChecked": 0,
   "errors": [],
   "brands": [
     {
@@ -369,8 +370,9 @@
       "key": "name:cinnabon",
       "name": "Cinnabon",
       "branches": 16,
-      "status": "ambiguous-brand",
-      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+      "status": "verified",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z",
+      "source": "https://commons.wikimedia.org/wiki/File:Cinnabon_logo.svg"
     },
     {
       "key": "name:чихо",
@@ -4334,5 +4336,5 @@
       "source": "https://commons.wikimedia.org/wiki/File:Carl's_Jr_logo.svg"
     }
   ],
-  "generatedAt": "2026-11-25T08:37:08.112Z"
+  "generatedAt": "2026-11-25T15:42:14.552Z"
 }

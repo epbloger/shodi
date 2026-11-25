@@ -339,3 +339,15 @@ dialog textarea { resize: vertical; }
 .scroll-top{position:fixed;bottom:20px;right:16px;z-index:10;width:46px;height:46px;padding:0;border-radius:50%;box-shadow:0 5px 20px #14244b44;}
 .scroll-top .icon{width:22px;height:22px;}
 .scroll-top[hidden],#android-about[hidden],#android-share[hidden]{display:none!important;}
+
+@media (max-width:760px) {
+  .button { min-height:44px; }
+  .route-actions > .button { flex:1 1 130px; }
+  .dialog-actions > .button, .save-actions > .button { flex:1; min-width:0; }
+  .save-actions { flex:1; }
+  .dialog-actions:has(> .button:not([hidden])) > .save-actions { flex:2; }
+  .icon-button { width:44px; height:44px; }
+  .visit { min-height:44px; }
+  .stop-actions { grid-column:1 / -1; }
+  dialog { max-height:calc(100dvh - 24px); overflow:auto; padding:18px; }
+}

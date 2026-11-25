@@ -12,7 +12,7 @@ const rawById = new Map(rawRows.map(row => [row[0], row]));
 test("verified corrections match the frozen cultural scope and raw records", () => {
   assert.equal(scope.cultural.length, 652);
   assert.equal(scope.brands.length, 67);
-  assert.equal(catalogCorrections.length, 5);
+  assert.equal(catalogCorrections.length, 9);
   const candidates = new Map(scope.cultural.map(row => [row.id, row]));
   for (const entry of catalogCorrections) {
     const raw = rawById.get(entry.id);
@@ -42,6 +42,9 @@ test("corrected coordinates, address and category are suitable for the displayed
   assert.deepEqual(effectiveRow(rawById.get("ru-7eeb876e7b67-oc8dcf150d8dd")).slice(4, 6), [55.114463, 37.647121]);
   assert.equal(effectiveRow(rawById.get("nn-o9c0838acd24a"))[2], "architecture");
   assert.equal(effectiveRow(rawById.get("spb-o20250f8ba7e2"))[2], "coffee");
+  assert.match(effectiveRow(rawById.get("kzn-oeb16ffdc1b10"))[3], /Петербургская/);
+  assert.match(effectiveRow(rawById.get("msk-o20dba94845a0"))[3], /павильон 13/);
+  assert.match(effectiveRow(rawById.get("msk-o86e7cab7c588"))[3], /стр\. 9/);
 });
 
 test("effective city lists preserve all 55,716 IDs and uncertain identities", () => {
@@ -50,7 +53,7 @@ test("effective city lists preserve all 55,716 IDs and uncertain identities", ()
   assert.equal(corrected.length, currentCatalog.places);
   assert.deepEqual(corrected.map(row => row[0]), rawRows.map(row => row[0]));
   assert.equal(new Set(corrected.map(row => row[0])).size, 55716);
-  assert.equal(corrected.filter((row, i) => row !== rawRows[i]).length, 5);
+  assert.equal(corrected.filter((row, i) => row !== rawRows[i]).length, catalogCorrections.length);
   for (const id of ["msk-o811e48c4faed", "msk-o77954ba465bf", "msk-o987751770e91", "nn-ocd23d6ac31db"]) {
     const raw = rawById.get(id);
     assert.ok(raw);
@@ -74,4 +77,5 @@ test("verified photo identities apply only to the exact corrected location",()=>
   assert.equal(effectivePhotoIdentity([...corrected.slice(0,4),0,0]),null);
   assert.equal(effectivePhotoIdentity(effectiveRow(rawById.get("nn-o9c0838acd24a"))).qid,"Q2371326");
   assert.equal(effectivePhotoIdentity(effectiveRow(rawById.get("ru-7eeb876e7b67-oc8dcf150d8dd"))).qid,"Q564901");
+  assert.equal(effectivePhotoIdentity(effectiveRow(rawById.get("msk-o20dba94845a0"))).qid,"Q48948839");
 });
