@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile,writeFile} from "node:fs/promises";
 import {cities,catalogPlacesForCity} from "../public/guide.js";
-import {bundledBrandLogo} from "../public/brands.js";
+import {bundledBrandLogo,brandForPlace,verifiedBrandCorrection} from "../public/brands.js";
 import {hasUsefulDescription} from "../public/catalog-presentation.js";
 import {currentPlaces} from "../public/data/current-places.js";
 import {effectiveRow} from "../public/catalog-corrections.js";
@@ -9,9 +9,15 @@ const scope=JSON.parse(await readFile("docs/release-priority-scope.json","utf8")
 const all=cities.flatMap(city=>catalogPlacesForCity(city.id));assert.equal(all.length,scope.catalogPlaces);
 const byId=new Map(all.map(p=>[p.id,p]));assert.equal(byId.size,all.length);
 const brandReport=JSON.parse(await readFile("docs/brand-logo-coverage.json","utf8"));
+const originalBrands=new Map(all.map(p=>[p.id,brandForPlace(p.id,p.name,p.kind,{corrected:false})?.key]));
 const groups=scope.brands.map(b=>{
- const cards=all.filter(p=>p.brand?.key===b.key);assert.equal(cards.length,b.branches,"Brand snapshot changed "+b.key);
- return {...b,name:cards[0].brand.name,described:cards.filter(hasUsefulDescription).length,brandDescribed:cards.filter(p=>["editorial-brand","wikipedia-brand"].includes(p.descriptionKind)).length,logo:!!bundledBrandLogo(cards[0].brand),missing:cards.filter(p=>!hasUsefulDescription(p)).map(p=>({id:p.id,name:p.name,kind:p.kind})),logoStatus:brandReport.brands.find(x=>x.key===b.key)?.status};
+ const original=all.filter(p=>originalBrands.get(p.id)===b.key);
+ assert.equal(original.length,b.branches,"Frozen brand snapshot changed "+b.key);
+ const cards=all.filter(p=>p.brand?.key===b.key);
+ assert.ok(original.every(p=>p.brand?.key===b.key),"Lost frozen brand membership "+b.key);
+ const added=cards.filter(p=>originalBrands.get(p.id)!==b.key);
+ assert.ok(added.every(p=>verifiedBrandCorrection(p.id,p.name,p.kind)),"Unverified new brand membership "+b.key);
+ return {...b,baselineBranches:b.branches,branches:cards.length,addedVerifiedBranches:added.map(p=>p.id),name:cards[0].brand.name,described:cards.filter(hasUsefulDescription).length,brandDescribed:cards.filter(p=>["editorial-brand","wikipedia-brand"].includes(p.descriptionKind)).length,logo:!!bundledBrandLogo(cards[0].brand),missing:cards.filter(p=>!hasUsefulDescription(p)).map(p=>({id:p.id,name:p.name,kind:p.kind})),logoStatus:brandReport.brands.find(x=>x.key===b.key)?.status};
 });
 const rawById=new Map(Object.values(currentPlaces).flat().map(row=>[row[0],row]));
 const places=scope.cultural.map(x=>{

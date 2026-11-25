@@ -30,9 +30,9 @@ android {
         targetSdk 35
         versionCode 20000
         versionName '2.0.0'
-        buildConfigField 'String', 'BANNER_ID', '"demo-banner-yandex"'
-        buildConfigField 'String', 'INTERSTITIAL_ID', '"demo-interstitial-yandex"'
-        buildConfigField 'String', 'NATIVE_ID', '"demo-native-content-yandex"'
+        buildConfigField 'String', 'BANNER_ID', '""'
+        buildConfigField 'String', 'INTERSTITIAL_ID', '""'
+        buildConfigField 'String', 'NATIVE_ID', '""'
         buildConfigField 'boolean', 'PRODUCTION_ADS', 'false'
     }
     buildFeatures { buildConfig true }
@@ -50,6 +50,9 @@ android {
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-test'
+            buildConfigField 'String', 'BANNER_ID', '"demo-banner-yandex"'
+            buildConfigField 'String', 'INTERSTITIAL_ID', '"demo-interstitial-yandex"'
+            buildConfigField 'String', 'NATIVE_ID', '"demo-native-content-yandex"'
         }
         release {
             if (production) {

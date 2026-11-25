@@ -1,12 +1,11 @@
 {
-  "totalBrands": 607,
-  "brandedPlaces": 7356,
+  "totalBrands": 604,
+  "brandedPlaces": 7355,
   "verifiedLogos": 14,
-  "coveredPlaces": 3568,
+  "coveredPlaces": 3572,
   "statusCounts": {
-    "retained": 13,
-    "verified": 1,
-    "no-logo-claim": 481,
+    "retained": 14,
+    "no-logo-claim": 478,
     "ambiguous-brand": 74,
     "no-verified-logo-claim": 38
   },
@@ -369,8 +368,8 @@
     {
       "key": "name:cinnabon",
       "name": "Cinnabon",
-      "branches": 16,
-      "status": "verified",
+      "branches": 20,
+      "status": "retained",
       "lastAttemptAt": "2026-11-25T07:36:46.618Z",
       "source": "https://commons.wikimedia.org/wiki/File:Cinnabon_logo.svg"
     },
@@ -2824,13 +2823,6 @@
       "lastAttemptAt": "2026-11-25T07:35:55.001Z"
     },
     {
-      "key": "name:cinnabon в новосибирске",
-      "name": "Cinnabon в Новосибирске",
-      "branches": 1,
-      "status": "no-logo-claim",
-      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
-    },
-    {
       "key": "name:кофий room сеть кофеен",
       "name": "Кофий Room - сеть кофеен",
       "branches": 4,
@@ -3635,20 +3627,6 @@
       "lastAttemptAt": "2026-11-25T07:36:13.389Z"
     },
     {
-      "key": "name:cinnabon в санкт петербурге",
-      "name": "Cinnabon в Санкт-Петербурге",
-      "branches": 3,
-      "status": "no-logo-claim",
-      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
-    },
-    {
-      "key": "name:аврора торговый дом русской книги",
-      "name": "Аврора торговый дом русской книги",
-      "branches": 1,
-      "status": "no-logo-claim",
-      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
-    },
-    {
       "key": "name:pearl beach",
       "name": "Pearl Beach",
       "branches": 1,
@@ -4336,5 +4314,5 @@
       "source": "https://commons.wikimedia.org/wiki/File:Carl's_Jr_logo.svg"
     }
   ],
-  "generatedAt": "2026-11-25T15:42:14.552Z"
+  "generatedAt": "2026-11-25T16:26:20.239Z"
 }

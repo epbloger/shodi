@@ -82,7 +82,7 @@ try {
   await page.locator("#edit-form button[type=submit]").click();
   const manual=page.locator(".stop-card").filter({hasText:"Своя остановка"});
   assert.equal(await manual.locator(".stop-address").textContent(),"Адрес: Невский проспект, 1");
-  assert.match(new URL(await manual.locator(".stop-map").getAttribute("href")).searchParams.get("text"),/Невский проспект, 1/);
+  assert.equal(new URL(await manual.locator(".stop-map").getAttribute("href")).searchParams.get("text"),"Санкт-Петербург Невский проспект, 1");
   await manual.locator(".move-up").click();
   assert.equal(await page.locator(".stop-title").first().textContent(),"Своя остановка");
   await manual.locator(".visit-toggle").click();

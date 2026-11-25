@@ -2,7 +2,7 @@
   "baseline": "42fa197984cc43410de8c6e7c107ef6c9e195198",
   "catalog": 55716,
   "brandGroups": 67,
-  "brandCards": 5927,
+  "brandCards": 5931,
   "brandCardsWithoutDescription": 0,
   "brandsWithoutLogo": 60,
   "culturalCandidates": 652,
@@ -13,6 +13,8 @@
     {
       "key": "Q3442874",
       "branches": 1292,
+      "baselineBranches": 1292,
+      "addedVerifiedBranches": [],
       "name": "Rostic's",
       "described": 1292,
       "brandDescribed": 1292,
@@ -23,6 +25,8 @@
     {
       "key": "Q177054",
       "branches": 948,
+      "baselineBranches": 948,
+      "addedVerifiedBranches": [],
       "name": "Burger King",
       "described": 948,
       "brandDescribed": 607,
@@ -33,6 +37,8 @@
     {
       "key": "Q112406961",
       "branches": 890,
+      "baselineBranches": 890,
+      "addedVerifiedBranches": [],
       "name": "Вкусно — и точка",
       "described": 890,
       "brandDescribed": 890,
@@ -43,6 +49,8 @@
     {
       "key": "Q55662627",
       "branches": 799,
+      "baselineBranches": 799,
+      "addedVerifiedBranches": [],
       "name": "Coffee Like",
       "described": 799,
       "brandDescribed": 619,
@@ -53,6 +61,8 @@
     {
       "key": "Q524757",
       "branches": 340,
+      "baselineBranches": 340,
+      "addedVerifiedBranches": [],
       "name": "KFC",
       "described": 340,
       "brandDescribed": 337,
@@ -63,6 +73,8 @@
     {
       "key": "name:шоколадница казань",
       "branches": 105,
+      "baselineBranches": 105,
+      "addedVerifiedBranches": [],
       "name": "Шоколадница Казань",
       "described": 105,
       "brandDescribed": 64,
@@ -73,6 +85,8 @@
     {
       "key": "name:starbucks",
       "branches": 102,
+      "baselineBranches": 102,
+      "addedVerifiedBranches": [],
       "name": "Starbucks",
       "described": 102,
       "brandDescribed": 102,
@@ -83,6 +97,8 @@
     {
       "key": "name:тануки",
       "branches": 76,
+      "baselineBranches": 76,
+      "addedVerifiedBranches": [],
       "name": "ТАНУКИ",
       "described": 76,
       "brandDescribed": 69,
@@ -93,6 +109,8 @@
     {
       "key": "name:цех85",
       "branches": 70,
+      "baselineBranches": 70,
+      "addedVerifiedBranches": [],
       "name": "ЦЕХ85",
       "described": 70,
       "brandDescribed": 15,
@@ -103,6 +121,8 @@
     {
       "key": "name:baggins coffee",
       "branches": 64,
+      "baselineBranches": 64,
+      "addedVerifiedBranches": [],
       "name": "Baggins Coffee",
       "described": 64,
       "brandDescribed": 34,
@@ -113,6 +133,8 @@
     {
       "key": "name:куулклевер",
       "branches": 64,
+      "baselineBranches": 64,
+      "addedVerifiedBranches": [],
       "name": "КуулКлевер",
       "described": 64,
       "brandDescribed": 64,
@@ -123,6 +145,8 @@
     {
       "key": "name:papa john's pizza",
       "branches": 56,
+      "baselineBranches": 56,
+      "addedVerifiedBranches": [],
       "name": "Papa John's Pizza",
       "described": 56,
       "brandDescribed": 56,
@@ -133,6 +157,8 @@
     {
       "key": "name:евразия",
       "branches": 56,
+      "baselineBranches": 56,
+      "addedVerifiedBranches": [],
       "name": "Евразия",
       "described": 56,
       "brandDescribed": 51,
@@ -143,6 +169,8 @@
     {
       "key": "name:cofix россия",
       "branches": 50,
+      "baselineBranches": 50,
+      "addedVerifiedBranches": [],
       "name": "Cofix Россия",
       "described": 50,
       "brandDescribed": 50,
@@ -153,6 +181,8 @@
     {
       "key": "name:skuratov coffee",
       "branches": 48,
+      "baselineBranches": 48,
+      "addedVerifiedBranches": [],
       "name": "Skuratov Coffee",
       "described": 48,
       "brandDescribed": 14,
@@ -163,6 +193,8 @@
     {
       "key": "name:mcdonald's",
       "branches": 43,
+      "baselineBranches": 43,
+      "addedVerifiedBranches": [],
       "name": "McDonald's",
       "described": 43,
       "brandDescribed": 43,
@@ -173,6 +205,8 @@
     {
       "key": "name:чайхона 1",
       "branches": 42,
+      "baselineBranches": 42,
+      "addedVerifiedBranches": [],
       "name": "Чайхона 1",
       "described": 42,
       "brandDescribed": 42,
@@ -183,6 +217,8 @@
     {
       "key": "name:своя компания",
       "branches": 36,
+      "baselineBranches": 36,
+      "addedVerifiedBranches": [],
       "name": "Своя Компания",
       "described": 36,
       "brandDescribed": 33,
@@ -193,6 +229,8 @@
     {
       "key": "name:хлеб насущный официальная страница",
       "branches": 36,
+      "baselineBranches": 36,
+      "addedVerifiedBranches": [],
       "name": "Хлеб Насущный Официальная страница",
       "described": 36,
       "brandDescribed": 36,
@@ -203,6 +241,8 @@
     {
       "key": "name:буше москва",
       "branches": 34,
+      "baselineBranches": 34,
+      "addedVerifiedBranches": [],
       "name": "Буше Москва",
       "described": 34,
       "brandDescribed": 17,
@@ -213,6 +253,8 @@
     {
       "key": "name:кофемания / сoffeemania",
       "branches": 34,
+      "baselineBranches": 34,
+      "addedVerifiedBranches": [],
       "name": "Кофемания / Сoffeemania",
       "described": 34,
       "brandDescribed": 34,
@@ -223,6 +265,8 @@
     {
       "key": "name:bricobilandia",
       "branches": 33,
+      "baselineBranches": 33,
+      "addedVerifiedBranches": [],
       "name": "Bricobilandia",
       "described": 33,
       "brandDescribed": 33,
@@ -233,6 +277,8 @@
     {
       "key": "name:il патио",
       "branches": 31,
+      "baselineBranches": 31,
+      "addedVerifiedBranches": [],
       "name": "IL Патио",
       "described": 31,
       "brandDescribed": 30,
@@ -243,6 +289,8 @@
     {
       "key": "name:subway",
       "branches": 31,
+      "baselineBranches": 31,
+      "addedVerifiedBranches": [],
       "name": "Subway",
       "described": 31,
       "brandDescribed": 18,
@@ -253,6 +301,8 @@
     {
       "key": "name:таширпицца",
       "branches": 31,
+      "baselineBranches": 31,
+      "addedVerifiedBranches": [],
       "name": "ТаширПицца",
       "described": 31,
       "brandDescribed": 31,
@@ -263,6 +313,8 @@
     {
       "key": "name:pizza hut",
       "branches": 29,
+      "baselineBranches": 29,
+      "addedVerifiedBranches": [],
       "name": "Pizza Hut",
       "described": 29,
       "brandDescribed": 24,
@@ -273,6 +325,8 @@
     {
       "key": "name:сеть пиццерий сицилия",
       "branches": 26,
+      "baselineBranches": 26,
+      "addedVerifiedBranches": [],
       "name": "Сеть Пиццерий \"Сицилия\"",
       "described": 26,
       "brandDescribed": 26,
@@ -283,6 +337,8 @@
     {
       "key": "name:chicko",
       "branches": 25,
+      "baselineBranches": 25,
+      "addedVerifiedBranches": [],
       "name": "Chicko",
       "described": 25,
       "brandDescribed": 25,
@@ -293,6 +349,8 @@
     {
       "key": "name:андерсон",
       "branches": 21,
+      "baselineBranches": 21,
+      "addedVerifiedBranches": [],
       "name": "АндерСон",
       "described": 21,
       "brandDescribed": 21,
@@ -303,6 +361,8 @@
     {
       "key": "name:все дома сеть булочных спб",
       "branches": 20,
+      "baselineBranches": 20,
+      "addedVerifiedBranches": [],
       "name": "ВСЕ ДОМА сеть булочных СПб",
       "described": 20,
       "brandDescribed": 20,
@@ -313,6 +373,8 @@
     {
       "key": "name:кофе бон",
       "branches": 20,
+      "baselineBranches": 20,
+      "addedVerifiedBranches": [],
       "name": "Кофе Бон",
       "described": 20,
       "brandDescribed": 18,
@@ -323,6 +385,8 @@
     {
       "key": "name:domino's pizza",
       "branches": 19,
+      "baselineBranches": 19,
+      "addedVerifiedBranches": [],
       "name": "Domino's Pizza",
       "described": 19,
       "brandDescribed": 19,
@@ -333,6 +397,8 @@
     {
       "key": "name:бургер & фрайс",
       "branches": 19,
+      "baselineBranches": 19,
+      "addedVerifiedBranches": [],
       "name": "Бургер & Фрайс",
       "described": 19,
       "brandDescribed": 18,
@@ -343,6 +409,8 @@
     {
       "key": "name:джонджоли",
       "branches": 19,
+      "baselineBranches": 19,
+      "addedVerifiedBranches": [],
       "name": "Джонджоли",
       "described": 19,
       "brandDescribed": 13,
@@ -353,6 +421,8 @@
     {
       "key": "name:чайхона 1 сеть lounge cafe",
       "branches": 18,
+      "baselineBranches": 18,
+      "addedVerifiedBranches": [],
       "name": "«Чайхона 1» сеть lounge cafe",
       "described": 18,
       "brandDescribed": 18,
@@ -362,17 +432,26 @@
     },
     {
       "key": "name:cinnabon",
-      "branches": 16,
+      "branches": 20,
+      "baselineBranches": 16,
+      "addedVerifiedBranches": [
+        "ru-8dea00e39aab-o9f5810b89907",
+        "spb-oe7ec4226ccb9",
+        "spb-oaf3bd1c45e68",
+        "spb-o205df5ca3c4e"
+      ],
       "name": "Cinnabon",
-      "described": 16,
-      "brandDescribed": 15,
+      "described": 20,
+      "brandDescribed": 19,
       "logo": true,
       "missing": [],
-      "logoStatus": "verified"
+      "logoStatus": "retained"
     },
     {
       "key": "name:coffee moose",
       "branches": 16,
+      "baselineBranches": 16,
+      "addedVerifiedBranches": [],
       "name": "Coffee MOOSE",
       "described": 16,
       "brandDescribed": 16,
@@ -383,6 +462,8 @@
     {
       "key": "name:вареничная no1",
       "branches": 16,
+      "baselineBranches": 16,
+      "addedVerifiedBranches": [],
       "name": "Вареничная №1",
       "described": 16,
       "brandDescribed": 14,
@@ -393,6 +474,8 @@
     {
       "key": "name:волконский",
       "branches": 16,
+      "baselineBranches": 16,
+      "addedVerifiedBranches": [],
       "name": "Волконский",
       "described": 16,
       "brandDescribed": 16,
@@ -403,6 +486,8 @@
     {
       "key": "name:zамания",
       "branches": 15,
+      "baselineBranches": 15,
+      "addedVerifiedBranches": [],
       "name": "Zамания",
       "described": 15,
       "brandDescribed": 15,
@@ -413,6 +498,8 @@
     {
       "key": "name:британские пекарни british bakery",
       "branches": 15,
+      "baselineBranches": 15,
+      "addedVerifiedBranches": [],
       "name": "Британские пекарни - British Bakery",
       "described": 15,
       "brandDescribed": 15,
@@ -423,6 +510,8 @@
     {
       "key": "name:теплого хлеба",
       "branches": 15,
+      "baselineBranches": 15,
+      "addedVerifiedBranches": [],
       "name": "Тёплого хлеба",
       "described": 15,
       "brandDescribed": 15,
@@ -433,6 +522,8 @@
     {
       "key": "Q61949318",
       "branches": 14,
+      "baselineBranches": 14,
+      "addedVerifiedBranches": [],
       "name": "Додо Пицца",
       "described": 14,
       "brandDescribed": 5,
@@ -443,6 +534,8 @@
     {
       "key": "name:lambic",
       "branches": 14,
+      "baselineBranches": 14,
+      "addedVerifiedBranches": [],
       "name": "Lambic",
       "described": 14,
       "brandDescribed": 14,
@@ -453,6 +546,8 @@
     {
       "key": "name:патрик&мари",
       "branches": 14,
+      "baselineBranches": 14,
+      "addedVerifiedBranches": [],
       "name": "«Патрик&Мари»",
       "described": 14,
       "brandDescribed": 14,
@@ -463,6 +558,8 @@
     {
       "key": "name:пироговый дворик, кафе пекарни",
       "branches": 14,
+      "baselineBranches": 14,
+      "addedVerifiedBranches": [],
       "name": "Пироговый Дворик, кафе-пекарни",
       "described": 14,
       "brandDescribed": 14,
@@ -473,6 +570,8 @@
     {
       "key": "name:питькофе, сеть кофеен",
       "branches": 14,
+      "baselineBranches": 14,
+      "addedVerifiedBranches": [],
       "name": "Питькофе, сеть кофеен",
       "described": 14,
       "brandDescribed": 14,
@@ -483,6 +582,8 @@
     {
       "key": "name:республика",
       "branches": 14,
+      "baselineBranches": 14,
+      "addedVerifiedBranches": [],
       "name": "Республика",
       "described": 14,
       "brandDescribed": 13,
@@ -493,6 +594,8 @@
     {
       "key": "name:дуть особое пространство",
       "branches": 13,
+      "baselineBranches": 13,
+      "addedVerifiedBranches": [],
       "name": "Дуть - особое пространство",
       "described": 13,
       "brandDescribed": 13,
@@ -503,6 +606,8 @@
     {
       "key": "name:the coffee bean & tea leaf (philippines)",
       "branches": 12,
+      "baselineBranches": 12,
+      "addedVerifiedBranches": [],
       "name": "The Coffee Bean & Tea Leaf (Philippines)",
       "described": 12,
       "brandDescribed": 7,
@@ -513,6 +618,8 @@
     {
       "key": "name:брусника кондитерская кулинария",
       "branches": 12,
+      "baselineBranches": 12,
+      "addedVerifiedBranches": [],
       "name": "Брусника кондитерская-кулинария",
       "described": 12,
       "brandDescribed": 12,
@@ -523,6 +630,8 @@
     {
       "key": "name:пхалихинкали",
       "branches": 12,
+      "baselineBranches": 12,
+      "addedVerifiedBranches": [],
       "name": "ПхалиХинкали",
       "described": 12,
       "brandDescribed": 12,
@@ -533,6 +642,8 @@
     {
       "key": "name:burger heroes",
       "branches": 11,
+      "baselineBranches": 11,
+      "addedVerifiedBranches": [],
       "name": "Burger Heroes",
       "described": 11,
       "brandDescribed": 7,
@@ -543,6 +654,8 @@
     {
       "key": "name:konigsbacker kaliningrad",
       "branches": 11,
+      "baselineBranches": 11,
+      "addedVerifiedBranches": [],
       "name": "Konigsbacker Kaliningrad",
       "described": 11,
       "brandDescribed": 11,
@@ -553,6 +666,8 @@
     {
       "key": "name:академия кофе",
       "branches": 11,
+      "baselineBranches": 11,
+      "addedVerifiedBranches": [],
       "name": "Академия Кофе",
       "described": 11,
       "brandDescribed": 8,
@@ -563,6 +678,8 @@
     {
       "key": "name:блинбери",
       "branches": 11,
+      "baselineBranches": 11,
+      "addedVerifiedBranches": [],
       "name": "БлинБери",
       "described": 11,
       "brandDescribed": 11,
@@ -573,6 +690,8 @@
     {
       "key": "name:папаша беппе",
       "branches": 11,
+      "baselineBranches": 11,
+      "addedVerifiedBranches": [],
       "name": "Папаша Беппе",
       "described": 11,
       "brandDescribed": 10,
@@ -583,6 +702,8 @@
     {
       "key": "name:пироговые линдфорс",
       "branches": 11,
+      "baselineBranches": 11,
+      "addedVerifiedBranches": [],
       "name": "Пироговые «Линдфорс»",
       "described": 11,
       "brandDescribed": 11,
@@ -593,6 +714,8 @@
     {
       "key": "name:хинкали gали",
       "branches": 11,
+      "baselineBranches": 11,
+      "addedVerifiedBranches": [],
       "name": "Хинкали-Gали",
       "described": 11,
       "brandDescribed": 11,
@@ -603,6 +726,8 @@
     {
       "key": "name:ямм пицца",
       "branches": 11,
+      "baselineBranches": 11,
+      "addedVerifiedBranches": [],
       "name": "ЯММ Пицца",
       "described": 11,
       "brandDescribed": 11,
@@ -613,6 +738,8 @@
     {
       "key": "name:farfor доставка удовольствий",
       "branches": 10,
+      "baselineBranches": 10,
+      "addedVerifiedBranches": [],
       "name": "Farfor - доставка удовольствий",
       "described": 10,
       "brandDescribed": 10,
@@ -623,6 +750,8 @@
     {
       "key": "name:surf coffee",
       "branches": 10,
+      "baselineBranches": 10,
+      "addedVerifiedBranches": [],
       "name": "Surf Coffee",
       "described": 10,
       "brandDescribed": 5,
@@ -633,6 +762,8 @@
     {
       "key": "name:грузинские каникулы",
       "branches": 10,
+      "baselineBranches": 10,
+      "addedVerifiedBranches": [],
       "name": "Грузинские Каникулы",
       "described": 10,
       "brandDescribed": 10,
@@ -643,6 +774,8 @@
     {
       "key": "name:контакт бар",
       "branches": 10,
+      "baselineBranches": 10,
+      "addedVerifiedBranches": [],
       "name": "Контакт Бар",
       "described": 10,
       "brandDescribed": 10,
@@ -653,6 +786,8 @@
     {
       "key": "name:пекарня мамин хлеб ижевск",
       "branches": 10,
+      "baselineBranches": 10,
+      "addedVerifiedBranches": [],
       "name": "Пекарня МАМИН ХЛЕБ Ижевск",
       "described": 10,
       "brandDescribed": 10,
@@ -663,6 +798,8 @@
     {
       "key": "name:урюк",
       "branches": 10,
+      "baselineBranches": 10,
+      "addedVerifiedBranches": [],
       "name": "УРЮК",
       "described": 10,
       "brandDescribed": 10,
@@ -673,6 +810,8 @@
     {
       "key": "name:хачапури и вино",
       "branches": 10,
+      "baselineBranches": 10,
+      "addedVerifiedBranches": [],
       "name": "Хачапури и Вино",
       "described": 10,
       "brandDescribed": 10,

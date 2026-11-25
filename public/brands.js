@@ -10,7 +10,23 @@ const seeds=[
  {qid:"Q524757",name:"KFC",aliases:["KFC","КФС"],file:"KFC logo wordmark.svg",kind:["food"]},
  {qid:"Q55662627",name:"Coffee Like",aliases:["Coffee Like"],kind:["coffee","food"]}
 ];
-export function brandForPlace(id,name,kind){
+// Exact source-record overrides, verified against the operator's address list.
+// The frozen source links remain untouched; do not generalize regional aliases.
+const verifiedLinks = Object.freeze({
+ "spb-oe7ec4226ccb9": {name:"Cinnabon",kind:"coffee",old:"Cinnabon в Санкт-Петербурге",source:"https://cinnabonrussia.com/locations/cinnabon-sankt-peterburg-pr-bolshoy-ps/"},
+ "spb-oaf3bd1c45e68": {name:"Cinnabon",kind:"coffee",old:"Cinnabon в Санкт-Петербурге",source:"https://cinnabonrussia.com/locations/"},
+ "spb-o205df5ca3c4e": {name:"Cinnabon в Санкт-Петербурге",kind:"coffee",old:"Cinnabon в Санкт-Петербурге",source:"https://cinnabonrussia.com/locations/"},
+ "ru-8dea00e39aab-o9f5810b89907": {name:"Cinnabon",kind:"coffee",old:"Cinnabon в Новосибирске",source:"https://cinnabonrussia.com/locations/cinnabon-novosibirsk-trk-mega-novosibirsk/"},
+ "spb-o927b89825cc1": {name:"Кинотеатр «Аврора»",kind:"family",old:"Аврора торговый дом русской книги",remove:true,source:"https://avrora.spb.ru/cinema/"}
+});
+export function verifiedBrandCorrection(id,name,kind){
+ const entry=Object.hasOwn(verifiedLinks,id)?verifiedLinks[id]:null;
+ const row=Object.hasOwn(placeBrands,id)?placeBrands[id]:null;
+ return entry&&entry.name===name&&entry.kind===kind&&row?.qid===null&&row.name===entry.old?entry:null;
+}
+export function brandForPlace(id,name,kind,{corrected=true}={}){
+ const correction=corrected?verifiedBrandCorrection(id,name,kind):null;
+ if(correction)return correction.remove?null:{name:"Cinnabon",qid:null,key:"name:cinnabon"};
  const row=Object.hasOwn(placeBrands,id)?placeBrands[id]:null;
  const valid=row&&typeof row.name==="string"&&row.name.trim()&&row.name.length<=120&&(row.qid===null||qid.test(row.qid));
  const seed=seeds.find(b=>b.kind.includes(kind)&&(valid&&row.qid===b.qid||(!valid||!row.qid)&&b.aliases.some(n=>brandNameKey(n)===brandNameKey(valid?row.name:name))));

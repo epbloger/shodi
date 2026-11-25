@@ -3,7 +3,7 @@ import {
   newId, readBoard, routeDetails, routeStats, stopDetails,
 } from "./routes.js";
 import { mountGuide } from "./guide-view.js";
-import { budgetLabel, cityMatches, mapLink, placeById, PLACE_CATEGORIES, reviewLabel } from "./guide.js";
+import { budgetLabel, cityMatches, mapLink, manualStopMapLink, placeById, PLACE_CATEGORIES, reviewLabel } from "./guide.js";
 
 import { initTheme } from "./theme.js";
 
@@ -184,7 +184,7 @@ function renderStops(route) {
       text(address, actualAddress ? (place?.address ? "Адрес по каталогу: " : "Адрес: ") + actualAddress : "");
       address.hidden = !actualAddress;
       const map = item.querySelector(".stop-map");
-      map.href = mapLink(place ?? {name: stop.name, address: [route.city, stop.address].filter(Boolean).join(" "), city: route.city});
+      map.href = place ? mapLink(place) : manualStopMapLink(stop,route.city);
       map.hidden = false;
       map.setAttribute("aria-label", (place?.name ?? stop.name) + " на карте, откроется в новой вкладке");
     }

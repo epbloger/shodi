@@ -3,6 +3,14 @@
 // may have fixed the record independently or changed its identity.
 const entries = [
   {
+    id: "spb-of869e540494f", cityId: "spb",
+    before: ["Мастерская Аникушина", "museum", "Санкт-Петербург, Вяземский переулок 8", 59.973129, 30.297102],
+    after: { address: "Санкт-Петербург, Вяземский переулок, 8, литера А" },
+    unavailable: "Закрыто на реэкспозицию; открытие запланировано на 23.12.2026. Уточните актуальный статус у музея",
+    photoQid: "Q131412455", photoFile: "Вяземский переулок 8 СПб.jpg",
+    sources: ["https://gmgs.ru/post/23563", "https://base.garant.ru/413834616/", "https://www.wikidata.org/wiki/Q131412455", "https://commons.wikimedia.org/wiki/File:Вяземский_переулок_8_СПб.jpg"],
+  },
+  {
     id: "msk-o06c85a92a42b", cityId: "msk",
     before: ["им. ВЛ. МАЯКОВСКОГО МОСКОВСКИЙ АКАДЕМИЧЕСКИЙ ТЕАТР ФИЛИАЛ", "theater", "Москва, Пушкарёв переулок 21", 55.769032, 37.630894],
     after: { address: "Москва, Пушкарёв переулок 21/24" },

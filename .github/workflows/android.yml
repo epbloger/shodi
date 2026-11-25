@@ -649,6 +649,8 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump permissions "$apk" > release-permissions.txt
           if grep -E 'ACCESS_(FINE|COARSE)_LOCATION|com.google.android.gms.permission.AD_ID|READ_CONTACTS|READ_PHONE_STATE|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|READ_MEDIA_(IMAGES|VIDEO|AUDIO|VISUAL_USER_SELECTED)|RECORD_AUDIO|android.permission.CAMERA|QUERY_ALL_PACKAGES' release-permissions.txt; then exit 1; fi
           unzip -p "$apk" assets/index.html | cmp - dist/shodi.html
+          for doc in about privacy terms consent licenses; do unzip -p "$apk" "assets/$doc.html" | cmp - "public/$doc.html"; done
+          node scripts/verify-production-ads.mjs android/app/build/generated/source/buildConfig/release/ru/moorkis/shodi/BuildConfig.java "$apk"
           mkdir -p android-release-output
           cp "$apk" android-release-output/shodi-2.0.0.apk
       - uses: actions/upload-artifact@v4

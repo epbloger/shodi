@@ -12,7 +12,7 @@ const rawById = new Map(rawRows.map(row => [row[0], row]));
 test("verified corrections match the frozen cultural scope and raw records", () => {
   assert.equal(scope.cultural.length, 652);
   assert.equal(scope.brands.length, 67);
-  assert.equal(catalogCorrections.length, 13);
+  assert.equal(catalogCorrections.length, 14);
   const candidates = new Map(scope.cultural.map(row => [row.id, row]));
   for (const entry of catalogCorrections) {
     const raw = rawById.get(entry.id);
@@ -21,7 +21,7 @@ test("verified corrections match the frozen cultural scope and raw records", () 
     assert.ok(russianCities.some(city => city[0] === entry.cityId));
     const candidate = candidates.get(entry.id);
     if(candidate)assert.deepEqual([candidate.name, candidate.kind, candidate.lat, candidate.lon], [raw[1], raw[2], raw[4], raw[5]]);
-    else assert.equal(entry.id,"spb-o20250f8ba7e2");
+    else assert.ok(["spb-o20250f8ba7e2","spb-of869e540494f"].includes(entry.id));
     assert.ok(entry.sources.every(source => new URL(source).protocol === "https:"));
     const copy = [...raw];
     const effective = effectiveRow(raw);

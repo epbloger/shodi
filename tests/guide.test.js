@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  budgetLabel, cities, cityByQuery, cityMatches, findPlaces, mapLink, placeById,
+  budgetLabel, cities, cityByQuery, cityMatches, findPlaces, mapLink, manualStopMapLink, placeById,
   placesForCity, PLACE_CATEGORIES, reviewLabel, catalogPlacesForCity, catalogSource,
 } from "../public/guide.js";
 import { demoBoard, readBoard, routeDetails, stopDetails } from "../public/routes.js";
@@ -89,6 +89,8 @@ test("map links use a fixed origin and encode place names", () => {
   assert.equal(url.origin, "https://yandex.ru");
   assert.equal(url.pathname, "/maps/");
   assert.equal(url.searchParams.get("text"), "Тест & парк Казань");
+  assert.equal(new URL(manualStopMapLink({name:"Личная встреча",address:"Невский проспект, 1"},"Санкт-Петербург")).searchParams.get("text"),"Санкт-Петербург Невский проспект, 1");
+  assert.equal(new URL(manualStopMapLink({name:"Музей"},"Казань")).searchParams.get("text"),"Музей Казань");
 });
 
 test("saved routes support catalog categories and older records", () => {
@@ -156,4 +158,17 @@ test("confirmed temporary closures are hidden from recommendations but remain in
     assert.ok(place.address);
   }
   assert.ok(available.has("msk-of1c48e53f60a"));
+  assert.ok(placeById("spb-of869e540494f").unavailable?.message.includes("23.12.2026"));
+  assert.ok(!findPlaces({cityId:"spb"}).some(p=>p.id==="spb-of869e540494f"));
+});
+
+test("verified regional Cinnabon aliases reuse the canonical licensed logo and unrelated cinema has no bookstore brand",()=>{
+  for(const id of ["spb-oe7ec4226ccb9","spb-oaf3bd1c45e68","spb-o205df5ca3c4e","ru-8dea00e39aab-o9f5810b89907"]){
+    const place=placeById(id);
+    assert.equal(place.brand.key,"name:cinnabon");
+    assert.equal(place.photo?.brandLogo,true);
+    assert.ok(place.descriptionSource);
+  }
+  assert.equal(placeById("spb-o927b89825cc1").brand,null);
+  assert.equal(placeById("spb-o612c97543279").descriptionKind,"editorial-place");
 });

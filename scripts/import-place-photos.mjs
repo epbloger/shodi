@@ -59,7 +59,7 @@ const placeIds=catalog.map(row=>{
 });
 const cultural=new Set(["museum","gallery","architecture","theater","view","park","walk","live"]);
 const important=placeIds.filter((q,i)=>q&&cultural.has(catalog[i][2]));
-const qids = [...new Set(placeIds.filter((q,i)=>q&&scopeIds.has(catalog[i][0])&&(!newQids||newQids.has(q))&&(!correctedOnly||effectivePhotoIdentity(catalog[i]))))];
+const qids = [...new Set(placeIds.filter((q,i)=>q&&(scopeIds.has(catalog[i][0])||(correctedOnly&&effectivePhotoIdentity(catalog[i])))&&(!newQids||newQids.has(q))&&(!correctedOnly||effectivePhotoIdentity(catalog[i]))))];
 const out={};let bytes=0;
 for(const qid of [...new Set([...Object.keys(previous),...qids])]){
  const p=previous[qid],size=photoBytes(p);

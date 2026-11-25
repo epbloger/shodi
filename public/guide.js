@@ -264,7 +264,13 @@ export function reviewLabel(place) {
 
 export function mapLink(place) {
   const url = new URL("https://yandex.ru/maps/");
-  url.searchParams.set("text", place.name + " " + (place.address || place.city));
+  url.searchParams.set("text", [place.name, place.address || place.city].filter(Boolean).join(" "));
   if (Number.isFinite(place.lat) && Number.isFinite(place.lon)) { url.searchParams.set("ll", place.lon + "," + place.lat); url.searchParams.set("z", "16"); }
   return url.href;
+}
+
+// The user can give a stop an arbitrary private title ("meet here"). Do not
+// send that label into the geocoder search when a real address was entered.
+export function manualStopMapLink(stop,city) {
+  return mapLink({name:stop.address?"":stop.name,address:[city,stop.address].filter(Boolean).join(" "),city});
 }
