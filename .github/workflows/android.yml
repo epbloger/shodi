@@ -183,6 +183,28 @@ jobs:
             public/data/wiki-summaries.js
             docs/wiki-summary-coverage.json
           key: ${{ steps.wiki-cache.outputs.cache-primary-key }}
+      - name: Restore verified brand article progress
+        id: brand-article-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            public/data/brand-articles.js
+            docs/brand-article-coverage.json
+          key: shodi-brand-articles-v1-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            shodi-brand-articles-v1-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js') }}-
+      - name: Import one sourced article per missing major chain
+        run: |
+          node --check scripts/import-brand-articles.mjs
+          node --test tests/brand-articles.test.js
+          node scripts/import-brand-articles.mjs
+      - name: Save verified brand article progress
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            public/data/brand-articles.js
+            docs/brand-article-coverage.json
+          key: ${{ steps.brand-article-cache.outputs.cache-primary-key }}
       - name: Measure actual offline catalog quality
         run: node scripts/catalog-quality.mjs
       - uses: actions/upload-artifact@v4
@@ -195,6 +217,9 @@ jobs:
             public/data/brand-logos.js
             docs/brand-logo-coverage.json
             docs/catalog-quality.json
+            docs/priority-content-backlog.json
+            public/data/brand-articles.js
+            docs/brand-article-coverage.json
             public/data/place-taxonomy.js
             public/data/wiki-summaries.js
             docs/wiki-summary-coverage.json
