@@ -1,16 +1,16 @@
 {
   "catalogPlaces": 55716,
-  "coveredPlaces": 605,
-  "candidateItems": 823,
-  "photos": 577,
-  "retained": 500,
-  "added": 77,
-  "photoLimit": 650,
-  "byteLimit": 24000000,
-  "bytes": 17013665,
-  "attempts": 206,
-  "errors": 6,
-  "rejectedLicense": 122,
+  "coveredPlaces": 606,
+  "candidateItems": 144,
+  "photos": 578,
+  "retained": 577,
+  "added": 1,
+  "photoLimit": 1050,
+  "byteLimit": 38000000,
+  "bytes": 17100368,
+  "attempts": 31,
+  "errors": 2,
+  "rejectedLicense": 28,
   "source": "Wikimedia Commons",
-  "generatedAt": "2026-11-25T06:50:11.566Z"
+  "generatedAt": "2026-11-25T08:04:11.576Z"
 }
