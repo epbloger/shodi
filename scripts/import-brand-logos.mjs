@@ -15,6 +15,8 @@ for(const [id,name,kind,,,,status] of Object.values(currentPlaces).flat()){
  if(!brands.has(b.key))brands.set(b.key,{brand:b,branches:0});
  brands.get(b.key).branches++;
 }
+const scope=JSON.parse(await readFile("docs/release-priority-scope.json","utf8"));
+const priority=new Set(scope.brands.map(b=>b.key));
 const out={},states={},candidates=new Map(),errors=[];
 let previousReport=null;
 try{previousReport=JSON.parse(await readFile("docs/brand-logo-coverage.json","utf8"));}
@@ -63,7 +65,7 @@ for(const {brand} of brands.values()){
  if(p&&validBrandLogo({...p,brandName:brand.name},brand)){out[brand.key]=p;states[brand.key]="retained";}
  if(brand.file)candidates.set(brand.key,[brand.file]);
 }
-const known=unresolvedFirst([...brands.values()].filter(x=>x.brand.qid&&!out[x.brand.key]),attempts);
+const known=unresolvedFirst([...brands.values()].filter(x=>priority.has(x.brand.key)&&x.brand.qid&&!out[x.brand.key]&&!attempts.has(x.brand.key)),attempts);
 for(let i=0;i<known.length;i+=40){
  if(!available("www.wikidata.org"))break;
  const batch=known.slice(i,i+40);
@@ -130,7 +132,7 @@ for(let i=0;i<files.length;i+=20){
 await importCandidates();
 // Batch exact labels and aliases via the public Wikidata query service.
 // This replaces hundreds of one-by-one search requests, while keeping ambiguity checks.
-const pending=unresolvedFirst([...brands.values()].filter(({brand})=>!brand.qid&&!out[brand.key]),attempts);
+const pending=unresolvedFirst([...brands.values()].filter(({brand})=>priority.has(brand.key)&&!brand.qid&&!out[brand.key]&&!attempts.has(brand.key)),attempts);
 for(let i=0;i<pending.length;i+=20){
  if(!available("query.wikidata.org")||!available("www.wikidata.org"))break;
  const batch=pending.slice(i,i+20);
@@ -177,7 +179,7 @@ await importCandidates();
 // Require both a verified entity link and a standalone exact-name logo file.
 candidates.clear();
 let directChecked=0,directCandidates=0;
-const direct=unresolvedFirst([...brands.values()].filter(x=>resolvedQids.has(x.brand.key)&&!out[x.brand.key]),directAttempts);
+const direct=unresolvedFirst([...brands.values()].filter(x=>priority.has(x.brand.key)&&resolvedQids.has(x.brand.key)&&!out[x.brand.key]),directAttempts);
 for(const {brand} of direct.slice(0,120)){
  if(!available("commons.wikimedia.org"))break;
  if(Date.now()-(directAttempts.get(brand.key)||0)<7*86400000)continue;
@@ -199,7 +201,7 @@ for(const {brand} of direct.slice(0,120)){
 await importCandidates();
 // Recover P373 categories for verified QIDs even if earlier P154 attempts are on cooldown.
 candidates.clear();
-const categoryPending=[...brands.values()].filter(({brand})=>!out[brand.key]&&resolvedQids.has(brand.key)&&Date.now()-(categoryAttempts.get(brand.key)||0)>=7*86400000);
+const categoryPending=[...brands.values()].filter(({brand})=>priority.has(brand.key)&&!out[brand.key]&&resolvedQids.has(brand.key)&&Date.now()-(categoryAttempts.get(brand.key)||0)>=7*86400000);
 for(let i=0;i<categoryPending.length;i+=40){
  if(!available("www.wikidata.org"))break;
  const group=categoryPending.slice(i,i+40),ids=[...new Set(group.map(({brand})=>resolvedQids.get(brand.key)))];
@@ -224,9 +226,40 @@ for(const {brand} of categoryPending.slice(0,120)){
  }catch(e){recordError("commons-category",e);}
 }
 await importCandidates();
+
+// New method for major chains: exact standalone file plus explicitly identified
+// official source domain in Commons credit metadata. Never infer a license.
+candidates.clear();
+const official={"name:куулклевер":["coolclever.ru","КуулКлевер","CoolClever"],"name:андерсон":["cafeanderson.com","АндерСон","Anderson"],"name:британские пекарни british bakery":["british-bakery.ru","Британские пекарни","British Bakery"],"name:пхалихинкали":["phali-hinkali.ru","ПхалиХинкали","Пхали Хинкали"],"name:брусника кондитерская кулинария":["brusnikacafe.ru","Брусника"],"name:блинбери":["blinberry.group","БлинБери","Blinberry"],"name:кофе бон":["coffeebon.ru","Кофе Бон","Coffee Bon"],"name:zамания":["zamania.ru","Zамания","Zamania","Замания"],"name:волконский":["wolkonsky.com","Волконский","Wolkonsky"],"name:питькофе, сеть кофеен":["pitcofe.ru","ПитьКофе"],"name:вареничная no1":["varenichnaya1.ru","Вареничная №1"],"name:хинкали gали":["hinkaligali.ru","Хинкали Gали"],"name:пироговые линдфорс":["lindfors.ru","Линдфорс","Lindfors"],"name:farfor доставка удовольствий":["farfor.ru","FARFOR"],"name:пекарня мамин хлеб ижевск":["maminhleb.ru","Мамин хлеб"],"name:грузинские каникулы":["gruzinskie-kanikuli.ru","Грузинские Каникулы"],"name:дуть особое пространство":["dutclub.com","Дуть"],"name:академия кофе":["akademiacoffee.com","Академия Кофе"],"name:burger heroes":["burgerheroes.ru","Burger Heroes"],"name:lambic":["lambic.ru","Brasserie Lambic","Lambic"],"name:бургер & фрайс":["miratorg.ru","Бургер & Фрайс","Бургер&Фрайс"],"name:the coffee bean & tea leaf (philippines)":["coffeebean.com.ph","The Coffee Bean & Tea Leaf"]};
+let officialChecked=0;
+function creditMatches(meta,host){
+ const credit=[meta?.Credit?.value,meta?.Source?.value,meta?.Attribution?.value].filter(s=>typeof s==="string").join(" ");
+ for(const hit of credit.matchAll(/https?:\/\/[^\s"'<>]+/gi)){
+  try{const u=new URL(hit[0].replace(/&amp;/g,"&"));if(!u.username&&!u.password&&!u.port&&(u.hostname===host||u.hostname.endsWith("."+host)))return true;}catch{}
+ }
+ return false;
+}
+for(const [key,[host,...names]] of Object.entries(official)){
+ if(!priority.has(key)||out[key]||!brands.has(key)||!available("commons.wikimedia.org"))continue;
+ officialChecked++;
+ try{
+  const exact=new Map();
+  for(const name of names.slice(0,2)){
+   if(!available("commons.wikimedia.org"))break;
+   const d=await api("commons.wikimedia.org",{action:"query",list:"search",srnamespace:"6",srlimit:"30",srsearch:'"'+name.replace(/"/g,"")+'" (logo OR логотип)',formatversion:"2"});
+   for(const r of d.query?.search||[])if(names.some(n=>exactLogoTitle(r.title,n))&&Number.isSafeInteger(r.pageid))exact.set(r.pageid,r.title);
+  }
+  if(!exact.size)continue;
+  const d=await api("commons.wikimedia.org",{action:"query",pageids:[...exact.keys()].slice(0,20).join("|"),prop:"imageinfo",iiprop:"extmetadata",formatversion:"2"});
+  const proven=(d.query?.pages||[]).filter(p=>exact.has(p.pageid)&&brandLicense(p.imageinfo?.[0]?.extmetadata)&&creditMatches(p.imageinfo[0].extmetadata,host));
+  if(proven.length===1)candidates.set(key,[proven[0].title.slice(5)]);
+ }catch(e){recordError("official-credit",e);}
+}
+await importCandidates();
+
 for(const key of brands.keys())if(!states[key])states[key]=previousStates.get(key)||"not-verified";
 const counts={};for(const v of Object.values(states))counts[v]=(counts[v]||0)+1;
-const report={totalBrands:brands.size,brandedPlaces:[...brands.values()].reduce((n,b)=>n+b.branches,0),verifiedLogos:Object.keys(out).length,coveredPlaces:Object.keys(out).reduce((n,key)=>n+brands.get(key).branches,0),statusCounts:counts,directChecked,directCandidates,categoryChecked,errors,brands:[...brands.entries()].map(([key,{brand,branches}])=>({key,name:brand.name,branches,status:states[key],lastAttemptAt:attempts.has(key)?new Date(attempts.get(key)).toISOString():undefined,directAttemptAt:directAttempts.has(key)?new Date(directAttempts.get(key)).toISOString():undefined,categoryAttemptAt:categoryAttempts.has(key)?new Date(categoryAttempts.get(key)).toISOString():undefined,source:out[key]?.source})),generatedAt:new Date().toISOString()};
+const report={totalBrands:brands.size,brandedPlaces:[...brands.values()].reduce((n,b)=>n+b.branches,0),verifiedLogos:Object.keys(out).length,coveredPlaces:Object.keys(out).reduce((n,key)=>n+brands.get(key).branches,0),statusCounts:counts,directChecked,directCandidates,categoryChecked,officialChecked,errors,brands:[...brands.entries()].map(([key,{brand,branches}])=>({key,name:brand.name,branches,status:states[key],lastAttemptAt:attempts.has(key)?new Date(attempts.get(key)).toISOString():undefined,directAttemptAt:directAttempts.has(key)?new Date(directAttempts.get(key)).toISOString():undefined,categoryAttemptAt:categoryAttempts.has(key)?new Date(categoryAttempts.get(key)).toISOString():undefined,source:out[key]?.source})),generatedAt:new Date().toISOString()};
 await writeFile("public/data/brand-logos.js","// Generated verified Commons raster logos; see docs/photo-providers.md.\nexport const brandLogos = "+JSON.stringify(out)+";\n");
 await writeFile("docs/brand-logo-coverage.json",JSON.stringify(report,null,2)+"\n");
 console.log(JSON.stringify({...report,brands:undefined,errors:errors.slice(0,8)}));

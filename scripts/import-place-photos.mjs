@@ -1,4 +1,5 @@
-import {writeFile} from "node:fs/promises";
+import {writeFile,readFile} from "node:fs/promises";
+import {voyagePhotos} from "../public/data/voyage-photos.js";
 import {thumbnailUrl} from "../public/commons-thumbnail.js";
 import {PHOTO_LIMIT,PHOTO_BYTES_LIMIT,photoBytes} from "./photo-import-policy.mjs";
 import {placePhotos as previous} from "../public/data/place-photos.js";
@@ -9,7 +10,12 @@ import {osmPhotoLink} from "../public/osm-photo-links.js";
 import {osmFactsForPlace,osmFactPhotoLink} from "../public/osm-place-facts.js";
 import {wikiSummaries} from "../public/data/wiki-summaries.js";
 import {validWikiSummary} from "../public/wiki-summary.js";
-const deadline=Date.now()+4*60000;
+const deadline=Date.now()+12*60000;
+const scope=JSON.parse(await readFile("docs/release-priority-scope.json","utf8"));
+const scopeIds=new Set(scope.cultural.map(p=>p.id));
+const newOnly=process.argv.includes("--new-identities-only");
+const newQids=newOnly?new Set(JSON.parse(await readFile("docs/priority-wiki-report.json","utf8")).newQids):null;
+const byteLimit=PHOTO_BYTES_LIMIT-Object.values(voyagePhotos).reduce((n,p)=>n+photoBytes(p),0);
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const ua="SHODI/2.0 catalog (https://github.com/epbloger/shodi; helpmoorkis@yandex.ru)";
 async function get(url,json=true){
@@ -48,27 +54,27 @@ const placeIds=catalog.map(([id,name,kind,,lat,lon])=>{
 });
 const cultural=new Set(["museum","gallery","architecture","theater","view","park","walk","live"]);
 const important=placeIds.filter((q,i)=>q&&cultural.has(catalog[i][2]));
-const qids = [...new Set([...important,...filesByQid.keys(),...placeIds.filter(Boolean)])];
+const qids = [...new Set(placeIds.filter((q,i)=>q&&scopeIds.has(catalog[i][0])&&(!newQids||newQids.has(q))))];
 const out={};let bytes=0;
 for(const qid of [...new Set([...Object.keys(previous),...qids])]){
  const p=previous[qid],size=photoBytes(p);
- if(validatePhoto(p)&&size&&Object.keys(out).length<PHOTO_LIMIT&&bytes+size<=PHOTO_BYTES_LIMIT){out[qid]=p;bytes+=size;}
+ if(validatePhoto(p)&&size&&Object.keys(out).length<PHOTO_LIMIT&&bytes+size<=byteLimit){out[qid]=p;bytes+=size;}
 }
 const retained=Object.keys(out).length;
 let attempts=0,errors=0,rejectedLicense=0;
-for(let i=0;i<qids.length&&Object.keys(out).length<PHOTO_LIMIT&&bytes<PHOTO_BYTES_LIMIT&&attempts<300&&Date.now()<deadline;i+=40){
+for(let i=0;i<qids.length&&Object.keys(out).length<PHOTO_LIMIT&&bytes<byteLimit&&attempts<650&&Date.now()<deadline;i+=40){
   const ids=qids.slice(i,i+40).filter(q=>!out[q]);if(!ids.length)continue;
   let entities;
   try{const u=new URL("https://www.wikidata.org/w/api.php");u.search=new URLSearchParams({action:"wbgetentities",ids:ids.join("|"),props:"claims",format:"json"});entities=(await get(u)).entities;}catch(e){console.warn("Wikidata request failed:",String(e));errors++;if(errors>=3)break;continue;}
   for(const qid of ids){
-    if(Object.keys(out).length>=PHOTO_LIMIT||bytes>=PHOTO_BYTES_LIMIT||attempts>=300||Date.now()>=deadline)break;
+    if(Object.keys(out).length>=PHOTO_LIMIT||bytes>=byteLimit||attempts>=650||Date.now()>=deadline)break;
     const claims=entities?.[qid]?.claims?.P18||[];
     const filename=filesByQid.get(qid)??claims.filter(c=>c.rank!=="deprecated").sort((a,b)=>Number(b.rank==="preferred")-Number(a.rank==="preferred"))[0]?.mainsnak?.datavalue?.value;
     if(typeof filename!=="string"||!/\.(jpe?g|png)$/i.test(filename))continue;
     attempts++;
     try{
       const u=new URL("https://commons.wikimedia.org/w/api.php");
-      u.search=new URLSearchParams({action:"query",titles:"File:"+filename,prop:"imageinfo",iiprop:"url|mime|extmetadata",iiurlwidth:"330",format:"json",formatversion:"2"});
+      u.search=new URLSearchParams({action:"query",titles:"File:"+filename,prop:"imageinfo",iiprop:"url|mime|extmetadata",iiurlwidth:"250",format:"json",formatversion:"2"});
       const page=(await get(u)).query?.pages?.[0],info=page?.imageinfo?.[0],m=info?.extmetadata;
       const v=k=>m?.[k]?.value||"";
       const licensed=unrestrictedPhotoLicense(m);
@@ -81,7 +87,7 @@ for(let i=0;i<qids.length&&Object.keys(out).length<PHOTO_LIMIT&&bytes<PHOTO_BYTE
       const source="https://commons.wikimedia.org/wiki/"+encodeURIComponent(page.title.replaceAll(" ","_")).replace(/^File%3A/,"File:");
       const image=await get(thumb,false);
       const photo={data:image.data,author,title:page.title,license,licenseUrl:licensed.url,source};
-      if(validatePhoto(photo)&&photoBytes(photo)===image.bytes&&bytes+image.bytes<=PHOTO_BYTES_LIMIT){out[qid]=photo;bytes+=image.bytes;}
+      if(validatePhoto(photo)&&photoBytes(photo)===image.bytes&&bytes+image.bytes<=byteLimit){out[qid]=photo;bytes+=image.bytes;}
     }catch(e){errors++;console.warn("Skipped",qid,String(e));if(errors>=5)break;}
     await pause(2000);
   }

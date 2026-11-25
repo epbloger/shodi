@@ -40,14 +40,35 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
+      - name: Restore complete previously verified baseline without re-import
+        id: release-baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -eu
+          echo "reused=false" >> "$GITHUB_OUTPUT"
+          test "$(git rev-parse HEAD:public/data/current-places.js)" = b772116cc742991504bf97d467023ef788d44844 || exit 1
+          seed="$(mktemp -d)"
+          trap 'rm -rf "$seed"' EXIT
+          if gh run download 45569279535 --repo "$GITHUB_REPOSITORY" --name shodi-brand-coverage --dir "$seed" && (cd "$seed" && sha256sum --check --strict "$GITHUB_WORKSPACE/docs/release-baseline-sha256.txt"); then
+            while read -r checksum file; do mkdir -p "$(dirname "$file")"; cp "$seed/$file" "$file"; done < docs/release-baseline-sha256.txt
+            printf '%s\n' '42fa197984cc43410de8c6e7c107ef6c9e195198' > docs/release-baseline-restored.txt
+            echo "reused=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Verified artifact unavailable; normal validated cache/source restoration will be used."
+          fi
       - uses: actions/setup-python@v6
+        if: steps.release-baseline.outputs.reused != 'true'
         with:
           python-version: '3.12'
       - name: Prepare verified real Saint Petersburg photograph
+        if: steps.release-baseline.outputs.reused != 'true'
         run: |
           python -m pip install Pillow==11.3.0
           python scripts/prepare-hero-photo.py
       - name: Restore catalog brand links
+        if: steps.release-baseline.outputs.reused != 'true'
         id: brand-links-cache
         uses: actions/cache/restore@v4
         with:
@@ -57,7 +78,7 @@ jobs:
           key: shodi-brand-links-v1-${{ hashFiles('public/data/current-places.js', 'docs/current-catalog.json', 'scripts/import-brand-links.py') }}
       - name: Reuse previously verified exact-snapshot brand links
         id: seed-brand-links
-        if: steps.brand-links-cache.outputs.cache-hit != 'true'
+        if: steps.release-baseline.outputs.reused != 'true' && (steps.brand-links-cache.outputs.cache-hit != 'true')
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -81,14 +102,15 @@ jobs:
           cp "$seed/docs/brand-coverage.json" docs/brand-coverage.json
           echo "reused=true" >> "$GITHUB_OUTPUT"
       - name: Import all brand links from the exact catalog snapshot
-        if: steps.brand-links-cache.outputs.cache-hit != 'true' && steps.seed-brand-links.outputs.reused != 'true'
+        if: steps.release-baseline.outputs.reused != 'true' && (steps.brand-links-cache.outputs.cache-hit != 'true' && steps.seed-brand-links.outputs.reused != 'true')
         run: |
           pip install duckdb==1.5.4
           python scripts/import-brand-links.py
       - name: Validate brand links before reuse
+        if: steps.release-baseline.outputs.reused != 'true'
         run: node scripts/validate-brand-data.mjs --links
       - name: Save catalog brand links
-        if: steps.brand-links-cache.outputs.cache-hit != 'true'
+        if: steps.release-baseline.outputs.reused != 'true' && (steps.brand-links-cache.outputs.cache-hit != 'true')
         uses: actions/cache/save@v4
         with:
           path: |
@@ -96,25 +118,28 @@ jobs:
             docs/brand-coverage.json
           key: ${{ steps.brand-links-cache.outputs.cache-primary-key }}
       - name: Restore precise place taxonomy
+        if: steps.release-baseline.outputs.reused != 'true'
         id: taxonomy-cache
         uses: actions/cache/restore@v4
         with:
           path: public/data/place-taxonomy.js
           key: shodi-taxonomy-v1-${{ hashFiles('public/data/current-places.js', 'docs/current-catalog.json', 'scripts/import-place-taxonomy.py', 'scripts/import-brand-links.py') }}
       - name: Import precise taxonomy from the exact Overture snapshot
-        if: steps.taxonomy-cache.outputs.cache-hit != 'true'
+        if: steps.release-baseline.outputs.reused != 'true' && (steps.taxonomy-cache.outputs.cache-hit != 'true')
         run: |
           pip install duckdb==1.5.4
           python scripts/import-place-taxonomy.py
       - name: Validate precise place taxonomy
+        if: steps.release-baseline.outputs.reused != 'true'
         run: node scripts/validate-place-taxonomy.mjs
       - name: Save precise place taxonomy
-        if: steps.taxonomy-cache.outputs.cache-hit != 'true'
+        if: steps.release-baseline.outputs.reused != 'true' && (steps.taxonomy-cache.outputs.cache-hit != 'true')
         uses: actions/cache/save@v4
         with:
           path: public/data/place-taxonomy.js
           key: ${{ steps.taxonomy-cache.outputs.cache-primary-key }}
       - name: Restore Wikipedia descriptions
+        if: steps.release-baseline.outputs.reused != 'true'
         id: wiki-cache
         uses: actions/cache/restore@v4
         with:
@@ -125,6 +150,7 @@ jobs:
           restore-keys: |
             shodi-wiki-v2-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'public/wiki-summary.js') }}-
       - name: Recover previously verified article data before importing
+        if: steps.release-baseline.outputs.reused != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -140,11 +166,21 @@ jobs:
           done
           node scripts/recover-wiki-progress.mjs "${dirs[@]}"
       - name: Ensure optional prior article checkpoint exists
+        if: steps.release-baseline.outputs.reused != 'true'
         run: test -f docs/wiki-summary-coverage.json || printf '%s\n' '{}' > docs/wiki-summary-coverage.json
       - uses: actions/upload-artifact@v4
         with:
           name: shodi-catalog-inputs
           path: |
+            docs/release-baseline-restored.txt
+            public/data/brand-logos.js
+            docs/brand-logo-coverage.json
+            public/data/place-photos.js
+            docs/photo-coverage.json
+            public/data/voyage-photos.js
+            docs/voyage-photo-coverage.json
+            public/data/brand-articles.js
+            docs/brand-article-coverage.json
             public/data/place-brands.js
             docs/brand-coverage.json
             public/data/place-taxonomy.js
@@ -173,6 +209,7 @@ jobs:
           name: shodi-catalog-inputs
           path: .
       - name: Restore previously verified logos
+        if: hashFiles('docs/release-baseline-restored.txt') == ''
         id: logo-cache
         uses: actions/cache/restore@v4
         with:
@@ -188,6 +225,7 @@ jobs:
           node scripts/import-brand-logos.mjs
           node scripts/validate-brand-data.mjs --logos
       - name: Save verified logo progress before compilation
+        if: hashFiles('docs/release-baseline-restored.txt') == ''
         uses: actions/cache/save@v4
         with:
           path: |
@@ -221,25 +259,13 @@ jobs:
         with:
           name: shodi-catalog-inputs
           path: .
-      - name: Import licensed Wikipedia descriptions
-        run: node scripts/import-wiki-summaries.mjs
-      - name: Restore Wikipedia cache key for save
-        id: wiki-cache
-        uses: actions/cache/restore@v4
-        with:
-          lookup-only: true
-          path: |
-            public/data/wiki-summaries.js
-            docs/wiki-summary-coverage.json
-          key: shodi-wiki-v2-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'public/wiki-summary.js') }}-${{ github.run_id }}-${{ github.run_attempt }}
-      - name: Save Wikipedia progress
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            public/data/wiki-summaries.js
-            docs/wiki-summary-coverage.json
-          key: ${{ steps.wiki-cache.outputs.cache-primary-key }}
+      - name: Enrich only the frozen priority cultural candidates
+        run: |
+          node --check scripts/import-priority-wiki.mjs
+          node --test tests/priority-identity.test.js
+          node scripts/import-priority-wiki.mjs
       - name: Restore verified brand article progress
+        if: hashFiles('docs/release-baseline-restored.txt') == ''
         id: brand-article-cache
         uses: actions/cache/restore@v4
         with:
@@ -250,11 +276,13 @@ jobs:
           restore-keys: |
             shodi-brand-articles-v1-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js') }}-
       - name: Import one sourced article per missing major chain
+        if: hashFiles('docs/release-baseline-restored.txt') == ''
         run: |
           node --check scripts/import-brand-articles.mjs
           node --test tests/brand-articles.test.js
           node scripts/import-brand-articles.mjs
       - name: Save verified brand article progress
+        if: hashFiles('docs/release-baseline-restored.txt') == ''
         uses: actions/cache/save@v4
         with:
           path: |
@@ -265,6 +293,7 @@ jobs:
         with:
           name: shodi-parallel-descriptions
           path: |
+            docs/priority-wiki-report.json
             public/data/wiki-summaries.js
             docs/wiki-summary-coverage.json
             public/data/brand-articles.js
@@ -291,6 +320,7 @@ jobs:
           name: shodi-catalog-inputs
           path: .
       - name: Restore previous verified place photo progress
+        if: hashFiles('docs/release-baseline-restored.txt') == ''
         id: place-photo-cache
         uses: actions/cache/restore@v4
         with:
@@ -305,8 +335,9 @@ jobs:
           node --check scripts/import-place-photos.mjs
           node scripts/import-place-photos.mjs
           node --check scripts/import-voyage-photos.mjs
-          node scripts/import-voyage-photos.mjs
+          if test ! -f docs/release-baseline-restored.txt; then node scripts/import-voyage-photos.mjs; fi
       - name: Save verified place photo progress
+        if: hashFiles('docs/release-baseline-restored.txt') == ''
         uses: actions/cache/save@v4
         with:
           path: |
@@ -329,7 +360,7 @@ jobs:
       contents: read
       actions: read
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 65
     steps:
       - uses: actions/checkout@v6
         with:
@@ -367,13 +398,17 @@ jobs:
         with:
           name: shodi-parallel-photos
           path: .
+      - name: Fetch photos only for newly matched encyclopedia identities
+        run: node scripts/import-place-photos.mjs --new-identities-only
       - name: Validate merged catalog assets
         run: |
           node scripts/validate-brand-data.mjs --logos
           node scripts/validate-place-taxonomy.mjs
           node scripts/validate-place-photos.mjs
-      - name: Measure actual offline catalog quality
-        run: node scripts/catalog-quality.mjs
+      - name: Measure actual offline catalog quality and frozen release scope
+        run: |
+          node scripts/catalog-quality.mjs
+          node scripts/report-release-priority.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -384,6 +419,9 @@ jobs:
             public/data/brand-logos.js
             docs/brand-logo-coverage.json
             docs/catalog-quality.json
+            docs/release-priority-scope.json
+            docs/release-priority-report.json
+            docs/priority-wiki-report.json
             public/data/place-photos.js
             docs/photo-coverage.json
             public/data/voyage-photos.js
