@@ -2,7 +2,7 @@ name: Recover and verify consolidated catalog
 on:
   push:
     branches: [android-v2]
-    paths: ['.github/workflows/recover-catalog.yml']
+    paths: ['.github/workflows/recover-catalog.yml', 'scripts/integrate-recovered-descriptions.mjs', 'scripts/integrate-recovered-voyage.mjs']
   workflow_dispatch:
 permissions:
   contents: read

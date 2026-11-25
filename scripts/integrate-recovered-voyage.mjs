@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {readFile,writeFile} from "node:fs/promises";
-import {currentPlaces} from "./public/data/current-places.js";
-import {validateVoyage} from "./public/voyage-places.js";
+import {currentPlaces} from "../public/data/current-places.js";
+import {validateVoyage} from "../public/voyage-places.js";
 const raw=await readFile((process.env.IMPORT_DIR+"/voyage-places.js"),"utf8");
 const m=/^\/\/[^\n]*\nexport const voyagePlaces = (\{[\s\S]*\});\n?$/.exec(raw);
 assert.ok(m);
