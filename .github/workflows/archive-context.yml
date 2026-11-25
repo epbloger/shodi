@@ -1,0 +1,104 @@
+name: Import historical visitor context
+on:
+  push:
+    branches: [android-v2]
+    paths: ['scripts/import-archive-context.py', '.github/workflows/archive-context.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: shodi-archive-context
+  cancel-in-progress: false
+jobs:
+  extract:
+    if: github.ref == 'refs/heads/android-v2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Read pinned verified review corpus
+        run: |
+          set -eu
+          python -m pip install duckdb==1.5.4
+          python -m py_compile scripts/import-archive-context.py
+          cd "$RUNNER_TEMP"
+          base=https://raw.githubusercontent.com/AndreyKapusti/geo-reviews-dataset-2023-analytics/80c29106e52971efefd0e35e6cebc392df0739e1
+          for n in 1 2; do curl -fL --retry 3 --max-time 300 "$base/geo-reviews-dataset-2023-$n.parquet" -o "reviews-$n.parquet"; done
+          printf '%s\n' '2008efc1db0718b32296e50175c800a38d815b7e2f1bdb2d33e3ecb1e42a3120  reviews-1.parquet' 'd7fac358acc4342ffe6921090356bb89c3adfa86e2b0d88fd827ecc2974f07f8  reviews-2.parquet' | sha256sum --check --strict
+      - name: Generate and test supported summaries
+        run: |
+          python scripts/import-archive-context.py "$RUNNER_TEMP/reviews-1.parquet" "$RUNNER_TEMP/reviews-2.parquet" --output public/data/archive-context.js
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-archive-context
+          path: public/data/archive-context.js
+          if-no-files-found: error
+  integrate:
+    needs: extract
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      revision: ${{ steps.integrate.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: android-v2
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-archive-context
+          path: import-snapshot
+      - name: Validate and merge without overwriting concurrent changes
+        id: integrate
+        run: |
+          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js public/data/archive-context.js public/archive-context.js scripts/import-archive-context.py
+          node --input-type=module <<'JS'
+          import assert from "node:assert/strict";
+          import {readFile,writeFile} from "node:fs/promises";
+          import {archiveDescription} from "./public/archive-context.js";
+          import {currentPlaces} from "./public/data/current-places.js";
+          const raw=await readFile("import-snapshot/archive-context.js","utf8");
+          const m=/^\/\/[^\n]*\nexport const archiveContext = (\{[\s\S]*\});\n?$/.exec(raw);
+          assert.ok(m);const data=JSON.parse(m[1]),ids=new Set(Object.values(currentPlaces).flat().map(r=>r[0]));
+          assert.ok(Object.keys(data).length);
+          for(const [id,row] of Object.entries(data))assert.ok(ids.has(id)&&archiveDescription(row));
+          await writeFile("public/data/archive-context.js",raw);
+          await writeFile("docs/archive-context-coverage.json",JSON.stringify({catalogPlaces:ids.size,matched:Object.keys(data).length,source:"Yandex Geo Reviews Dataset 2023",license:"MIT"},null,2)+"\n");
+          JS
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+          git add public/data/archive-context.js docs/archive-context-coverage.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "data(catalog): integrate historical visitor context"
+            for attempt in 1 2 3; do
+              if git push origin HEAD:android-v2; then break; fi
+              git fetch origin android-v2
+              git rebase origin/android-v2
+              test "$attempt" != 3
+            done
+          fi
+          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  verify-apk:
+    needs: integrate
+    uses: ./.github/workflows/android.yml
+    with:
+      checkout_ref: ${{ needs.integrate.outputs.revision }}
+    permissions:
+      contents: read
+      actions: read
