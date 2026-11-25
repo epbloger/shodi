@@ -2,7 +2,7 @@
 
 ## Scope and release criteria
 - Work on android-v2 only for the Android project. Do not change main, signing secrets, production ad IDs or RuStore publishing without explicit instruction.
-- Current user priority: substantive Russian descriptions for all 55,716 catalog places. Missing photos/logos do NOT block release. Preserve legal images already verified. Never invent history, opening hours, amenities or reviews; distinguish place-specific facts, brand history, historical observations and basic catalog/location summaries.
+- Current user priority (latest clarification): retain all 55,716 places; substantive descriptions and licensed images for major sights, important cultural venues and recognized chains (one description per chain). Ordinary obscure venues may be map-only, with no generic filler or empty image covers. Missing images for minor venues do NOT block release. Preserve legal images already verified. Never invent history, opening hours, amenities or reviews; distinguish place-specific facts, brand history, historical observations and basic catalog/location summaries.
 - A passing build does not prove complete content. Check coverage separately. Do not describe intermediate APKs as final.
 - Read docs/android-engineering-runbook.md before each engineering iteration. Update that file when an actual new failure or lesson is found. Read current files and actual logs, not stale summaries.
 - Batch independent research and extraction; single coordinated integration of finished results; one final full verification. Avoid starting redundant builds or interrupting useful running jobs.

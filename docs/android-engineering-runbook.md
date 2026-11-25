@@ -29,3 +29,6 @@ Recorded 2026-11-25. These are actual prior incidents, not a checklist of hypoth
 
 ## Current user requirement
 Descriptions are the release priority; image coverage is optional. Focus on meaningful, sourced Russian text and actual individual details. No fabricated facts or artificially inflated coverage. Use independently verifiable sources, not invented copy or scraped restricted data. The user wants a completed product rather than a report after every small change.
+
+## Latest scope clarification (supersedes earlier all-place description target)
+The user permits ordinary obscure places without descriptions or pictures. Retain name, location, category, map details and route actions; hide unsourced filler and empty image covers. Prioritize recognized chains (one sourced description per chain), major landmarks and cultural destinations. Preserve already verified source-backed descriptions and photos. Category-based cultural priority is a conservative starting point, not a claim that every park or monument is famous. Use the generated priority-content-backlog.json to select important unresolved places, not a requirement to research all 55,716. Last full APK verification succeeded for 94bb37b (run 45557762959, artifact 14996984722); 46/46 tests, Gradle and emulator passed.

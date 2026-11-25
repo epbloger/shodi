@@ -1,4 +1,5 @@
 import {loadPlacePhoto} from "./online-photos.js";
+import {hasUsefulDescription,shouldLookupPhoto} from "./catalog-presentation.js";
 import {
   budgetLabel, cities, cityById, cityByQuery, cityMatches, findPlaces,
   mapLink, PLACE_CATEGORIES, reviewLabel, catalogSource,
@@ -124,9 +125,10 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
       rating.textContent = place.status === "open" ? "Действует по данным источника" : "Статус уточните на карте";
       rating.hidden = false;
       const description = card.querySelector(".place-description");
-      description.textContent = place.description || "Подтверждённое описание пока отсутствует.";
-      description.hidden = false;
-      if (place.descriptionSource) {
+      const showDescription=hasUsefulDescription(place);
+      description.textContent = showDescription ? place.description : "";
+      description.hidden = !showDescription;
+      if (showDescription) {
         const source = document.createElement("a");
         source.className = "description-source";
         source.href = place.descriptionSource;
@@ -134,13 +136,9 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         source.textContent = place.descriptionKind==="wikivoyage-place" ? "Викигид · "+place.descriptionTitle+" (сокращено)" : place.descriptionKind?.startsWith("wikipedia") ? "Википедия · "+place.descriptionTitle+" (сокращено)" : place.descriptionTitle ?? "Источник описания";
         description.append(document.createElement("br"), source);
         if(place.descriptionLicense){const a=document.createElement("a");a.href=place.descriptionLicense;a.className="description-source";a.target="_blank";a.rel="noopener noreferrer";a.textContent="CC BY-SA 4.0";description.append(" · ",a);}
-      } else if (place.descriptionKind === "catalog") {
-        const source = document.createElement("span");
-        source.className = "description-source";
-        source.textContent = "Сведения из каталога Overture Maps";
-        description.append(document.createElement("br"), source);
       }
       const cover = card.querySelector(".place-cover");
+      cover.hidden = true;
       cover.querySelector("use").setAttribute("href","#i-"+kind.icon);
       cover.querySelector("span").textContent=kind.name;
       if(place.brand){cover.querySelector("span").textContent=place.brand.name;cover.querySelector("small").textContent="Бренд · фото пока нет";}
@@ -154,7 +152,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         };
         figure.classList.toggle("place-brand-logo",photo.brandLogo===true);
         image.alt = photo.brandLogo===true ? "Логотип "+photo.brandName : photo.nearby === true ? "Окрестности: "+place.name : place.name;
-        image.addEventListener("error", () => { figure.hidden = true; cover.hidden = false; }, {once:true});
+        image.addEventListener("error", () => { figure.hidden = true; cover.hidden = true; }, {once:true});
         caption.replaceChildren(link(photo.source,photo.provider==="kartaview"?photo.author:photo.author+" · Wikimedia Commons")," · ",link(photo.licenseUrl,photo.license)," · уменьшенная копия");
         if(photo.provider==="kartaview"){
           caption.append(" · ",link(photo.sequenceUrl,"KartaView"));
@@ -176,7 +174,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
         figure.hidden = false;
       };
       if(place.photo) renderPhoto(place.photo);
-      else if(photoObserver) {
+      else if(photoObserver&&shouldLookupPhoto(place)) {
         photoTasks.set(card,()=>{
           const current=()=>card.isConnected&&photoVersion===photoRenderVersion;
           loadPlacePhoto(place,current).then(photo=>{if(photo&&current())renderPhoto(photo);}).catch(()=>{});

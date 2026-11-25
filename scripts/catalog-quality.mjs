@@ -6,6 +6,7 @@ import {currentPlaces,currentCatalog} from "../public/data/current-places.js";
 import {cities,catalogPlacesForCity} from "../public/guide.js";
 import {bundledBrandLogo} from "../public/brands.js";
 import {hasSpecificType} from "../public/catalog-summary.js";
+import {hasUsefulDescription,priorityForEnrichment} from "../public/catalog-presentation.js";
 const report=JSON.parse(await readFile("docs/brand-logo-coverage.json","utf8"));
 const rows=Object.values(currentPlaces).flat();
 const active=rows.filter(r=>!r[6]||["open","unknown"].includes(r[6]));
@@ -28,6 +29,11 @@ assert.equal(distinct.size,report.totalBrands);
 assert.equal(branded.length,report.brandedPlaces);
 assert.equal(verified.length,report.coveredPlaces);
 assert.equal(logos.length+photos.length,places.filter(p=>p.photo).length);
+const priority=places.filter(p=>priorityForEnrichment(p)!=="optional");
+const brandGroups=new Map();
+for(const p of branded){const r=brandGroups.get(p.brand.key)||{key:p.brand.key,name:p.brand.name,branches:0,withDescription:0};r.branches++;if(hasUsefulDescription(p))r.withDescription++;brandGroups.set(p.brand.key,r);}
+const missingBrands=[...brandGroups.values()].filter(r=>r.withDescription<r.branches).sort((a,b)=>(b.branches-b.withDescription)-(a.branches-a.withDescription));
+await writeFile("docs/priority-content-backlog.json",JSON.stringify({brands:missingBrands,cultural:priority.filter(p=>!p.brand&&!hasUsefulDescription(p)).map(p=>({id:p.id,name:p.name,city:p.city,kind:p.kind,lat:p.lat,lon:p.lon}))},null,2)+"\n");
 const quality={
  revision:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),release:currentCatalog.release,
  catalogPlaces:rows.length,visiblePlaces:places.length,citiesWithPlaces:Object.keys(currentPlaces).length,
@@ -36,6 +42,7 @@ const quality={
  cardsDisplayingBundledLogo:logos.length,cardsDisplayingBundledPlacePhoto:photos.length,
  cardsWithBundledImage:logos.length+photos.length,cardsWithoutBundledImage:places.length-logos.length-photos.length,
  cardsWithVerifiedDescription:descriptions.length,cardsWithWikivoyageDescription:descriptions.filter(p=>p.descriptionKind==="wikivoyage-place").length,cardsWithOsmFactDescription:descriptions.filter(p=>p.descriptionKind==="osm-facts").length,cardsWithArchiveContext:archive.length,cardsWithCatalogSummary:summaries.length,cardsWithNearbyContext:places.filter(p=>p.nearbyContext).length,cardsWithContextInBasicDescription:summaries.filter(p=>p.nearbyContext&&p.description.includes(p.nearbyContext)).length,cardsWithSpecificCategorySummary:summaries.filter(p=>hasSpecificType(p.id,p.kind)).length,cardsWithWikipediaPlaceDescription:descriptions.filter(p=>p.descriptionKind==="wikipedia-place").length,cardsWithWikipediaBrandDescription:brandDescriptions.filter(p=>p.descriptionKind==="wikipedia-brand").length,cardsWithEditorialPlaceDescription:descriptions.filter(p=>p.descriptionKind==="editorial-place").length,cardsWithEditorialBrandDescription:brandDescriptions.filter(p=>p.descriptionKind==="editorial-brand").length,cardsWithAnyDescription:descriptions.length+brandDescriptions.length+archive.length+summaries.length,cardsWithoutAnyDescription:places.length-descriptions.length-brandDescriptions.length-archive.length-summaries.length,cardsWithoutVerifiedDescription:places.length-descriptions.length,
+ cardsShowingUsefulDescription:places.filter(hasUsefulDescription).length,cardsWithMapOnlyDescription:places.filter(p=>!hasUsefulDescription(p)).length,priorityCards:priority.length,priorityCardsWithoutUsefulDescription:priority.filter(p=>!hasUsefulDescription(p)).length,optionalCardsWithoutUsefulDescription:places.filter(p=>priorityForEnrichment(p)==="optional"&&!hasUsefulDescription(p)).length,brandsWithIncompleteDescription:missingBrands.length,
  cardsWithOsmPhotoReference:places.filter(p=>p.osmPhotoLink).length,
  cardsWithUnknownOpeningStatus:places.filter(p=>p.status==="unknown").length,
  brandStatusCounts:report.statusCounts,generatedAt:new Date().toISOString()

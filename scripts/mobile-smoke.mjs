@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 import {chromium} from "playwright";
 import {cities,catalogPlacesForCity} from "../public/guide.js";
+import {hasUsefulDescription} from "../public/catalog-presentation.js";
 const html=await readFile("dist/shodi.html","utf8");
 const browser=await chromium.launch({headless:true});
 try {
@@ -29,7 +30,18 @@ try {
   await hero.evaluate(img=>img.decode());
   assert.deepEqual(await hero.evaluate(img=>[img.naturalWidth,img.naturalHeight]),[1440,960]);
   assert.match(await hero.getAttribute("src"),/^data:image\/webp;base64,/,"hero photograph bundled offline");
-  assert.equal(await page.locator(".place-description:visible").count(),10);
+  const initialIds=await page.locator(".place-card").evaluateAll(cards=>cards.map(c=>c.dataset.placeId));
+  const initialPlaces=new Map(catalogPlacesForCity("spb").map(p=>[p.id,p]));
+  for(const id of initialIds){
+    const place=initialPlaces.get(id);
+    assert.ok(place,"Unknown initial card");
+    const card=page.locator("[data-place-id="+JSON.stringify(id)+"]");
+    assert.equal(await card.locator(".place-description").isVisible(),hasUsefulDescription(place),"Only source-backed descriptions are visible");
+    assert.equal(await card.locator(".place-cover").isVisible(),false,"No empty cover on ordinary cards");
+    assert.ok(await card.locator(".place-map").isVisible(),"Map detail remains available for every place");
+  }
+  const ordinary=cities.flatMap(city=>catalogPlacesForCity(city.id).filter(p=>!p.brand&&!p.photo&&!hasUsefulDescription(p)&&p.kind==="food").slice(0,1).map(place=>({city,place}))).at(0);
+  assert.ok(ordinary,"Expected at least one map-only venue");
   assert.ok((await page.locator(".place-map").first().textContent()).includes("Подробнее на картах"));
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),"no horizontal overflow");
   await page.locator("#guide-more").click();
@@ -56,6 +68,15 @@ try {
   await page.locator("#guide-search").fill("");
   assert.equal(await page.locator(".place-card").count(),10);
   // Exercise one actually imported thumbnail; do not substitute a stock photo.
+  await page.locator("#guide-city").fill(ordinary.city.label);
+  await page.locator("#guide-city").press("Enter");
+  await page.locator("#guide-search").fill(ordinary.place.name.slice(0,100));
+  const ordinaryCard=page.locator("[data-place-id="+JSON.stringify(ordinary.place.id)+"]");
+  await ordinaryCard.waitFor({state:"visible"});
+  assert.equal(await ordinaryCard.locator(".place-description").isVisible(),false);
+  assert.equal(await ordinaryCard.locator(".place-cover").isVisible(),false);
+  assert.ok(await ordinaryCard.locator(".place-map").isVisible());
+  assert.match(await ordinaryCard.locator(".place-map").getAttribute("href"),/^https:\/\//);
   const sample = cities.flatMap(city => catalogPlacesForCity(city.id).filter(p=>p.photo).map(place=>({city,place}))).at(0);
   if(sample){
     await page.locator("#guide-city").fill(sample.city.label);
