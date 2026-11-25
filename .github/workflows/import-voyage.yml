@@ -2,7 +2,7 @@ name: Import Wikivoyage descriptions
 on:
   push:
     branches: [android-v2]
-    paths: ['scripts/import-voyage-places.py', '.github/workflows/import-voyage.yml']
+    paths: ['scripts/import-voyage-places.py']
   workflow_dispatch:
 permissions:
   contents: read
@@ -63,6 +63,9 @@ jobs:
           if-no-files-found: error
           retention-days: 7
   integrate:
+    concurrency:
+      group: shodi-catalog-integrate-android-v2
+      cancel-in-progress: false
     needs: extract
     runs-on: ubuntu-latest
     permissions:
@@ -108,7 +111,14 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -m "data(catalog): integrate licensed geographically matched Wikivoyage descriptions"
-            git push origin HEAD:android-v2
+            for attempt in 1 2 3; do
+              if git push origin HEAD:android-v2; then break; fi
+              git fetch origin android-v2
+              git rebase origin/android-v2
+              npm test
+              npm run build
+              test "$attempt" != 3
+            done
           fi
           echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   verify-apk:

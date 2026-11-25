@@ -1,0 +1,84 @@
+name: Recover and verify consolidated catalog
+on:
+  push:
+    branches: [android-v2]
+    paths: ['.github/workflows/recover-catalog.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  integrate:
+    if: github.ref == 'refs/heads/android-v2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: shodi-catalog-integrate-android-v2
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      revision: ${{ steps.integrate.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: android-v2
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Recover both successful imports without network re-import
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          # Require exact source catalog and unchanged importer/validators.
+          git diff --quiet 8af9bf893f7fdbf485c38d458a641c8737007052 HEAD -- public/data/current-places.js public/data/place-descriptions.js public/data/imported-descriptions.js public/data/place-photos.js public/photos.js public/commons-thumbnail.js scripts/enrich-descriptions.mjs scripts/import-place-photos.mjs scripts/photo-import-policy.mjs scripts/catalog-match-helpers.mjs public/data/osm-photo-links.js public/data/osm-place-facts.js public/osm-place-facts.js
+          git diff --quiet 009e4886b114999140f60c16510b6c10c5cbb1c4 HEAD -- public/data/current-places.js public/voyage-places.js scripts/import-voyage-places.py
+          gh run download 45555254985 --repo "$GITHUB_REPOSITORY" --name shodi-description-import --dir "$RUNNER_TEMP/descriptions"
+          gh run download 45555726895 --repo "$GITHUB_REPOSITORY" --name shodi-voyage --dir "$RUNNER_TEMP/voyage"
+          IMPORT_DIR="$RUNNER_TEMP/descriptions" node scripts/integrate-recovered-descriptions.mjs
+          IMPORT_DIR="$RUNNER_TEMP/voyage" node scripts/integrate-recovered-voyage.mjs
+          node --input-type=module <<'JS'
+          import assert from "node:assert/strict";
+          import {voyagePlaces} from "./public/data/voyage-places.js";
+          import {archiveContext} from "./public/data/archive-context.js";
+          import {placePhotos} from "./public/data/place-photos.js";
+          import {osmPlaceFacts} from "./public/data/osm-place-facts.js";
+          assert.ok(Object.keys(voyagePlaces).length>=250,"Lost Wikivoyage data");
+          assert.ok(Object.keys(archiveContext).length>=66,"Lost archive data");
+          assert.ok(Object.keys(placePhotos).length>=500,"Lost photos");
+          assert.ok(Object.keys(osmPlaceFacts).length>=3604,"Lost OSM data");
+          console.log({voyage:Object.keys(voyagePlaces).length,archive:Object.keys(archiveContext).length,photos:Object.keys(placePhotos).length,osm:Object.keys(osmPlaceFacts).length});
+          JS
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+      - name: Publish consolidated data with race-safe retry
+        id: integrate
+        run: |
+          set -eu
+          git add public/data/imported-descriptions.js public/data/place-photos.js public/data/voyage-places.js docs/description-coverage.json docs/photo-coverage.json docs/voyage-coverage.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "data(catalog): recover and consolidate all completed verified imports"
+            for attempt in 1 2 3; do
+              if git push origin HEAD:android-v2; then break; fi
+              git fetch origin android-v2
+              git rebase origin/android-v2
+              npm test
+              npm run build
+              test "$attempt" != 3
+            done
+          fi
+          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  verify-apk:
+    needs: integrate
+    uses: ./.github/workflows/android.yml
+    with:
+      checkout_ref: ${{ needs.integrate.outputs.revision }}
+    permissions:
+      contents: read
+      actions: read

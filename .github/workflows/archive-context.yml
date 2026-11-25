@@ -2,7 +2,7 @@ name: Import historical visitor context
 on:
   push:
     branches: [android-v2]
-    paths: ['scripts/import-archive-context.py', '.github/workflows/archive-context.yml']
+    paths: ['scripts/import-archive-context.py']
   workflow_dispatch:
 permissions:
   contents: read
@@ -43,6 +43,9 @@ jobs:
           path: public/data/archive-context.js
           if-no-files-found: error
   integrate:
+    concurrency:
+      group: shodi-catalog-integrate-android-v2
+      cancel-in-progress: false
     needs: extract
     runs-on: ubuntu-latest
     permissions:

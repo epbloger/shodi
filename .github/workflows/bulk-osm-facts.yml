@@ -2,7 +2,7 @@ name: Bulk OSM place facts
 on:
   push:
     branches: [android-v2]
-    paths: ['scripts/import-osm-place-facts.py', '.github/workflows/bulk-osm-facts.yml']
+    paths: ['scripts/import-osm-place-facts.py']
   workflow_dispatch:
 permissions:
   contents: read
@@ -54,6 +54,9 @@ jobs:
           if-no-files-found: error
           retention-days: 7
   integrate:
+    concurrency:
+      group: shodi-catalog-integrate-android-v2
+      cancel-in-progress: false
     needs: extract
     runs-on: ubuntu-latest
     permissions:
@@ -105,7 +108,14 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -m "data(catalog): integrate bulk matched OSM facts"
-            git push origin HEAD:android-v2
+            for attempt in 1 2 3; do
+              if git push origin HEAD:android-v2; then break; fi
+              git fetch origin android-v2
+              git rebase origin/android-v2
+              npm test
+              npm run build
+              test "$attempt" != 3
+            done
           fi
           echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   verify-apk:

@@ -2,7 +2,7 @@ name: Enrich place descriptions
 on:
   push:
     branches: [android-v2]
-    paths: ['scripts/enrich-descriptions.mjs', 'scripts/import-place-photos.mjs', 'scripts/photo-import-policy.mjs', 'scripts/catalog-match-helpers.mjs', 'public/data/osm-photo-links.js', 'public/data/osm-place-facts.js', '.github/workflows/enrich-descriptions.yml']
+    paths: ['scripts/enrich-descriptions.mjs', 'scripts/import-place-photos.mjs', 'scripts/photo-import-policy.mjs', 'scripts/catalog-match-helpers.mjs', 'public/data/osm-photo-links.js', 'public/data/osm-place-facts.js']
   workflow_dispatch:
 permissions:
   contents: read
@@ -86,6 +86,9 @@ jobs:
           if-no-files-found: error
           retention-days: 7
   integrate:
+    concurrency:
+      group: shodi-catalog-integrate-android-v2
+      cancel-in-progress: false
     needs: enrich
     if: github.ref == 'refs/heads/android-v2'
     runs-on: ubuntu-latest
@@ -146,7 +149,14 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -m "data(catalog): integrate verified Wikidata descriptions and coverage"
-            git push origin HEAD:android-v2
+            for attempt in 1 2 3; do
+              if git push origin HEAD:android-v2; then break; fi
+              git fetch origin android-v2
+              git rebase origin/android-v2
+              npm test
+              npm run build
+              test "$attempt" != 3
+            done
           fi
           echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   verify-apk:

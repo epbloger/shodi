@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import {readFile,writeFile} from "node:fs/promises";
+import {currentPlaces} from "./public/data/current-places.js";
+import {validateVoyage} from "./public/voyage-places.js";
+const raw=await readFile((process.env.IMPORT_DIR+"/voyage-places.js"),"utf8");
+const m=/^\/\/[^\n]*\nexport const voyagePlaces = (\{[\s\S]*\});\n?$/.exec(raw);
+assert.ok(m);
+const data=JSON.parse(m[1]),rows=new Map(Object.values(currentPlaces).flat().map(([id,name,kind,,lat,lon])=>[id,{id,name,kind,lat,lon}]));
+assert.ok(Object.keys(data).length);
+for(const [id,row] of Object.entries(data))assert.ok(rows.has(id)&&validateVoyage(row,rows.get(id)));
+await writeFile("public/data/voyage-places.js",raw);
+await writeFile("docs/voyage-coverage.json",JSON.stringify({catalogPlaces:rows.size,descriptions:Object.keys(data).length,imageReferences:Object.values(data).filter(r=>r.image).length,license:"CC BY-SA 4.0"},null,2)+"\n");
