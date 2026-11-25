@@ -7,14 +7,15 @@ import {validWikiSummary,exactNearbyArticle,wikipediaTextLicense} from "../publi
 import {wikiSummaries as previous} from "../public/data/wiki-summaries.js";
 const deadline=Date.now()+7*60000,pause=ms=>new Promise(r=>setTimeout(r,ms));
 const ua="SHODI/2.0 guide (https://github.com/epbloger/shodi; helpmoorkis@yandex.ru)";
-let cooldown=0,errors=0;
+const cooldowns=new Map();let errors=0;
+const ready=host=>Date.now()>=(cooldowns.get(host)||0);
 async function api(host,params){
- if(Date.now()>deadline||Date.now()<cooldown)throw Error("Source cooldown or budget");
+ if(Date.now()>deadline||!ready(host))throw Error("Source cooldown or budget");
  await pause(1100);
  const r=await fetch("https://"+host+"/w/api.php",{method:"POST",body:new URLSearchParams({...params,format:"json",formatversion:"2",maxlag:"5"}),headers:{"User-Agent":ua,"Api-User-Agent":ua},redirect:"error",signal:AbortSignal.timeout(18000)});
- if([429,503].includes(r.status)){const n=Number(r.headers.get("Retry-After")||60);cooldown=Date.now()+Math.max(60000,Number.isFinite(n)?n*1000:60000);}
+ if([429,503].includes(r.status)){const n=Number(r.headers.get("Retry-After")||60);cooldowns.set(host,Date.now()+Math.max(60000,Number.isFinite(n)?n*1000:60000));}
  if(!r.ok)throw Error("HTTP "+r.status);
- const d=await r.json();if(d.error){if(d.error.code==="maxlag")cooldown=Date.now()+60000;throw Error(d.error.code);}return d;
+ const d=await r.json();if(d.error){if(d.error.code==="maxlag")cooldowns.set(host,Date.now()+60000);throw Error(d.error.code);}return d;
 }
 const ids=new Map(),places=new Map(),out={};
 for(const [id,name,kind,,lat,lon,status] of Object.values(currentPlaces).flat()){
@@ -47,7 +48,7 @@ function extract(page,max=360){
 const queryPages=async titles=>(await api("ru.wikipedia.org",{action:"query",titles:titles.join("|"),prop:"extracts|pageprops|coordinates|info",exintro:"1",explaintext:"1",exchars:"500",exlimit:"20",ppprop:"wikibase_item|disambiguation",colimit:"max"})).query?.pages||[];
 const pending=[...new Set([...ids].filter(([k])=>!out[k]&&!checkedIds.has(k)).map(([,q])=>q))];
 let added=0,directAdded=0;
-for(let i=0;licenseConfirmed&&i<pending.length&&Date.now()<deadline&&Date.now()>=cooldown;i+=40){
+for(let i=0;licenseConfirmed&&i<pending.length&&Date.now()<deadline&&ready("www.wikidata.org")&&ready("ru.wikipedia.org");i+=40){
  const batch=pending.slice(i,i+40);
  try{
   const entity=(await api("www.wikidata.org",{action:"wbgetentities",ids:batch.join("|"),props:"sitelinks",sitefilter:"ruwiki"})).entities||{};
@@ -67,7 +68,7 @@ for(const p of places.values()){
  byTitle.get(p.name).push(p);
 }
 const titles=[...byTitle.keys()];
-for(let i=0;licenseConfirmed&&i<titles.length&&Date.now()<deadline&&Date.now()>=cooldown&&errors<4;i+=20){
+for(let i=0;licenseConfirmed&&i<titles.length&&Date.now()<deadline&&ready("ru.wikipedia.org")&&errors<4;i+=20){
  const batch=titles.slice(i,i+20);
  try{
   for(const page of await queryPages(batch)){

@@ -10,3 +10,18 @@ test("researched visitor context matches the actual place, not another same-name
  assert.match(editorialGuide({kind:"coffee",brand:{name:"Coffee Like",qid:"Q55662627"}}).text,/Ижевске/);
  assert.match(editorialGuide({kind:"food",brand:{name:"Додо Пицца"}}).text,/Сыктывкаре/);
 });
+
+test("additional researched brands have distinct history and exact identity",()=>{
+ assert.match(editorialGuide({kind:"food",brand:{name:"Вкусно — и точка"}}).text,/2022/);
+ assert.match(editorialGuide({kind:"food",brand:{name:"Burger King"}}).text,/2010/);
+ assert.match(editorialGuide({kind:"coffee",brand:{name:"Шоколадница"}}).text,/1964/);
+ assert.match(editorialGuide({kind:"coffee",brand:{name:"Кофе Хауз"}}).text,/1999/);
+ assert.match(editorialGuide({kind:"food",brand:{name:"Папа Джонс"}}).text,/1984/);
+ assert.match(editorialGuide({kind:"food",brand:{name:"Якитория"}}).text,/1999/);
+ assert.match(editorialGuide({kind:"food",brand:{name:"Теремок"}}).text,/1998/);
+ assert.match(editorialGuide({kind:"food",brand:{name:"Subway"}}).text,/1965/);
+ assert.match(editorialGuide({kind:"coffee",brand:{name:"Буше"}}).text,/1999/);
+ assert.match(editorialGuide({kind:"coffee",brand:{name:"Surf Coffee"}}).text,/2010/);
+ assert.match(editorialGuide({kind:"food",brand:{name:"IL Patio"}}).text,/1993/);
+ assert.equal(editorialGuide({kind:"museum",brand:{name:"Шоколадница"}}),null);
+});
