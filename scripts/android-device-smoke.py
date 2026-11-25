@@ -16,7 +16,13 @@ def hierarchy():
     return ET.fromstring(adb("shell", "cat", "/sdcard/shodi-window.xml"))
 def matches(node, text):
     return any(normalized(node.get(attr,"")) == normalized(text) for attr in ("text","content-desc"))
-def find_text(text, timeout=90, dialog_button=None, dialog_title=None, recover_launcher=False, prefix=False):
+def touch_bounds(node):
+    bounds=list(map(int,re.findall(r"\d+",node.get("bounds",""))))
+    if len(bounds)!=4 or bounds[2]<=bounds[0] or bounds[3]<=bounds[1]:
+        return None
+    return bounds
+
+def find_text(text, timeout=90, dialog_button=None, dialog_title=None, recover_launcher=False, prefix=False, visible=False):
     end=time.monotonic()+timeout
     seen=[]
     recovered=False
@@ -36,7 +42,7 @@ def find_text(text, timeout=90, dialog_button=None, dialog_title=None, recover_l
                 time.sleep(3)
                 continue
             for node in nodes:
-                if matches(node,text) or (prefix and any(normalized(node.get(attr,"" )).startswith(normalized(text)) for attr in ("text","content-desc"))):
+                if (matches(node,text) or (prefix and any(normalized(node.get(attr,"" )).startswith(normalized(text)) for attr in ("text","content-desc")))) and (not visible or touch_bounds(node)):
                     return node
             if dialog_button and any(matches(n,dialog_title) for n in nodes):
                 for node in nodes:
@@ -53,19 +59,38 @@ def tap_node(node):
     assert x2>x1 and y2>y1,"Empty touch bounds"
     adb("shell","input","tap",str((x1+x2)//2),str((y1+y2)//2))
 def tap(text, **kwargs):
-    tap_node(find_text(text, **kwargs))
+    tap_node(find_text(text, visible=True, **kwargs))
 def scroll_to(text, prefix=False, direction=1):
     # Use actual screen dimensions; WebView exposes only visible accessible nodes.
     w,h=map(int,re.findall(r"(\d+)x(\d+)",adb("shell","wm","size"))[-1])
-    for _ in range(8):
+    for _ in range(12):
+        clipped=None
+        unsettled=False
         for n in hierarchy().iter("node"):
             if n.get("package")!=PACKAGE: continue
             values=[normalized(n.get(attr,"")) for attr in ("text","content-desc")]
             if matches(n,text) or (prefix and any(v.startswith(normalized(text)) for v in values)):
-                bounds=list(map(int,re.findall(r"\d+",n.get("bounds",""))))
-                if len(bounds)==4 and bounds[2]>bounds[0] and bounds[3]>bounds[1]:return n
-        y1,y2=int(h*.75),int(h*.28)
-        if direction<0:y1,y2=y2,y1
+                bounds=touch_bounds(n)
+                # WebView can expose a clipped edge of a button during a swipe.
+                # Do not tap it until its touch target is visible and stationary.
+                if bounds and bounds[3]-bounds[1]>=(32 if n.get("clickable")=="true" else 12):
+                    time.sleep(0.6)
+                    for settled in hierarchy().iter("node"):
+                        if settled.get("package")==PACKAGE and touch_bounds(settled)==bounds and (matches(settled,text) or (prefix and any(normalized(settled.get(a,"")).startswith(normalized(text)) for a in ("text","content-desc")))):
+                            return settled
+                    unsettled=True
+                    break
+                if bounds:
+                    clipped=bounds
+        if unsettled:
+            continue
+        if clipped:
+            # Bring a partial element toward the viewport center rather than
+            # overshooting it with a full swipe in the original direction.
+            y1,y2=(int(h*.67),int(h*.37)) if (clipped[1]+clipped[3])/2>h/2 else (int(h*.37),int(h*.67))
+        else:
+            y1,y2=int(h*.75),int(h*.28)
+            if direction<0:y1,y2=y2,y1
         adb("shell","input","swipe",str(w//2),str(y1),str(w//2),str(y2),"450")
         time.sleep(1)
     raise AssertionError("Cannot scroll to: "+text)
@@ -124,7 +149,18 @@ def run():
     add=scroll_to("Добавить в маршрут:",prefix=True)
     capture("android-catalog-places.png")
     tap_node(add)
-    tap_node(scroll_to("Открыть маршрут",direction=-1))
+    find_text("Санкт-Петербург — прогулка",prefix=True,timeout=20)
+    # Start at a known scroll position after the catalog re-renders. A long
+    # reverse swipe from a card could leave the open button clipped or moving.
+    nodes=list(hierarchy().iter("node"))
+    top=next((n for n in nodes if matches(n,"Вернуться наверх") and touch_bounds(n)),None)
+    if top is not None:
+        tap_node(top)
+    elif not any(matches(n,"О приложении") and touch_bounds(n) for n in nodes):
+        scroll_to("О приложении",direction=-1)
+    find_text("О приложении",visible=True,timeout=20)
+    tap_node(scroll_to("Открыть маршрут"))
+    find_text("Удалить маршрут",timeout=20)
     scroll_to("Удалить маршрут")
     address=scroll_to("Адрес по каталогу:",prefix=True)
     assert address is not None
@@ -133,6 +169,7 @@ def run():
     launch()
     find_text("О приложении")
     tap("Санкт-Петербург — прогулка",prefix=True)
+    find_text("Удалить маршрут",timeout=20)
     # Reopening a saved route starts at the top; its actions are below the viewport.
     tap_node(scroll_to("Удалить маршрут"))
     tap("Отмена")
