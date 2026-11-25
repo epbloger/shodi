@@ -26,19 +26,35 @@ def image_name(s):
     s=re.sub(r"^(?:File|Image|Файл):","",s,flags=re.I).replace("_"," ").strip()
     return s if 0<len(s)<=350 and re.search(r"\.(?:jpe?g|png)$",s,re.I) and not re.search(r"[\x00-\x1f<>|#?/\\]",s) else None
 def match_page(title,revision,raw,index,hits):
-    if not raw or not re.search(r"\{\{\s*listing\b",raw,re.I):return
+    if not raw or not re.search(r"\{\{\s*(?:listing|monument2?)\b",raw,re.I):return
     for t in mwparserfromhell.parse(raw).filter_templates(recursive=True):
-        if str(t.name).strip().lower()!="listing":continue
+        template=str(t.name).strip().lower()
+        if template not in ("listing","monument","monument2"):continue
+        monument=template!="listing"
         kind=param(t,"type") or param(t,"1")
-        if kind not in ALLOWED or param(t,"format")=="poi":continue
+        if monument:
+            if not title.startswith("Культурное наследие России/") or kind not in ("architecture","history","archeology","monument") or param(t,"precise")!="yes" or param(t,"status") or param(t,"dismissed"):continue
+            allowed={"architecture","walk","museum","theater","gallery"}
+        else:
+            if kind not in ALLOWED or param(t,"format")=="poi":continue
+            allowed=ALLOWED[kind]
         name=plain(param(t,"name"))
         if not name or len(name)>100:continue
         try:lat,lon=float(param(t,"lat")),float(param(t,"long"))
         except ValueError:continue
         if not math.isfinite(lat) or not math.isfinite(lon):continue
-        candidates=[r for r in index.get(norm(name),[]) if r[2] in ALLOWED[kind] and dist(lat,lon,r)<=119]
+        candidates=[r for r in index.get(norm(name),[]) if r[2] in allowed and dist(lat,lon,r)<=119]
         if len(candidates)!=1:continue
-        text=excerpt(param(t,"description"))
+        raw_desc=param(t,"description")
+        if monument:
+            year=plain(param(t,"year"));author=plain(param(t,"author"));style=plain(param(t,"style"))
+            parts=[]
+            if re.fullmatch(r"(?:1[0-9]{3}|20[0-2][0-9])(?:[–—-](?:1[0-9]{3}|20[0-2][0-9]))?",year):parts.append("Датировка в каталоге наследия: "+year+".")
+            if 2<=len(author)<=100 and re.fullmatch(r"[\w .,\-–—()]+",author):parts.append("Автор объекта: "+author+".")
+            if style in ("конструктивизм","авангард","модерн"):parts.append("Архитектурный стиль: "+style+".")
+            if param(t,"protection") in ("Ф","Р","М"):parts.append("В каталоге отмечен охранный статус памятника.")
+            raw_desc=" ".join([raw_desc,*parts])
+        text=excerpt(raw_desc)
         if not text:continue
         r=candidates[0]
         row={"name":name,"kind":r[2],"lat":lat,"lon":lon,"text":text,"title":title,"revision":revision,"license":"CC BY-SA 4.0","image":image_name(param(t,"image"))}
@@ -63,7 +79,9 @@ def main():
             root.clear()
     out={}
     for id,entries in hits.items():
-        unique={r["text"]:r for r in entries}
+        # Prefer a travel description over a registry entry, never resolve conflicting peers by guess.
+        travel=[r for r in entries if not r["title"].startswith("Культурное наследие России/")]
+        unique={r["text"]:r for r in (travel or entries)}
         if len(unique)==1:out[id]=next(iter(unique.values()))
     if not out:raise RuntimeError("No unique geographically matched Wikivoyage listings")
     Path(a.output).write_text("// Wikivoyage contributors, CC BY-SA 4.0; excerpts shortened.\nexport const voyagePlaces = "+json.dumps(out,ensure_ascii=False,separators=(",",":"))+";\n",encoding="utf-8")

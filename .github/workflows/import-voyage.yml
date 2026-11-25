@@ -33,8 +33,23 @@ jobs:
           cd "$RUNNER_TEMP"
           curl --fail --location --retry 2 --max-time 180 -o dump.bz2 https://dumps.wikimedia.org/ruwikivoyage/latest/ruwikivoyage-latest-pages-articles.xml.bz2
           curl --fail --location --retry 2 --max-time 60 -o checksums https://dumps.wikimedia.org/ruwikivoyage/latest/ruwikivoyage-latest-sha1sums.txt
-          grep ' ruwikivoyage-latest-pages-articles.xml.bz2$' checksums | sed 's/ruwikivoyage-latest-pages-articles.xml.bz2$/dump.bz2/' > dump.sha1
+          python - <<'PY'
+          import pathlib,re
+          rows=[]
+          for line in pathlib.Path("checksums").read_text().splitlines():
+              m=re.fullmatch(r"([0-9a-fA-F]{40})\s+\*?(?:\./)?ruwikivoyage-(?:latest|\d{8})-pages-articles\.xml\.bz2\s*",line)
+              if m: rows.append(m.group(1).lower())
+          if len(set(rows))!=1: raise SystemExit("Missing or ambiguous full-dump checksum")
+          pathlib.Path("dump.sha1").write_text(rows[0]+"  dump.bz2\n")
+          PY
           sha1sum --check dump.sha1
+          curl --fail --location --retry 2 --max-time 30 -A 'SHODI/2.0 (https://github.com/epbloger/shodi)' 'https://ru.wikivoyage.org/w/api.php?action=query&meta=siteinfo&siprop=rightsinfo&format=json' -o rights.json
+          python - <<'PY'
+          import json
+          from urllib.parse import urlparse
+          u=urlparse(json.load(open("rights.json"))["query"]["rightsinfo"]["url"])
+          assert u.hostname=="creativecommons.org" and u.path.startswith("/licenses/by-sa/4.0"), "Unrecognized source license"
+          PY
       - name: Match and validate exact catalog records
         run: |
           python scripts/import-voyage-places.py "$RUNNER_TEMP/dump.bz2" --output public/data/voyage-places.js

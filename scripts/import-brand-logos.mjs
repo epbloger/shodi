@@ -20,8 +20,14 @@ let previousReport=null;
 try{previousReport=JSON.parse(await readFile("docs/brand-logo-coverage.json","utf8"));}
 catch(e){if(e.code!=="ENOENT")console.warn("Ignoring unreadable previous coverage report:",String(e));}
 const attempts=priorAttempts(previousReport,brands);
+const categoryAttempts=new Map((previousReport?.brands||[]).filter(r=>brands.has(r.key)&&Number.isFinite(Date.parse(r.categoryAttemptAt))).map(r=>[r.key,Date.parse(r.categoryAttemptAt)]));
 const directAttempts=new Map((Array.isArray(previousReport?.brands)?previousReport.brands:[]).filter(r=>brands.has(r.key)&&Number.isFinite(Date.parse(r.directAttemptAt))).map(r=>[r.key,Date.parse(r.directAttemptAt)]));
 const resolvedQids=new Map([...brands.values()].filter(x=>x.brand.qid).map(x=>[x.brand.key,x.brand.qid]));
+const categories=new Map();
+function rememberCategory(key,entity){
+ const cs=[...new Set((entity?.claims?.P373||[]).filter(c=>c.rank!=="deprecated").map(c=>c.mainsnak?.datavalue?.value).filter(s=>typeof s==="string"&&s.length<=180&&!/[<>|#?\u0000-\u001f]/.test(s)))];
+ if(cs.length===1)categories.set(key,cs[0]);
+}
 const attempted=rows=>{const at=Date.now();for(const {brand} of rows)attempts.set(brand.key,at);};
 const previousStates=new Map((Array.isArray(previousReport?.brands)?previousReport.brands:[]).filter(row=>row&&typeof row.status==="string"&&!["verified","retained"].includes(row.status)).map(row=>[row.key,row.status]));
 
@@ -66,7 +72,9 @@ for(let i=0;i<known.length;i+=40){
   const data=await entities(batch.map(x=>x.brand.qid));
   for(const {brand} of batch){
    const e=data.entities?.[brand.qid];
-   const files=brandMatches(e,brand)?logoFiles(e):[];
+   const exact=brandMatches(e,brand);
+   if(exact)rememberCategory(brand.key,e);
+   const files=exact?logoFiles(e):[];
    candidates.set(brand.key,[...new Set([...(candidates.get(brand.key)||[]),...files])]);
    if(!files.length&&!brand.file&&!out[brand.key])states[brand.key]="no-logo-claim";
   }
@@ -153,7 +161,7 @@ for(let i=0;i<pending.length;i+=20){
    for(const {brand,id} of selected.filter(x=>subset.includes(x.id))){
     const entity=data.entities?.[id];
     const exact=brandMatches(entity,brand);
-    if(exact)resolvedQids.set(brand.key,id);
+    if(exact){resolvedQids.set(brand.key,id);rememberCategory(brand.key,entity);}
     const files=exact?logoFiles(entity):[];
     if(files.length)candidates.set(brand.key,files);
     else states[brand.key]="no-verified-logo-claim";
@@ -189,9 +197,36 @@ for(const {brand} of direct.slice(0,120)){
  }catch(e){recordError("commons-structured",e);}
 }
 await importCandidates();
+// Recover P373 categories for verified QIDs even if earlier P154 attempts are on cooldown.
+candidates.clear();
+const categoryPending=[...brands.values()].filter(({brand})=>!out[brand.key]&&resolvedQids.has(brand.key)&&Date.now()-(categoryAttempts.get(brand.key)||0)>=7*86400000);
+for(let i=0;i<categoryPending.length;i+=40){
+ if(!available("www.wikidata.org"))break;
+ const group=categoryPending.slice(i,i+40),ids=[...new Set(group.map(({brand})=>resolvedQids.get(brand.key)))];
+ try{const result=await entities(ids);for(const {brand} of group){const e=result.entities?.[resolvedQids.get(brand.key)];if(brandMatches(e,brand))rememberCategory(brand.key,e);}}catch(e){recordError("category-entity",e);break;}
+}
+let categoryChecked=0;
+for(const {brand} of categoryPending.slice(0,120)){
+ if(!available("commons.wikimedia.org"))break;
+ const cat=categories.get(brand.key);if(!cat)continue;
+ try{
+  const results=new Map();
+  let cmcontinue;
+  for(let j=0;j<3;j++){
+   const data=await api("commons.wikimedia.org",{action:"query",list:"categorymembers",cmtitle:"Category:"+cat,cmtype:"file",cmlimit:"100",formatversion:"2",...(cmcontinue?{cmcontinue}:{})});
+   if(!Array.isArray(data.query?.categorymembers))throw Error("Unexpected category response");
+   for(const r of data.query.categorymembers)if(exactLogoTitle(r.title,brand.name)&&Number.isSafeInteger(r.pageid))results.set(r.pageid,r.title.slice(5));
+   cmcontinue=data.continue?.cmcontinue;
+   if(!cmcontinue)break;
+  }
+  // An incomplete category or several logo variants is ambiguous.
+  if(!cmcontinue){categoryAttempts.set(brand.key,Date.now());categoryChecked++;if(results.size===1)candidates.set(brand.key,[...results.values()]);}
+ }catch(e){recordError("commons-category",e);}
+}
+await importCandidates();
 for(const key of brands.keys())if(!states[key])states[key]=previousStates.get(key)||"not-verified";
 const counts={};for(const v of Object.values(states))counts[v]=(counts[v]||0)+1;
-const report={totalBrands:brands.size,brandedPlaces:[...brands.values()].reduce((n,b)=>n+b.branches,0),verifiedLogos:Object.keys(out).length,coveredPlaces:Object.keys(out).reduce((n,key)=>n+brands.get(key).branches,0),statusCounts:counts,directChecked,directCandidates,errors,brands:[...brands.entries()].map(([key,{brand,branches}])=>({key,name:brand.name,branches,status:states[key],lastAttemptAt:attempts.has(key)?new Date(attempts.get(key)).toISOString():undefined,directAttemptAt:directAttempts.has(key)?new Date(directAttempts.get(key)).toISOString():undefined,source:out[key]?.source})),generatedAt:new Date().toISOString()};
+const report={totalBrands:brands.size,brandedPlaces:[...brands.values()].reduce((n,b)=>n+b.branches,0),verifiedLogos:Object.keys(out).length,coveredPlaces:Object.keys(out).reduce((n,key)=>n+brands.get(key).branches,0),statusCounts:counts,directChecked,directCandidates,categoryChecked,errors,brands:[...brands.entries()].map(([key,{brand,branches}])=>({key,name:brand.name,branches,status:states[key],lastAttemptAt:attempts.has(key)?new Date(attempts.get(key)).toISOString():undefined,directAttemptAt:directAttempts.has(key)?new Date(directAttempts.get(key)).toISOString():undefined,categoryAttemptAt:categoryAttempts.has(key)?new Date(categoryAttempts.get(key)).toISOString():undefined,source:out[key]?.source})),generatedAt:new Date().toISOString()};
 await writeFile("public/data/brand-logos.js","// Generated verified Commons raster logos; see docs/photo-providers.md.\nexport const brandLogos = "+JSON.stringify(out)+";\n");
 await writeFile("docs/brand-logo-coverage.json",JSON.stringify(report,null,2)+"\n");
 console.log(JSON.stringify({...report,brands:undefined,errors:errors.slice(0,8)}));
