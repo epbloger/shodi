@@ -1,0 +1,118 @@
+name: Bulk OSM place facts
+on:
+  push:
+    branches: [android-v2]
+    paths: ['scripts/import-osm-place-facts.py', '.github/workflows/bulk-osm-facts.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: shodi-bulk-osm-facts
+  cancel-in-progress: false
+jobs:
+  extract:
+    if: github.ref == 'refs/heads/android-v2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Prepare parser
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y osmium-tool
+          python -m pip install osmium==4.3.2 duckdb==1.5.4
+          python -m py_compile scripts/import-osm-place-facts.py
+      - name: Download verified dated open data
+        run: |
+          set -eu
+          cd "$RUNNER_TEMP"
+          url=https://download.geofabrik.de/russia-261124.osm.pbf
+          curl --fail --location --retry 3 --max-time 1800 -o russia-261124.osm.pbf "$url"
+          curl --fail --location --retry 3 --max-time 60 -o russia-261124.osm.pbf.md5 "$url.md5"
+          md5sum --check russia-261124.osm.pbf.md5
+          osmium tags-filter russia-261124.osm.pbf nw/description:ru nw/description nw/start_date nw/architect nw/artist_name nw/heritage nw/cuisine nw/takeaway nw/outdoor_seating nw/wheelchair nw/fee nw/wikidata nw/wikimedia_commons nw/image -o facts.osm.pbf
+          rm russia-261124.osm.pbf
+      - name: Match all catalog objects
+        run: |
+          python scripts/import-osm-place-facts.py "$RUNNER_TEMP/facts.osm.pbf" --index "$RUNNER_TEMP/locations.idx" --output public/data/osm-place-facts.js
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shodi-bulk-osm-facts
+          path: public/data/osm-place-facts.js
+          if-no-files-found: error
+          retention-days: 7
+  integrate:
+    needs: extract
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    outputs:
+      revision: ${{ steps.integrate.outputs.revision }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: android-v2
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: shodi-bulk-osm-facts
+          path: import-snapshot
+      - name: Verify and integrate only matching data
+        id: integrate
+        run: |
+          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js scripts/import-osm-place-facts.py public/osm-place-facts.js public/data/osm-place-facts.js
+          node --input-type=module <<'JS'
+          import assert from "node:assert/strict";
+          import {readFile,writeFile} from "node:fs/promises";
+          import {currentPlaces} from "./public/data/current-places.js";
+          import {validateOsmFact,osmFactDescription,osmFactPhotoLink} from "./public/osm-place-facts.js";
+          const raw=await readFile("import-snapshot/osm-place-facts.js","utf8");
+          const m=/^\/\/[^\n]*\nexport const osmPlaceFacts = (\{[\s\S]*\});\n?$/.exec(raw);
+          assert.ok(m);
+          const data=JSON.parse(m[1]),rows=new Map(Object.values(currentPlaces).flat().map(([id,name,kind,,lat,lon])=>[id,{id,name,kind,lat,lon}]));
+          let descriptions=0,links=0;
+          for(const [id,row] of Object.entries(data)){
+            assert.ok(rows.has(id)&&validateOsmFact(row,rows.get(id)));
+            if(osmFactDescription(row,row.kind))descriptions++;
+            if(osmFactPhotoLink(row))links++;
+          }
+          assert.ok(descriptions>0);
+          await writeFile("public/data/osm-place-facts.js",raw);
+          await writeFile("docs/osm-fact-coverage.json",JSON.stringify({catalogPlaces:rows.size,matched:Object.keys(data).length,descriptions,photoReferences:links,source:"Geofabrik 2026-11-24",license:"ODbL-1.0"},null,2)+"\n");
+          console.log({descriptions,links,matched:Object.keys(data).length});
+          JS
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+          git add public/data/osm-place-facts.js docs/osm-fact-coverage.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "data(catalog): integrate bulk matched OSM facts"
+            git push origin HEAD:android-v2
+          fi
+          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  verify-apk:
+    needs: integrate
+    uses: ./.github/workflows/android.yml
+    with:
+      checkout_ref: ${{ needs.integrate.outputs.revision }}
+    permissions:
+      contents: read
+      actions: read
