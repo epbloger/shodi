@@ -62,6 +62,16 @@ test("moveStop keeps all records and leaves invalid moves unchanged", () => {
   assert.equal(moveStop(stops, "missing", 1), stops);
 });
 
+test("manual stop addresses are optional, bounded, and persist without breaking older saved routes",()=>{
+  const board=demoBoard();
+  board.routes[0].stops[0].address="  улица Ленина, 1  ";
+  const loaded=readBoard(serialized(board));
+  assert.equal(loaded.routes[0].stops[0].address,"улица Ленина, 1");
+  assert.ok(!Object.hasOwn(loaded.routes[0].stops[1],"address"));
+  assert.throws(()=>stopDetails({...board.routes[0].stops[0],address:"a".repeat(241)}));
+  assert.ok(!Object.hasOwn(stopDetails({...board.routes[0].stops[0],address:" "}),"address"));
+});
+
 test("time labels cover zero, minutes and whole or partial hours", () => {
   assert.equal(minuteLabel(0), "0 мин");
   assert.equal(minuteLabel(20), "20 мин");

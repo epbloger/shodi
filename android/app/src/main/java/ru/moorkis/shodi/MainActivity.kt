@@ -219,7 +219,7 @@ class MainActivity : Activity() {
     private fun shareRoute() {
         if (!ready || legalDialogOpen) return
         // Read only the selected route, and only in response to this explicit button.
-        web.evaluateJavascript("""(()=>{try{const b=JSON.parse(localStorage.getItem('weekend-atlas/v1'));if(location.hash!=='#route'||document.querySelector('dialog[open]'))return '';const r=b.routes.find(x=>x.id===b.selected);return r?[r.name,r.city,r.note,...r.stops.map((s,i)=>(i+1)+'. '+s.name+(s.minutes?' · '+s.minutes+' мин':'')+(s.note?' — '+s.note:''))].filter(Boolean).join('\n'):''}catch{return ''}})()""") { result ->
+        web.evaluateJavascript("""(()=>{try{if(location.hash!=='#route'||document.querySelector('dialog[open]')||document.getElementById('active-route').hidden)return '';const t=id=>document.getElementById(id).textContent;const rows=[...document.querySelectorAll('#stop-list .stop-card')];return [t('route-title'),t('route-city'),t('route-description'),...rows.map((r,i)=>{const get=sel=>r.querySelector(sel)?.textContent||'';return (i+1)+'. '+get('.stop-title')+' · '+get('.stop-detail')+[get('.stop-address'),get('.stop-unavailable'),get('.stop-note')].filter(Boolean).map(s=>' — '+s).join('')})].filter(Boolean).join('\n')}catch{return ''}})()""") { result ->
             val text = runCatching { org.json.JSONTokener(result).nextValue() as? String }.getOrNull()
             if (!text.isNullOrBlank()) startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"; putExtra(Intent.EXTRA_TEXT, text)
@@ -230,7 +230,7 @@ class MainActivity : Activity() {
     @Deprecated("Use system back for this activity")
     override fun onBackPressed() {
         if (!ready) { super.onBackPressed(); return }
-        web.evaluateJavascript("""(()=>{const d=document.querySelector('dialog[open]');if(d){d.close();return true}if(location.hash==='#route'){document.getElementById('guide-trigger').click();return true}return false})()""") {
+        web.evaluateJavascript("""(()=>{const ds=document.querySelectorAll('dialog[open]');const d=ds[ds.length-1];if(d){d.close();return true}if(location.hash==='#route'){document.getElementById('guide-trigger').click();return true}return false})()""") {
             if (it != "true") finish()
         }
     }

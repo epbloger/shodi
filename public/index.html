@@ -202,6 +202,9 @@
           <input name="minutes" type="number" min="0" max="720" step="1" value="0">
         </label>
       </div>
+      <label id="stop-address-field" hidden>Адрес остановки (необязательно)
+        <input name="address" type="text" maxlength="240" autocomplete="off" placeholder="Улица, дом">
+      </label>
       <label><span id="note-label">Описание</span>
         <textarea name="note" maxlength="400" rows="3"></textarea>
       </label>
@@ -266,6 +269,7 @@
           <h3 class="stop-title"></h3>
           <p class="stop-detail"></p>
           <p class="stop-address stop-detail" hidden></p>
+          <p class="stop-unavailable" hidden></p>
           <p class="stop-note" hidden></p>
           <a class="place-map stop-map" target="_blank" rel="noopener noreferrer" hidden>Подробнее на картах <svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
         </div>

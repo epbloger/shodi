@@ -19,7 +19,7 @@ const places=scope.cultural.map(x=>{
  assert.ok(raw&&raw[1]===x.name&&raw[2]===x.kind&&raw[4]===x.lat&&raw[5]===x.lon,"Frozen target changed "+x.id);
  const [,name,kind,address,lat,lon]=effectiveRow(raw);
  assert.ok(p&&p.name===name&&p.kind===kind&&p.address===address&&p.lat===lat&&p.lon===lon,"Effective target changed "+x.id);
- return {...x,city:p.city,kind,lat,lon,corrected:raw!==effectiveRow(raw),description:hasUsefulDescription(p),substantive:["wikipedia-place","editorial-place","wikivoyage-place"].includes(p.descriptionKind)&&p.description?.length>=70,descriptionKind:p.descriptionKind,photo:!!(p.photo&&!p.photo.brandLogo)};
+ return {...x,city:p.city,kind,lat,lon,corrected:raw!==effectiveRow(raw),...(p.unavailable?{unavailable:p.unavailable}:{}),description:hasUsefulDescription(p),substantive:["wikipedia-place","editorial-place","wikivoyage-place"].includes(p.descriptionKind)&&p.description?.length>=70,descriptionKind:p.descriptionKind,photo:!!(p.photo&&!p.photo.brandLogo)};
 });
 const report={baseline:scope.baseline,catalog:all.length,brandGroups:groups.length,brandCards:groups.reduce((n,x)=>n+x.branches,0),brandCardsWithoutDescription:groups.reduce((n,x)=>n+x.branches-x.described,0),brandsWithoutLogo:groups.filter(x=>!x.logo).length,culturalCandidates:places.length,culturalWithoutDescription:places.filter(x=>!x.description).length,culturalWithoutSubstantive:places.filter(x=>!x.substantive).length,culturalWithoutPhoto:places.filter(x=>!x.photo).length,groups,places};
 await writeFile("docs/release-priority-report.json",JSON.stringify(report,null,2)+"\n");

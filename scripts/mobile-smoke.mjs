@@ -5,7 +5,7 @@ import {cities,catalogPlacesForCity} from "../public/guide.js";
 import {hasUsefulDescription} from "../public/catalog-presentation.js";
 const html=await readFile("dist/shodi.html","utf8");
 function findSample(predicate){
-  for(const city of cities){const place=catalogPlacesForCity(city.id).find(predicate);if(place)return {city,place};}
+  for(const city of cities){const place=catalogPlacesForCity(city.id).find(p=>!p.unavailable&&predicate(p));if(place)return {city,place};}
 }
 const browser=await chromium.launch({headless:true, ...(process.env.SHODI_BROWSER_EXECUTABLE ? {executablePath:process.env.SHODI_BROWSER_EXECUTABLE} : {})});
 try {
@@ -59,6 +59,13 @@ try {
   await page.waitForFunction(()=>window.scrollY<5);
   await page.locator("#guide-categories button[value=all]").click();
   assert.equal(await page.locator(".place-card").count(),10);
+  const originalTheme=await page.locator("html").getAttribute("data-theme");
+  await page.locator("#theme-toggle").click();
+  const alternateTheme=await page.locator("html").getAttribute("data-theme");
+  assert.notEqual(alternateTheme,originalTheme);
+  await page.reload();
+  assert.equal(await page.locator("html").getAttribute("data-theme"),alternateTheme);
+  await page.locator("#theme-toggle").click();
   await page.locator("#android-about").click();
   await page.waitForFunction(()=>document.readyState==="complete");
   assert.ok(actions.includes("/action/about"));
@@ -69,13 +76,34 @@ try {
   assert.equal(await page.locator(".stop-map").getAttribute("href"),mapHref);
   const savedPlace=initialPlaces.get(initialIds[0]);
   assert.equal(await page.locator(".stop-address").textContent(),savedPlace.address ? "Адрес по каталогу: "+savedPlace.address : "");
+  await page.locator("#add-stop").click();
+  await page.locator("#edit-form [name=name]").fill("Своя остановка");
+  await page.locator("#edit-form [name=address]").fill("Невский проспект, 1");
+  await page.locator("#edit-form button[type=submit]").click();
+  const manual=page.locator(".stop-card").filter({hasText:"Своя остановка"});
+  assert.equal(await manual.locator(".stop-address").textContent(),"Адрес: Невский проспект, 1");
+  assert.match(new URL(await manual.locator(".stop-map").getAttribute("href")).searchParams.get("text"),/Невский проспект, 1/);
+  await manual.locator(".move-up").click();
+  assert.equal(await page.locator(".stop-title").first().textContent(),"Своя остановка");
+  await manual.locator(".visit-toggle").click();
+  assert.equal(await manual.locator(".visit-toggle").isChecked(),true);
+  await manual.locator(".edit-stop").click();
+  assert.equal(await page.locator("#edit-form [name=address]").inputValue(),"Невский проспект, 1");
+  await page.locator("#edit-form [name=address]").fill("Невский проспект, 2");
+  await page.locator("#edit-form button[type=submit]").click();
+  assert.equal(await manual.locator(".stop-address").textContent(),"Адрес: Невский проспект, 2");
   await page.locator("#android-share").click();
   await page.waitForFunction(()=>document.readyState==="complete");
   assert.ok(actions.includes("/action/share"));
   await context.setOffline(true);
   await page.reload();
-  await page.locator(".stop-card").waitFor({state:"visible"});
-  assert.equal(await page.locator(".stop-map").getAttribute("href"),mapHref);
+  await page.locator(".stop-card").first().waitFor({state:"visible"});
+  assert.equal(await page.locator(".stop-map").last().getAttribute("href"),mapHref);
+  assert.equal(await manual.locator(".stop-address").textContent(),"Адрес: Невский проспект, 2");
+  assert.equal(await manual.locator(".visit-toggle").isChecked(),true);
+  await manual.locator(".remove-stop").click();
+  await page.locator("#delete-form button[value=confirm]").click();
+  await manual.waitFor({state:"detached"});
   await page.locator("#remove-route").click();
   await page.locator("#delete-form button[value=cancel]").click();
   assert.equal(await page.locator(".stop-card").count(),1);
@@ -93,6 +121,9 @@ try {
   // Exercise one actually imported thumbnail; do not substitute a stock photo.
   await page.locator("#guide-city").fill(ordinary.city.label);
   await page.locator("#guide-city").press("Enter");
+  await page.reload();
+  assert.equal(await page.locator("#guide-city").inputValue(),ordinary.city.label);
+  assert.ok(await page.locator(".place-card").count()<=10);
   await page.locator("#guide-search").fill(ordinary.place.name.slice(0,100));
   const ordinaryCard=page.locator("[data-place-id="+JSON.stringify(ordinary.place.id)+"]");
   await ordinaryCard.waitFor({state:"visible"});

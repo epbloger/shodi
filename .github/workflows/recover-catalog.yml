@@ -1,8 +1,5 @@
 name: Recover and verify consolidated catalog
 on:
-  push:
-    branches: [android-v2]
-    paths: ['.github/workflows/recover-catalog.yml', 'scripts/integrate-recovered-descriptions.mjs', 'scripts/integrate-recovered-voyage.mjs']
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,6 +22,12 @@ jobs:
         with:
           ref: android-v2
           fetch-depth: 0
+      - name: Protect the reviewed release snapshot
+        run: |
+          if test -f docs/release-catalog-blobs.txt; then
+            echo 'Release catalog is frozen. Use a separately reviewed snapshot update.'
+            exit 1
+          fi
       - uses: actions/setup-node@v6
         with:
           node-version: 24

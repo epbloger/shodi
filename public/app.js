@@ -121,6 +121,7 @@ function renderRoutes() {
   for (const route of board.routes) {
     const link = clone("route-template");
     link.dataset.id = route.id;
+    link.setAttribute("aria-label", route.name);
     if (!showingGuide && route.id === board.selected) link.setAttribute("aria-current", "true");
     text(link.querySelector(".route-name"), route.name);
     const city = link.querySelector(".route-city");
@@ -177,14 +178,25 @@ function renderStops(route) {
     const icon = PLACE_CATEGORIES[stop.kind]?.icon ?? (stop.kind === "culture" ? "culture" : "pin");
     kind.querySelector("use").setAttribute("href", "#i-" + icon);
     const place = stop.placeId ? placeById(stop.placeId) : null;
-    if (place) {
+    if (place || stop.address || route.city) {
       const address = item.querySelector(".stop-address");
-      text(address, place.address ? "Адрес по каталогу: " + place.address : "");
-      address.hidden = !place.address;
+      const actualAddress = place?.address || stop.address;
+      text(address, actualAddress ? (place?.address ? "Адрес по каталогу: " : "Адрес: ") + actualAddress : "");
+      address.hidden = !actualAddress;
       const map = item.querySelector(".stop-map");
-      map.href = mapLink(place);
+      map.href = mapLink(place ?? {name: stop.name, address: [route.city, stop.address].filter(Boolean).join(" "), city: route.city});
       map.hidden = false;
-      map.setAttribute("aria-label", place.name + " на карте, откроется в новой вкладке");
+      map.setAttribute("aria-label", (place?.name ?? stop.name) + " на карте, откроется в новой вкладке");
+    }
+    if (place?.unavailable) {
+      const warning = item.querySelector(".stop-unavailable");
+      text(warning, place.unavailable.message + " · проверено " + place.unavailable.checked + " · ");
+      const source = document.createElement("a");
+      source.href = place.unavailable.source;
+      source.target = "_blank"; source.rel = "noopener noreferrer";
+      source.textContent = "Источник";
+      warning.append(source);
+      warning.hidden = false;
     }
     const toggle = item.querySelector(".visit-toggle");
     toggle.checked = stop.visited;
@@ -266,6 +278,7 @@ function openEditor(type, existing = null) {
     : (existing ? "Редактировать остановку" : "Новая остановка"));
   byId("city-field").hidden = !editingRoute;
   byId("stop-fields").hidden = editingRoute;
+  byId("stop-address-field").hidden = editingRoute || Boolean(existing?.placeId && placeById(existing.placeId));
   text(byId("note-label"), editingRoute ? "Описание" : "Заметка");
   byId("delete-item").hidden = !existing;
   if (existing) {
@@ -275,6 +288,7 @@ function openEditor(type, existing = null) {
     else {
       fields.kind.value = existing.kind;
       fields.minutes.value = existing.minutes;
+      fields.address.value = existing.address ?? "";
     }
   }
   editor.showModal();
@@ -289,6 +303,7 @@ form.addEventListener("submit", event => {
     const input = {
       name: fields.name.value, note: fields.note.value, city: fields.city.value,
       kind: fields.kind.value, minutes: Number(fields.minutes.value),
+      address: byId("stop-address-field").hidden ? "" : fields.address.value,
     };
     if (type === "route") {
       const details = routeDetails(input);
@@ -310,6 +325,7 @@ form.addEventListener("submit", event => {
     if (itemId && !previous) throw new Error("Остановка уже удалена.");
     if (!itemId && route.stops.length >= MAX_STOPS) throw new Error("Достигнут лимит остановок.");
     const stop = previous ? { ...previous, ...details } : { id: newId(), ...details, visited: false };
+    if (!details.address) delete stop.address;
     editor.close();
     const stops = previous ? route.stops.map(item => item.id === stop.id ? stop : item) : [...route.stops, stop];
     replaceRoute({ ...route, stops }, previous ? "Остановка обновлена." : "Остановка добавлена.");

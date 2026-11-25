@@ -145,3 +145,15 @@ test("verified overrides reach cards, filters, saved-place lookups and map links
   assert.ok(!findPlaces({cityId:"spb",category:"architecture",query:"Baggins Coffee"}).some(p=>p.id===baggins.id));
   assert.equal(placeById("nn-o9c0838acd24a").kind,"architecture");
 });
+
+test("confirmed temporary closures are hidden from recommendations but remain in saved routes",()=>{
+  const available = new Set(findPlaces({cityId:"msk"}).map(p=>p.id));
+  for(const id of ["msk-o36ccf6733e69","msk-o86e7cab7c588"]){
+    const place=placeById(id);
+    assert.ok(place.unavailable?.message);
+    assert.equal(place.unavailable.checked,"2026-11-25");
+    assert.ok(!available.has(id));
+    assert.ok(place.address);
+  }
+  assert.ok(available.has("msk-of1c48e53f60a"));
+});

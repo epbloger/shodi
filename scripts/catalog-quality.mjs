@@ -36,7 +36,7 @@ const missingBrands=[...brandGroups.values()].filter(r=>r.withDescription<r.bran
 await writeFile("docs/priority-content-backlog.json",JSON.stringify({brands:missingBrands,cultural:priority.filter(p=>!p.brand&&!hasUsefulDescription(p)).map(p=>({id:p.id,name:p.name,city:p.city,kind:p.kind,lat:p.lat,lon:p.lon}))},null,2)+"\n");
 const quality={
  revision:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),release:currentCatalog.release,
- catalogPlaces:rows.length,visiblePlaces:places.length,citiesWithPlaces:Object.keys(currentPlaces).length,
+ catalogPlaces:rows.length,retainedPlaces:places.length,visiblePlaces:places.filter(p=>!p.unavailable).length,temporarilyHiddenPlaces:places.filter(p=>p.unavailable).map(p=>({id:p.id,name:p.name,...p.unavailable})),citiesWithPlaces:Object.keys(currentPlaces).length,
  recognizedBrands:distinct.size,verifiedBrandLogos:report.verifiedLogos,missingBrandLogos:distinct.size-report.verifiedLogos,
  brandedPlaces:branded.length,placesWithAvailableBrandLogo:verified.length,brandedPlacesWithoutLogo:branded.length-verified.length,
  cardsDisplayingBundledLogo:logos.length,cardsDisplayingBundledPlacePhoto:photos.length,

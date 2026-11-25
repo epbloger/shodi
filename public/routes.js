@@ -46,7 +46,8 @@ export function stopDetails(fields) {
   if (!Number.isInteger(minutes) || minutes < 0 || minutes > 720) {
     throw new Error("Укажите от 0 до 720 минут.");
   }
-  return { name: text(fields.name, 80, true), note: text(fields.note, 400), kind, minutes };
+  const address = text(fields.address ?? "", 240);
+  return { name: text(fields.name, 80, true), note: text(fields.note, 400), kind, minutes, ...(address ? { address } : {}) };
 }
 
 function records(items, maximum, parse) {

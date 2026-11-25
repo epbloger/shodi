@@ -14,6 +14,7 @@ Recorded 2026-11-25. These are actual prior incidents, not a checklist of hypoth
 | Unproductive scheduled runs | Previous connector used PR-only workflow listing, returned no relevant runs | Use GitHub REST fetch for branches/android-v2, actions/runs?branch=android-v2, actions/runs/{id}/jobs, then fetch_workflow_job_logs and fetch_workflow_run_artifacts. |
 | Integrated catalog could be overwritten during APK compilation | Catalog preparation restored an older baseline artifact even when newer validated manifests were committed | Bind committed catalog inputs to Git blob hashes, bypass remote enrichment/cache restoration for the pinned snapshot, and verify the hashes again after parallel artifact assembly. |
 | Slow full catalog audit | Repeated name normalization inside every nearby-place comparison | Normalize grid entries and the query name once; retain distance and identity conditions and run the existing regression suite. |
+| Native smoke run 45648878095 | After the saved route was reopened, scrolling toward the top could not reveal the actions farther down the mobile page | 444e203 corrects the direction; explicit accessible route names avoid truncated visual titles. Verify the emulator outcome, not just the debug build. |
 
 ## Latest verified data integration
 - HEAD at recording: 94bb37b658da8d499049070e0e5316b4a75fa943.

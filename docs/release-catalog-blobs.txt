@@ -2,7 +2,7 @@
 dad176f3be83f686efcd318b87285bf53a8ac0d1  docs/brand-coverage.json
 54a501b047bdf9b9cc2fdbe88602c358f3da872d  docs/brand-logo-coverage.json
 017cc3d800a81a8aa6f1cb9f00ede6978f4003e6  docs/current-catalog.json
-abd43d1cd88887274813b41adf7f8c11ac3d58e4  docs/photo-coverage.json
+c6c7a17cde0b75e37f14dc193e0d781348951669  docs/photo-coverage.json
 9b1be03dc6156fa87454482063bce997111eb32b  docs/priority-wiki-report.json
 c8bf920ce7e8e5ffa5c31bf431c77b6d2840fe21  docs/release-priority-scope.json
 6d6e43aaaee3de1413d420960ea3cb5d68f0b794  docs/voyage-photo-coverage.json
@@ -12,7 +12,7 @@ c8bf920ce7e8e5ffa5c31bf431c77b6d2840fe21  docs/release-priority-scope.json
 5b30f545f40197d334c1fbb7037c911158280e39  public/data/brand-logos.js
 b772116cc742991504bf97d467023ef788d44844  public/data/current-places.js
 88567fdc7dd687580685d58fc9bffe156cc67560  public/data/place-brands.js
-2687f36bd2b7d476d6e7b799d6e8b31557d37838  public/data/place-photos.js
+d1007de69ac99004a28e72c3f080a2766f924960  public/data/place-photos.js
 6b8c7c0684d0ab956aa7e7891de898b5b4198798  public/data/place-taxonomy.js
 72592f6d6896d45881a2634fa3d24a493579f36d  public/data/voyage-photos.js
 02dcdd8e407e4a4387591ffe978c368a6f7d6a57  public/data/wiki-summaries.js
@@ -24,5 +24,5 @@ e5e27dd5582e4875be51952feaa783390aaf1d95  public/data/osm-photo-links.js
 ba3fc69448a70386678530cb5ca0f7067b26927c  public/data/place-descriptions.js
 02986b75446dfcd6094b0375a74c344fc2397c3e  public/data/places.js
 1e6074d0dd9a331d029d0c94eb1e90d099e0e261  public/data/voyage-places.js
-63b4d150cdf3f93223cf9fae19310383082cc01f  public/catalog-corrections.js
-e46d5c1643648c056346604d1695cbf1320db5c2  public/editorial-guide.js
+4460f4c2fe4df9ada9969b6e849baf51e284f9db  public/catalog-corrections.js
+55f343bae90ac46f1e2512009e6a975605279028  public/editorial-guide.js

@@ -16,7 +16,7 @@ import {validWikiSummary} from "./wiki-summary.js";
 import { russianCities } from "./data/cities.js";
 import { russianPlaces } from "./data/places.js";
 import { currentCatalog, currentPlaces } from "./data/current-places.js";
-import {effectiveRowsForCity,effectivePhotoIdentity} from "./catalog-corrections.js";
+import {effectiveRowsForCity,effectivePhotoIdentity,effectiveAvailability} from "./catalog-corrections.js";
 
 export const PLACE_CATEGORIES = Object.freeze({
   museum: { label: "Музеи", name: "Музей", icon: "culture" },
@@ -219,6 +219,7 @@ export function catalogPlacesForCity(cityId) {
     id, name, kind, area: address || city.label, address, city: city.label,
     description: best?.text ?? catalogSummary({id,kind,address,city:city.label,brand,context:context?.text}), nearbyContext:context?.text, descriptionSource: best?.source, descriptionKind: best?.kind ?? "catalog", descriptionLicense: best?.license, descriptionTitle: best?.title, photo: photoForItem(photoQid) || voyagePhotoFor(id,voyage) || bundledBrandLogo(brand), photoItem: photoQid, brand, osmPhotoLink: osmLink, lat, lon, budget: { type: "unknown" },
     source: currentCatalog.release, status: status ?? "unknown",
+    unavailable: effectiveAvailability([id,name,kind,address,lat,lon]),
     });
   });
   freshCityCache.set(cityId, places);
@@ -235,6 +236,7 @@ export function placeById(id) {
 export function findPlaces({ cityId, category = "all", query = "", legacy = false }) {
   const terms = normalized(query).split(/\s+/).filter(Boolean);
   return (legacy ? placesForCity(cityId) : catalogPlacesForCity(cityId)).filter(place => {
+    if (place.unavailable) return false;
     if (category !== "all" && category !== place.kind) return false;
     if (!terms.length) return true;
     const kind = PLACE_CATEGORIES[place.kind];

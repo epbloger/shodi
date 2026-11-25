@@ -12,7 +12,7 @@ const rawById = new Map(rawRows.map(row => [row[0], row]));
 test("verified corrections match the frozen cultural scope and raw records", () => {
   assert.equal(scope.cultural.length, 652);
   assert.equal(scope.brands.length, 67);
-  assert.equal(catalogCorrections.length, 9);
+  assert.equal(catalogCorrections.length, 13);
   const candidates = new Map(scope.cultural.map(row => [row.id, row]));
   for (const entry of catalogCorrections) {
     const raw = rawById.get(entry.id);

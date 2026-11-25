@@ -339,6 +339,9 @@ dialog textarea { resize: vertical; }
 .scroll-top{position:fixed;bottom:20px;right:16px;z-index:10;width:46px;height:46px;padding:0;border-radius:50%;box-shadow:0 5px 20px #14244b44;}
 .scroll-top .icon{width:22px;height:22px;}
 .scroll-top[hidden],#android-about[hidden],#android-share[hidden]{display:none!important;}
+.stop-unavailable { color:#a33d33; font-size:.84rem; overflow-wrap:anywhere; }
+[data-theme="dark"] .stop-unavailable { color:#ffb4a7; }
+.stop-address { overflow-wrap:anywhere; }
 
 @media (max-width:760px) {
   .button { min-height:44px; }

@@ -3,6 +3,32 @@
 // may have fixed the record independently or changed its identity.
 const entries = [
   {
+    id: "msk-o06c85a92a42b", cityId: "msk",
+    before: ["им. ВЛ. МАЯКОВСКОГО МОСКОВСКИЙ АКАДЕМИЧЕСКИЙ ТЕАТР ФИЛИАЛ", "theater", "Москва, Пушкарёв переулок 21", 55.769032, 37.630894],
+    after: { address: "Москва, Пушкарёв переулок 21/24" },
+    sources: ["https://www.mayakovsky.ru/about/contacts/"],
+  },
+  {
+    id: "msk-o061c6a7fb6f9", cityId: "msk",
+    before: ["ГБУК города Москвы «Государственный выставочный зал «Замоскворечье»", "gallery", "Москва, улица Серпуховский Вал 24", 55.71257, 37.610207],
+    after: { address: "Москва, улица Серпуховский Вал 24, корпус 2" },
+    sources: ["https://www.culture.ru/institutes/24752/galereya-na-shabolovke", "https://artzamoskvorechye.nethouse.ru/"],
+  },
+  {
+    id: "msk-o36ccf6733e69", cityId: "msk",
+    before: ["Московский Государственный музей С.А. Есенина Есенин-центр", "museum", "Москва, Клязьминская улица 21А", 55.893303, 37.529034],
+    after: { address: "Москва, Клязьминская улица 21, корпус 2" },
+    unavailable: "Временно закрыт по техническим причинам",
+    sources: ["https://esenin-sergei.ru/contacts"],
+  },
+  {
+    id: "msk-of1c48e53f60a", cityId: "msk",
+    before: ["Храм Преподобных Зосимы и Савватия Соловецких в Гольяново", "architecture", "Москва, Байкальская улица 37А", 55.818333, 37.814163],
+    after: { address: "Москва, Байкальская улица, 37А" },
+    photoQid: "Q4501156", photoFile: "Church of Venerable Sosima and Savvatiy in Goliyanovo 30.jpg",
+    sources: ["https://sprav.moseparh.ru/org/1348", "https://www.wikidata.org/wiki/Q4501156", "https://commons.wikimedia.org/wiki/File:Church_of_Venerable_Sosima_and_Savvatiy_in_Goliyanovo_30.jpg"],
+  },
+  {
     id: "kzn-oeb16ffdc1b10", cityId: "kzn",
     before: ["Казанский татарский государственный театр юного зрителя им. Г. Кариева", "theater", "Республика Татарстан, Казань, улица Гладилова 49", 55.808907, 49.068401],
     after: { address: "Республика Татарстан, Казань, Петербургская улица 55Б", lat: 55.7807, lon: 49.1367 },
@@ -25,6 +51,7 @@ const entries = [
     id: "msk-o86e7cab7c588", cityId: "msk",
     before: ["Московский Государственный Музей Дом Бурганова", "museum", "Москва, Большой Афанасьевский переулок 15 стр 1", 55.746811, 37.596676],
     after: { address: "Москва, Большой Афанасьевский переулок 15, стр. 9", lat: 55.7465386, lon: 37.5971869 },
+    unavailable: "Закрыт на капитальный ремонт",
     sources: ["https://burganov.ru/kontakty/", "https://www.tourister.ru/world/europe/russia/city/moscow/museum/12608"],
   },
   {
@@ -99,4 +126,14 @@ export function effectivePhotoIdentity(row) {
   const expected=effectiveRow([entry.id,...entry.before]);
   if(!expected.slice(0,6).every((value,index)=>row[index]===value))return null;
   return {qid:entry.photoQid,file:entry.photoFile};
+}
+
+// Temporary closure notices are a separately dated editorial decision. Preserve
+// IDs and saved-route lookup; suppress recommendations until reviewed again.
+export function effectiveAvailability(row) {
+  const entry=byId.get(row?.[0]);
+  if(!entry?.unavailable)return null;
+  const expected=effectiveRow([entry.id,...entry.before]);
+  if(!expected.slice(0,6).every((value,index)=>row[index]===value))return null;
+  return {message:entry.unavailable,source:entry.sources[0],checked:"2026-11-25"};
 }

@@ -6,9 +6,9 @@
   "brandCardsWithoutDescription": 0,
   "brandsWithoutLogo": 60,
   "culturalCandidates": 652,
-  "culturalWithoutDescription": 296,
-  "culturalWithoutSubstantive": 308,
-  "culturalWithoutPhoto": 413,
+  "culturalWithoutDescription": 287,
+  "culturalWithoutSubstantive": 299,
+  "culturalWithoutPhoto": 412,
   "groups": [
     {
       "key": "Q3442874",
@@ -1207,9 +1207,9 @@
       ],
       "city": "Москва",
       "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {
@@ -1447,11 +1447,11 @@
         "landmark-name"
       ],
       "city": "Москва",
-      "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
-      "photo": false
+      "corrected": true,
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
+      "photo": true
     },
     {
       "id": "msk-o0c0ab46fd153",
@@ -1512,9 +1512,9 @@
       ],
       "city": "Москва",
       "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {
@@ -1559,10 +1559,10 @@
         "public-institution-name"
       ],
       "city": "Москва",
-      "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "corrected": true,
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {
@@ -1593,9 +1593,9 @@
       ],
       "city": "Москва",
       "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {
@@ -1608,10 +1608,10 @@
         "public-institution-name"
       ],
       "city": "Москва",
-      "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "corrected": true,
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {
@@ -1625,9 +1625,9 @@
       ],
       "city": "Москва",
       "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {
@@ -1769,6 +1769,11 @@
       ],
       "city": "Москва",
       "corrected": true,
+      "unavailable": {
+        "message": "Закрыт на капитальный ремонт",
+        "source": "https://burganov.ru/kontakty/",
+        "checked": "2026-11-25"
+      },
       "description": true,
       "substantive": true,
       "descriptionKind": "editorial-place",
@@ -1832,7 +1837,12 @@
         "public-institution-name"
       ],
       "city": "Москва",
-      "corrected": false,
+      "corrected": true,
+      "unavailable": {
+        "message": "Временно закрыт по техническим причинам",
+        "source": "https://esenin-sergei.ru/contacts",
+        "checked": "2026-11-25"
+      },
       "description": false,
       "substantive": false,
       "descriptionKind": "catalog",
@@ -1913,9 +1923,9 @@
       ],
       "city": "Москва",
       "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {
@@ -2025,9 +2035,9 @@
       ],
       "city": "Москва",
       "corrected": false,
-      "description": false,
-      "substantive": false,
-      "descriptionKind": "catalog",
+      "description": true,
+      "substantive": true,
+      "descriptionKind": "editorial-place",
       "photo": false
     },
     {

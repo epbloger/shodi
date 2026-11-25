@@ -9,6 +9,7 @@ const byId = id => document.getElementById(id);
 const countLabel = new Intl.PluralRules("ru");
 const mobile = window.matchMedia("(max-width: 760px)");
 const pageSize = () => mobile.matches ? 10 : 36;
+const CITY_KEY = "shodi/city/v1";
 
 export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   const cityInput = byId("guide-city");
@@ -22,6 +23,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
   const cityHelp = byId("city-help");
   const options = byId("city-options");
   let city = cityById("spb");
+  try { city = cityById(localStorage.getItem(CITY_KEY)) ?? city; } catch {}
   let category = "all";
   let selectedTarget;
   let visibleLimit = pageSize();
@@ -75,10 +77,11 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     }
     const photoVersion = photoRenderVersion;
     if(!photoObserver && location.origin === "https://appassets.androidplatform.net") {
-      photoObserver = new IntersectionObserver(entries => {
+      photoObserver = new IntersectionObserver((entries, observer) => {
+        if(observer!==photoObserver)return;
         for(const entry of entries) {
           if(!entry.isIntersecting)continue;
-          photoObserver.unobserve(entry.target);
+          observer.unobserve(entry.target);
           const task=photoTasks.get(entry.target);photoTasks.delete(entry.target);
           task?.();
         }
@@ -240,6 +243,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     cityHelp.hidden = true;
     if (chosen.id === city.id) return;
     city = chosen;
+    try { localStorage.setItem(CITY_KEY, city.id); } catch {}
     selectedTarget = undefined;
     resetSearch();
   }
@@ -269,7 +273,7 @@ export function mountGuide({ getRoutes, selectedRoute, addPlace, openRoute }) {
     resetSearch();
     search.focus();
   });
-  mobile.addEventListener('change', () => { visibleLimit = pageSize(); render(); });
+  mobile.addEventListener('change', () => { visibleLimit = Math.max(visibleLimit,pageSize()); render(); });
   window.addEventListener("online",()=>render());
   return render;
 }
