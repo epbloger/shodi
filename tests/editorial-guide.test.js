@@ -25,3 +25,12 @@ test("additional researched brands have distinct history and exact identity",()=
  assert.match(editorialGuide({kind:"food",brand:{name:"IL Patio"}}).text,/1993/);
  assert.equal(editorialGuide({kind:"museum",brand:{name:"Шоколадница"}}),null);
 });
+
+test("known source-backed chain aliases and significant landmarks receive matching editorial text",()=>{
+ assert.match(editorialGuide({kind:"food",brand:{name:"Papa John's Pizza"}}).text,/1984/);
+ assert.match(editorialGuide({kind:"coffee",brand:{name:"Шоколадница Казань"}}).text,/1964/);
+ assert.match(editorialGuide({kind:"coffee",brand:{name:"Cofix Россия"}}).text,/2016/);
+ assert.match(editorialGuide({kind:"food",brand:{name:"ТаширПицца"}}).text,/1999/);
+ assert.match(editorialGuide({kind:"museum",name:"Музей космонавтики в Калуге",lat:54.516949,lon:36.230686}).text,/1967/);
+ assert.equal(editorialGuide({kind:"museum",name:"Музей космонавтики в Калуге",lat:55.75,lon:37.62}),null);
+});

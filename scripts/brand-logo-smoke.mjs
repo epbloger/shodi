@@ -4,6 +4,7 @@ import {chromium} from "playwright";
 import {cities,catalogPlacesForCity} from "../public/guide.js";
 import {brandLogos} from "../public/data/brand-logos.js";
 import {placePhotos} from "../public/data/place-photos.js";
+import {voyagePhotos} from "../public/data/voyage-photos.js";
 const html=await readFile("dist/shodi.html","utf8");
 const report=JSON.parse(await readFile("docs/brand-logo-coverage.json","utf8"));
 assert.ok(report.verifiedLogos>0);
@@ -19,7 +20,7 @@ try{
  await context.route("**/*",route=>route.request().url()==="https://appassets.androidplatform.net/assets/index.html"?route.fulfill({contentType:"text/html",body:html}):route.abort());
  const page=await context.newPage();
  // Decode every bundled raster, including images not represented in the UI sample.
- const allImages=[...Object.entries(brandLogos).map(([key,p])=>({key:"brand:"+key,data:p.data})),...Object.entries(placePhotos).map(([key,p])=>({key:"photo:"+key,data:p.data}))];
+ const allImages=[...Object.entries(brandLogos).map(([key,p])=>({key:"brand:"+key,data:p.data})),...Object.entries(placePhotos).map(([key,p])=>({key:"photo:"+key,data:p.data})),...Object.entries(voyagePhotos).map(([key,p])=>({key:"voyage:"+key,data:p.data}))];
  for(let i=0;i<allImages.length;i+=20){
   const failures=await page.evaluate(async batch=>Promise.all(batch.map(async ({key,data})=>{
    try{const img=new Image();img.src=data;await img.decode();return img.naturalWidth>0&&img.naturalHeight>0?null:key;}

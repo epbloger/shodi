@@ -8,6 +8,7 @@ import {createNearbyContext} from "./catalog-context.js";
 import { wikiSummaryForPlace } from "./wiki-summary.js";
 import { editorialGuide } from "./editorial-guide.js";
 import {voyagePlace} from "./voyage-places.js";
+import {voyagePhotoFor} from "./voyage-photos.js";
 import {archiveForPlace} from "./archive-context.js";
 import {brandArticleFor} from "./brand-articles.js";
 import {wikiSummaries} from "./data/wiki-summaries.js";
@@ -214,7 +215,7 @@ export function catalogPlacesForCity(cityId) {
     const best=editorial?.kind==="editorial-place"?editorial:voyage??(wiki?.kind==="wikipedia-place"?wiki:osmDesc??(details?{...details,kind:"wikidata"}:editorial??wiki??brandArticleFor(brand,kind)??archive));
     return ({
     id, name, kind, area: address || city.label, address, city: city.label,
-    description: best?.text ?? catalogSummary({id,kind,address,city:city.label,brand,context:context?.text}), nearbyContext:context?.text, descriptionSource: best?.source, descriptionKind: best?.kind ?? "catalog", descriptionLicense: best?.license, descriptionTitle: best?.title, photo: photoForItem(photoQid) || bundledBrandLogo(brand), photoItem: photoQid, brand, osmPhotoLink: osmLink, lat, lon, budget: { type: "unknown" },
+    description: best?.text ?? catalogSummary({id,kind,address,city:city.label,brand,context:context?.text}), nearbyContext:context?.text, descriptionSource: best?.source, descriptionKind: best?.kind ?? "catalog", descriptionLicense: best?.license, descriptionTitle: best?.title, photo: photoForItem(photoQid) || voyagePhotoFor(id,voyage) || bundledBrandLogo(brand), photoItem: photoQid, brand, osmPhotoLink: osmLink, lat, lon, budget: { type: "unknown" },
     source: currentCatalog.release, status: status ?? "unknown",
     });
   });

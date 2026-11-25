@@ -304,6 +304,8 @@ jobs:
         run: |
           node --check scripts/import-place-photos.mjs
           node scripts/import-place-photos.mjs
+          node --check scripts/import-voyage-photos.mjs
+          node scripts/import-voyage-photos.mjs
       - name: Save verified place photo progress
         uses: actions/cache/save@v4
         with:
@@ -317,6 +319,8 @@ jobs:
           path: |
             public/data/place-photos.js
             docs/photo-coverage.json
+            public/data/voyage-photos.js
+            docs/voyage-photo-coverage.json
           if-no-files-found: error
           retention-days: 7
   test:
@@ -382,6 +386,8 @@ jobs:
             docs/catalog-quality.json
             public/data/place-photos.js
             docs/photo-coverage.json
+            public/data/voyage-photos.js
+            docs/voyage-photo-coverage.json
             docs/priority-content-backlog.json
             public/data/brand-articles.js
             docs/brand-article-coverage.json
