@@ -4,6 +4,7 @@ import {osmFactsForPlace,osmFactDescription,osmFactPhotoLink} from "./osm-place-
 import { photoForItem } from "./photos.js";
 import { descriptionForPlace } from "./descriptions.js";
 import { catalogSummary } from "./catalog-summary.js";
+import {createNearbyContext} from "./catalog-context.js";
 import { wikiSummaryForPlace } from "./wiki-summary.js";
 import { editorialGuide } from "./editorial-guide.js";
 import { russianCities } from "./data/cities.js";
@@ -191,6 +192,7 @@ export function catalogPlacesForCity(cityId) {
   if (!city) return [];
   if (!catalogSource(cityId)) return [];
   if (freshCityCache.has(cityId)) return freshCityCache.get(cityId);
+  const nearby=createNearbyContext(currentPlaces[cityId]);
   const places = currentPlaces[cityId].filter(row => !row[6] || ["open", "unknown"].includes(row[6])).map(([id, name, kind, address, lat, lon, status]) => {
     const details = descriptionForPlace(name, lat, lon);
     const brand=brandForPlace(id,name,kind);
@@ -199,10 +201,11 @@ export function catalogPlacesForCity(cityId) {
     const osmDesc=osmFactDescription(facts,kind);
     const wiki=wikiSummaryForPlace(id,details??(osmLink?.qid?{qid:osmLink.qid}:null),brand);
     const editorial=editorialGuide({name,kind,lat,lon,brand});
+    const context=nearby([id,name,kind,address,lat,lon,status]);
     const best=editorial?.kind==="editorial-place"?editorial:wiki?.kind==="wikipedia-place"?wiki:osmDesc??(details?{...details,kind:"wikidata"}:editorial??wiki);
     return ({
     id, name, kind, area: address || city.label, address, city: city.label,
-    description: best?.text ?? catalogSummary({id,kind,address,city:city.label,brand}), descriptionSource: best?.source, descriptionKind: best?.kind ?? "catalog", descriptionLicense: best?.license, descriptionTitle: best?.title, photo: photoForItem(details?.qid??osmLink?.qid) || bundledBrandLogo(brand), photoItem: details?.qid??osmLink?.qid, brand, osmPhotoLink: osmLink, lat, lon, budget: { type: "unknown" },
+    description: best?.text ?? catalogSummary({id,kind,address,city:city.label,brand,context:context?.text}), nearbyContext:context?.text, descriptionSource: best?.source, descriptionKind: best?.kind ?? "catalog", descriptionLicense: best?.license, descriptionTitle: best?.title, photo: photoForItem(details?.qid??osmLink?.qid) || bundledBrandLogo(brand), photoItem: details?.qid??osmLink?.qid, brand, osmPhotoLink: osmLink, lat, lon, budget: { type: "unknown" },
     source: currentCatalog.release, status: status ?? "unknown",
     });
   });

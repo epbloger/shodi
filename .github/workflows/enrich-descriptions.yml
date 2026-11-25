@@ -2,7 +2,7 @@ name: Enrich place descriptions
 on:
   push:
     branches: [android-v2]
-    paths: ['scripts/enrich-descriptions.mjs', 'scripts/import-place-photos.mjs', 'scripts/photo-import-policy.mjs', 'scripts/catalog-match-helpers.mjs', 'public/data/osm-photo-links.js', '.github/workflows/enrich-descriptions.yml']
+    paths: ['scripts/enrich-descriptions.mjs', 'scripts/import-place-photos.mjs', 'scripts/photo-import-policy.mjs', 'scripts/catalog-match-helpers.mjs', 'public/data/osm-photo-links.js', 'public/data/osm-place-facts.js', '.github/workflows/enrich-descriptions.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -108,7 +108,7 @@ jobs:
       - name: Validate and integrate only catalog data
         id: commit
         run: |
-          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js public/data/place-descriptions.js public/data/imported-descriptions.js public/data/place-photos.js public/photos.js public/commons-thumbnail.js scripts/enrich-descriptions.mjs scripts/import-place-photos.mjs scripts/photo-import-policy.mjs scripts/catalog-match-helpers.mjs public/data/osm-photo-links.js
+          git diff --quiet "$GITHUB_SHA" HEAD -- public/data/current-places.js public/data/place-descriptions.js public/data/imported-descriptions.js public/data/place-photos.js public/photos.js public/commons-thumbnail.js scripts/enrich-descriptions.mjs scripts/import-place-photos.mjs scripts/photo-import-policy.mjs scripts/catalog-match-helpers.mjs public/data/osm-photo-links.js public/data/osm-place-facts.js public/osm-place-facts.js
           node --input-type=module <<'JS'
           import {readFile,writeFile} from "node:fs/promises";
           import {validatePhoto} from "./public/photos.js";

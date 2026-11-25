@@ -4,6 +4,7 @@ import {currentPlaces} from "../public/data/current-places.js";
 import {descriptionForPlace} from "../public/descriptions.js";
 import {brandForPlace} from "../public/brands.js";
 import {osmFactsForPlace,osmFactPhotoLink} from "../public/osm-place-facts.js";
+import {osmPhotoLink} from "../public/osm-photo-links.js";
 import {validWikiSummary,exactNearbyArticle,wikipediaTextLicense} from "../public/wiki-summary.js";
 import {wikiSummaries as previous} from "../public/data/wiki-summaries.js";
 const deadline=Date.now()+7*60000,pause=ms=>new Promise(r=>setTimeout(r,ms));
@@ -21,7 +22,7 @@ async function api(host,params){
 const ids=new Map(),places=new Map(),out={};
 for(const [id,name,kind,,lat,lon,status] of Object.values(currentPlaces).flat()){
  if(status&&!["open","unknown"].includes(status))continue;
- const details=descriptionForPlace(name,lat,lon)??osmFactPhotoLink(osmFactsForPlace({id,name,kind,lat,lon})),brand=brandForPlace(id,name,kind);
+ const details=descriptionForPlace(name,lat,lon)??osmPhotoLink(id)??osmFactPhotoLink(osmFactsForPlace({id,name,kind,lat,lon})),brand=brandForPlace(id,name,kind);
  if(details?.qid)ids.set(details.qid,details.qid);
  if(brand?.qid)ids.set("brand:"+brand.qid,brand.qid);
  places.set(id,{id,name,kind,lat,lon,qid:details?.qid});

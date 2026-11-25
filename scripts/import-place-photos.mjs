@@ -5,6 +5,8 @@ import {placePhotos as previous} from "../public/data/place-photos.js";
 import {validatePhoto,unrestrictedPhotoLicense} from "../public/photos.js";
 import {currentPlaces} from "../public/data/current-places.js";
 import {descriptionForPlace} from "../public/descriptions.js";
+import {osmPhotoLink} from "../public/osm-photo-links.js";
+import {osmFactsForPlace,osmFactPhotoLink} from "../public/osm-place-facts.js";
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
 const ua="SHODI/2.0 catalog (https://github.com/epbloger/shodi; helpmoorkis@yandex.ru)";
 async function get(url,json=true){
@@ -32,8 +34,15 @@ async function get(url,json=true){
   return {data:"data:"+type+";base64,"+b.toString("base64"),bytes:b.length};
 }
 const catalog = Object.values(currentPlaces).flat().filter(r => !r[6] || ["open","unknown"].includes(r[6]));
-const placeIds = catalog.map(r => descriptionForPlace(r[1],r[4],r[5])?.qid ?? null);
-const qids = [...new Set(placeIds.filter(Boolean))];
+const filesByQid=new Map();
+const placeIds=catalog.map(([id,name,kind,,lat,lon])=>{
+ const details=descriptionForPlace(name,lat,lon);
+ const link=osmPhotoLink(id)??osmFactPhotoLink(osmFactsForPlace({id,name,kind,lat,lon}));
+ const qid=details?.qid??link?.qid??null;
+ if(qid&&link?.qid===qid&&link.files?.length&&!filesByQid.has(qid))filesByQid.set(qid,link.files[0]);
+ return qid;
+});
+const qids = [...new Set([...filesByQid.keys(),...placeIds.filter(Boolean)])];
 const out={};let bytes=0;
 for(const qid of qids){
  const p=previous[qid],size=photoBytes(p);
@@ -48,7 +57,7 @@ for(let i=0;i<qids.length&&Object.keys(out).length<PHOTO_LIMIT&&bytes<PHOTO_BYTE
   for(const qid of ids){
     if(Object.keys(out).length>=PHOTO_LIMIT||bytes>=PHOTO_BYTES_LIMIT||attempts>=300)break;
     const claims=entities?.[qid]?.claims?.P18||[];
-    const filename=claims.filter(c=>c.rank!=="deprecated").sort((a,b)=>Number(b.rank==="preferred")-Number(a.rank==="preferred"))[0]?.mainsnak?.datavalue?.value;
+    const filename=filesByQid.get(qid)??claims.filter(c=>c.rank!=="deprecated").sort((a,b)=>Number(b.rank==="preferred")-Number(a.rank==="preferred"))[0]?.mainsnak?.datavalue?.value;
     if(typeof filename!=="string"||!/\.(jpe?g|png)$/i.test(filename))continue;
     attempts++;
     try{

@@ -39,10 +39,12 @@ export function specificType(kind,tokens=[]){
 export function hasSpecificType(id,kind){
  return Boolean(specificType(kind,Object.hasOwn(placeTaxonomy,id)?placeTaxonomy[id]:[]));
 }
-export function catalogSummary({id,kind,address,city,brand,tokens}){
+export function catalogSummary({id,kind,address,city,brand,tokens,context}){
  const subtype=specificType(kind,tokens??(Object.hasOwn(placeTaxonomy,id)?placeTaxonomy[id]:[]));
  const type=subtype??(Object.hasOwn(types,kind)?types[kind]:"Место из каталога");
  const location=clean(address)||clean(city), name=clean(brand?.name);
- const text=type+"."+(name?" Бренд — «"+name+"».":"")+(location?" Адрес: "+location+".":"");
+ const base=type+"."+(name?" Бренд — «"+name+"».":"");
+ const useful=clean(context);
+ const text=useful&&base.length+useful.length+1<=360?base+" "+useful:base+(location?" Адрес: "+location+".":"");
  return text.length<=360?text:text.slice(0,357).trimEnd()+"…";
 }

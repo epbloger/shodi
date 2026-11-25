@@ -156,9 +156,24 @@ jobs:
           path: |
             public/data/wiki-summaries.js
             docs/wiki-summary-coverage.json
-          key: shodi-wiki-v1-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'scripts/import-wiki-summaries.mjs', 'public/wiki-summary.js') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: shodi-wiki-v2-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'public/wiki-summary.js') }}-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
-            shodi-wiki-v1-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'scripts/import-wiki-summaries.mjs', 'public/wiki-summary.js') }}-
+            shodi-wiki-v2-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'public/wiki-summary.js') }}-
+      - name: Recover previously verified article data before importing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -eu
+          test "$(git rev-parse HEAD:public/data/current-places.js)" = b772116cc742991504bf97d467023ef788d44844 || exit 0
+          dirs=()
+          for run in 45551541614 45551209831 45550723512 45484239544; do
+            dir="$RUNNER_TEMP/wiki-$run"
+            if gh run download "$run" --repo "$GITHUB_REPOSITORY" --name shodi-brand-coverage --dir "$dir" && test -s "$dir/public/data/wiki-summaries.js" && test -s "$dir/docs/wiki-summary-coverage.json" && test -s "$dir/public/data/place-brands.js"; then
+              dirs+=("$dir")
+            fi
+          done
+          node scripts/recover-wiki-progress.mjs "${dirs[@]}"
       - name: Import licensed Wikipedia descriptions
         run: node scripts/import-wiki-summaries.mjs
       - name: Save Wikipedia progress
