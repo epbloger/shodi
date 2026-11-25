@@ -16,6 +16,7 @@ import {validWikiSummary} from "./wiki-summary.js";
 import { russianCities } from "./data/cities.js";
 import { russianPlaces } from "./data/places.js";
 import { currentCatalog, currentPlaces } from "./data/current-places.js";
+import {effectiveRowsForCity,effectivePhotoIdentity} from "./catalog-corrections.js";
 
 export const PLACE_CATEGORIES = Object.freeze({
   museum: { label: "Музеи", name: "Музей", icon: "culture" },
@@ -198,8 +199,9 @@ export function catalogPlacesForCity(cityId) {
   if (!city) return [];
   if (!catalogSource(cityId)) return [];
   if (freshCityCache.has(cityId)) return freshCityCache.get(cityId);
-  const nearby=createNearbyContext(currentPlaces[cityId]);
-  const places = currentPlaces[cityId].filter(row => !row[6] || ["open", "unknown"].includes(row[6])).map(([id, name, kind, address, lat, lon, status]) => {
+  const rows=effectiveRowsForCity(currentPlaces,cityId);
+  const nearby=createNearbyContext(rows);
+  const places = rows.filter(row => !row[6] || ["open", "unknown"].includes(row[6])).map(([id, name, kind, address, lat, lon, status]) => {
     const details = descriptionForPlace(name, lat, lon);
     const brand=brandForPlace(id,name,kind);
     const facts=osmFactsForPlace({id,name,kind,lat,lon});
@@ -211,7 +213,7 @@ export function catalogPlacesForCity(cityId) {
     const voyage=voyagePlace({id,name,kind,lat,lon});
     const archive=archiveForPlace(id);
     const directWiki=wikiSummaries[id];
-    const photoQid=details?.qid??osmLink?.qid??(validWikiSummary(directWiki)?directWiki.qid:null);
+    const photoQid=effectivePhotoIdentity([id,name,kind,address,lat,lon])?.qid??details?.qid??osmLink?.qid??(validWikiSummary(directWiki)?directWiki.qid:null);
     const best=editorial?.kind==="editorial-place"?editorial:voyage??(wiki?.kind==="wikipedia-place"?wiki:osmDesc??(details?{...details,kind:"wikidata"}:editorial??wiki??brandArticleFor(brand,kind)??archive));
     return ({
     id, name, kind, area: address || city.label, address, city: city.label,

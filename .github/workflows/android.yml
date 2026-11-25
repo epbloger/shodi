@@ -49,6 +49,12 @@ jobs:
           set -eu
           echo "reused=false" >> "$GITHUB_OUTPUT"
           test "$(git rev-parse HEAD:public/data/current-places.js)" = b772116cc742991504bf97d467023ef788d44844 || exit 1
+          if test -f docs/release-catalog-blobs.txt; then
+            node scripts/verify-release-catalog.mjs
+            git rev-parse HEAD > docs/release-baseline-restored.txt
+            echo "reused=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           seed="$(mktemp -d)"
           trap 'rm -rf "$seed"' EXIT
           if gh run download 45569279535 --repo "$GITHUB_REPOSITORY" --name shodi-brand-coverage --dir "$seed" && (cd "$seed" && sha256sum --check --strict "$GITHUB_WORKSPACE/docs/release-baseline-sha256.txt"); then
@@ -220,10 +226,12 @@ jobs:
           restore-keys: |
             shodi-brand-logos-v2-${{ hashFiles('public/data/current-places.js', 'public/data/place-brands.js', 'public/brands.js', 'public/photos.js') }}-
       - name: Verify and bundle licensed brand logo thumbnails
+        if: hashFiles('docs/release-catalog-blobs.txt') == ''
         run: |
           node --check scripts/import-brand-logos.mjs
           node scripts/import-brand-logos.mjs
-          node scripts/validate-brand-data.mjs --logos
+      - name: Validate licensed brand logo thumbnails
+        run: node scripts/validate-brand-data.mjs --logos
       - name: Save verified logo progress before compilation
         if: hashFiles('docs/release-baseline-restored.txt') == ''
         uses: actions/cache/save@v4
@@ -260,6 +268,7 @@ jobs:
           name: shodi-catalog-inputs
           path: .
       - name: Enrich only the frozen priority cultural candidates
+        if: hashFiles('docs/release-catalog-blobs.txt') == ''
         run: |
           node --check scripts/import-priority-wiki.mjs
           node --test tests/priority-identity.test.js
@@ -331,6 +340,7 @@ jobs:
           restore-keys: |
             shodi-place-photos-v3-${{ hashFiles('public/data/current-places.js', 'public/data/place-photos.js') }}-
       - name: Import licensed photographs of significant places
+        if: hashFiles('docs/release-catalog-blobs.txt') == ''
         run: |
           node --check scripts/import-place-photos.mjs
           node scripts/import-place-photos.mjs
@@ -399,7 +409,11 @@ jobs:
           name: shodi-parallel-photos
           path: .
       - name: Fetch photos only for newly matched encyclopedia identities
+        if: hashFiles('docs/release-catalog-blobs.txt') == ''
         run: node scripts/import-place-photos.mjs --new-identities-only
+      - name: Verify final catalog is identical to the committed snapshot
+        if: hashFiles('docs/release-catalog-blobs.txt') != ''
+        run: node scripts/verify-release-catalog.mjs
       - name: Validate merged catalog assets
         run: |
           node scripts/validate-brand-data.mjs --logos

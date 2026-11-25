@@ -1,0 +1,4338 @@
+{
+  "totalBrands": 607,
+  "brandedPlaces": 7356,
+  "verifiedLogos": 13,
+  "coveredPlaces": 3552,
+  "statusCounts": {
+    "retained": 13,
+    "no-logo-claim": 481,
+    "ambiguous-brand": 75,
+    "no-verified-logo-claim": 38
+  },
+  "directChecked": 0,
+  "directCandidates": 0,
+  "categoryChecked": 0,
+  "officialChecked": 22,
+  "errors": [],
+  "brands": [
+    {
+      "key": "Q177054",
+      "name": "Burger King",
+      "branches": 948,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:10:22.917Z",
+      "source": "https://commons.wikimedia.org/wiki/File:Burger_King_2020.svg"
+    },
+    {
+      "key": "name:французский пекарь",
+      "name": "Французский Пекарь",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:республика",
+      "name": "Республика",
+      "branches": 14,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:si ristorante brest liberté",
+      "name": "SI Ristorante Brest Liberté",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:интернет магазин fast anime",
+      "name": "Интернет-магазин \"Fast Anime\"",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:papa carlo",
+      "name": "Papa Carlo",
+      "branches": 2,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z",
+      "directAttemptAt": "2026-11-24T20:22:07.982Z"
+    },
+    {
+      "key": "name:fun jump",
+      "name": "Fun Jump",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:newton, парк научных развлечений",
+      "name": "Newton, парк научных развлечений",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "Q524757",
+      "name": "KFC",
+      "branches": 340,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:10:22.917Z",
+      "source": "https://commons.wikimedia.org/wiki/File:KFC_logo_wordmark.svg"
+    },
+    {
+      "key": "name:chai&coffee",
+      "name": "Chai&Coffee",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:bricobilandia",
+      "name": "Bricobilandia",
+      "branches": 33,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:monk restaurant",
+      "name": "Monk Restaurant",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:своя компания",
+      "name": "Своя Компания",
+      "branches": 36,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:engels coffee",
+      "name": "Engels Coffee",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:тануки",
+      "name": "ТАНУКИ",
+      "branches": 76,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:дуть особое пространство",
+      "name": "Дуть - особое пространство",
+      "branches": 13,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:злата печка",
+      "name": "Злата Печка",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:шоколадница казань",
+      "name": "Шоколадница Казань",
+      "branches": 105,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:chicko",
+      "name": "Chicko",
+      "branches": 25,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:le grand café teatinos",
+      "name": "Le Grand Café Teatinos",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:япона мама, япона pub, мама азия",
+      "name": "Япона Мама, Япона Pub, Мама Азия",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:il патио",
+      "name": "IL Патио",
+      "branches": 31,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:пекара by пе́трович. печем с доставкой",
+      "name": "Пекара by Пе́трович. Печем с доставкой",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:не торты, а торты екатеринбург",
+      "name": "Не торты, а торты Екатеринбург",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:starbucks",
+      "name": "Starbucks",
+      "branches": 102,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "Q55662627",
+      "name": "Coffee Like",
+      "branches": 799,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:43.830Z",
+      "directAttemptAt": "2026-11-24T20:21:30.698Z"
+    },
+    {
+      "key": "name:проворный бариста",
+      "name": "Проворный бариста",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:subway",
+      "name": "Subway",
+      "branches": 31,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:coffeefox",
+      "name": "CoffeeFox",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "Q112406961",
+      "name": "Вкусно — и точка",
+      "branches": 890,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:10:22.917Z",
+      "source": "https://commons.wikimedia.org/wiki/File:Vkusno_I_Tochka_symbol.svg"
+    },
+    {
+      "key": "Q3442874",
+      "name": "Rostic's",
+      "branches": 1292,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:10:22.917Z",
+      "source": "https://commons.wikimedia.org/wiki/File:%D0%A2%D0%B5%D0%BA%D1%81%D1%82%D0%BE%D0%B2%D0%BE%D0%B9_%D0%BB%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF_%D1%81%D0%B5%D1%82%D0%B8_Rostic's.svg"
+    },
+    {
+      "key": "name:пицца сан",
+      "name": "Пицца Сан",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:grillhouse грили & барбекю",
+      "name": "GrillHouse - грили & барбекю",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:skuratov coffee",
+      "name": "Skuratov Coffee",
+      "branches": 48,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:fitness house prestige",
+      "name": "Fitness House Prestige",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:ресторан быстрого питания тюбетей",
+      "name": "Ресторан быстрого питания Тюбетей",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:the coffee bean & tea leaf (philippines)",
+      "name": "The Coffee Bean & Tea Leaf (Philippines)",
+      "branches": 12,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:чайхона 1",
+      "name": "Чайхона 1",
+      "branches": 42,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:кинотеатр караоке смотри и пой казань",
+      "name": "Кинотеатр Караоке \"Смотри и пой\" Казань",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:beanhearts coffee, бинхартс кофе",
+      "name": "Beanhearts Coffee, Бинхартс Кофе",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:шоколадница казань доставка",
+      "name": "Шоколадница Казань Доставка",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:кафе алан аш",
+      "name": "Кафе Алан Аш",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:окинава",
+      "name": "Окинава",
+      "branches": 8,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:урюк",
+      "name": "УРЮК",
+      "branches": 10,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:papa john's pizza",
+      "name": "Papa John's Pizza",
+      "branches": 56,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:10:29.641Z",
+      "source": "https://commons.wikimedia.org/wiki/File:Papa_Johns_logo.svg"
+    },
+    {
+      "key": "name:кафе татарской кухни azu",
+      "name": "Кафе татарской кухни AZU",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:cho фобошница",
+      "name": "CHO Фобошница",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:pizza hut",
+      "name": "Pizza Hut",
+      "branches": 29,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:shampur_kzn",
+      "name": "Shampur_kzn",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:cinnabon",
+      "name": "Cinnabon",
+      "branches": 16,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:чихо",
+      "name": "Чихо",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:кофемания / сoffeemania",
+      "name": "Кофемания / Сoffeemania",
+      "branches": 34,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:первый нос",
+      "name": "Первый Нос",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:ribambelle",
+      "name": "RIBAMBELLE",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:cantinetta antinori",
+      "name": "Cantinetta Antinori",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:il pizzaiolo",
+      "name": "IL Pizzaiolo",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:lambic",
+      "name": "Lambic",
+      "branches": 14,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:вареничная no1",
+      "name": "Вареничная №1",
+      "branches": 16,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:black angus",
+      "name": "Black Angus",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z",
+      "directAttemptAt": "2026-11-24T20:22:19.159Z",
+      "categoryAttemptAt": "2026-11-25T06:09:09.697Z"
+    },
+    {
+      "key": "name:semenov karaoke club",
+      "name": "Semenov karaoke-club",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:bambule",
+      "name": "Bambule",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:altmans gallery",
+      "name": "Altmans Gallery",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:москино",
+      "name": "Москино",
+      "branches": 4,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z",
+      "directAttemptAt": "2026-11-24T20:21:50.411Z"
+    },
+    {
+      "key": "name:mori cinema",
+      "name": "MORI Cinema",
+      "branches": 7,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z",
+      "directAttemptAt": "2026-11-24T20:21:45.968Z"
+    },
+    {
+      "key": "name:ссср сеть фитнес клубов",
+      "name": "СССР - сеть фитнес-клубов",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:колбасофф",
+      "name": "Колбасофф",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:акваклуб nemo",
+      "name": "Акваклуб NEMO",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:аквацентр грудничок",
+      "name": "Аквацентр ГрудничОк",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:алмаз синема",
+      "name": "Алмаз Синема",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:буше москва",
+      "name": "Буше Москва",
+      "branches": 34,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:театр цдр",
+      "name": "Театр ЦДР",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:хачапури и вино",
+      "name": "Хачапури и Вино",
+      "branches": 10,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:frank",
+      "name": "FRANK",
+      "branches": 7,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:хинкали gали",
+      "name": "Хинкали-Gали",
+      "branches": 11,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:zамания",
+      "name": "Zамания",
+      "branches": 15,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:джонджоли",
+      "name": "Джонджоли",
+      "branches": 19,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:tgi fridays",
+      "name": "TGI Fridays",
+      "branches": 4,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:churchill pub",
+      "name": "Churchill Pub",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:китайская грамота",
+      "name": "Китайская грамота",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:kafema",
+      "name": "KAFEMA",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:big wine freaks",
+      "name": "Big Wine Freaks",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:starlite diner",
+      "name": "Starlite Diner",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:la scarpetta trattoria",
+      "name": "La Scarpetta Trattoria",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:lao lee cafe",
+      "name": "Lao Lee cafe",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:котокафе котики и люди",
+      "name": "Котокафе \"Котики и Люди\"",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:вай мэ грузинские закусочные / vai me georgian cafes",
+      "name": "Вай Мэ грузинские закусочные / Vai Me Georgian cafes",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:m2 organic cafe",
+      "name": "M2 Organic Cafe",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:урюк рестораны узбекской кухни",
+      "name": "УРЮК - рестораны узбекской кухни",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:волконский",
+      "name": "Волконский",
+      "branches": 16,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z",
+      "directAttemptAt": "2026-11-24T20:21:39.339Z"
+    },
+    {
+      "key": "name:grand cru modern wine bar",
+      "name": "Grand Cru Modern Wine Bar",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:ресторан субботица",
+      "name": "Ресторан \"Субботица\"",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:печорин",
+      "name": "Печорин",
+      "branches": 7,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:андерсон",
+      "name": "АндерСон",
+      "branches": 21,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:мясо&рыба",
+      "name": "Мясо&Рыба",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:la veranda",
+      "name": "La Veranda",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:рыбная мануфактура",
+      "name": "Рыбная мануфактура",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:69pints",
+      "name": "69pints",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:goodman/гудман steak house",
+      "name": "GOODMAN/Гудман steak house",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:psycho place почасовая аренда помещений для работы",
+      "name": "Psycho Place - почасовая аренда помещений для работы",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:right hops",
+      "name": "Right Hops",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:чебуречная ссср",
+      "name": "Чебуречная СССР",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:quantum cliniс",
+      "name": "Quantum Cliniс",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:il forno",
+      "name": "il FORNO",
+      "branches": 3,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:брусника кондитерская кулинария",
+      "name": "Брусника кондитерская-кулинария",
+      "branches": 12,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:loft hall",
+      "name": "LOFT HALL",
+      "branches": 4,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:paul russia",
+      "name": "PAUL Russia",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:батутный центр flipfly",
+      "name": "Батутный центр FlipFly",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:магазин комиксов чук и гик",
+      "name": "Магазин комиксов «Чук и Гик»",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:chop chop",
+      "name": "Chop-Chop",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:cosmic latte",
+      "name": "COSMIC LATTE",
+      "branches": 6,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:warner music malaysia",
+      "name": "Warner Music Malaysia",
+      "branches": 1,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:11:18.052Z",
+      "source": "https://commons.wikimedia.org/wiki/File:Warner_Music_Malaysia.svg"
+    },
+    {
+      "key": "name:ku: рамен изакая бар",
+      "name": "KU: рамен изакая бар",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:musica viva australia",
+      "name": "Musica Viva Australia",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z",
+      "directAttemptAt": "2026-11-24T20:43:01.577Z"
+    },
+    {
+      "key": "name:библиотека shisha lounge",
+      "name": "Библиотека Shisha Lounge",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:венахи",
+      "name": "Венахи",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:udc upside down cake company moscow",
+      "name": "UDC - Upside Down Cake Company Moscow",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:чайхона 1 сеть lounge cafe",
+      "name": "«Чайхона 1» сеть lounge cafe",
+      "branches": 18,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:батон",
+      "name": "БАТОН",
+      "branches": 4,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:nicepricecafe",
+      "name": "Nicepricecafe",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:la marée restaurants",
+      "name": "La Marée Restaurants",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:misty wood",
+      "name": "Misty Wood",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:винлаб",
+      "name": "ВинЛаб",
+      "branches": 1,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:11:18.052Z",
+      "source": "https://commons.wikimedia.org/wiki/File:Winelab-logo.svg"
+    },
+    {
+      "key": "name:true cost moscow",
+      "name": "True Cost Moscow",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:куулклевер",
+      "name": "КуулКлевер",
+      "branches": 64,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z",
+      "directAttemptAt": "2026-11-24T20:21:37.265Z",
+      "categoryAttemptAt": "2026-11-25T06:09:10.645Z"
+    },
+    {
+      "key": "name:сыроварня",
+      "name": "Сыроварня",
+      "branches": 4,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z",
+      "directAttemptAt": "2026-11-24T20:21:54.767Z",
+      "categoryAttemptAt": "2026-11-25T06:09:11.743Z"
+    },
+    {
+      "key": "name:j'pan",
+      "name": "J'PAN",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:point 242",
+      "name": "Point 242",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:бутчер стейк хаус",
+      "name": "Бутчер стейк хаус",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:прогресс",
+      "name": "Прогресс",
+      "branches": 5,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:серьезные игры",
+      "name": "Серьёзные игры",
+      "branches": 2,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z",
+      "directAttemptAt": "2026-11-24T20:22:14.694Z",
+      "categoryAttemptAt": "2026-11-25T06:09:12.848Z"
+    },
+    {
+      "key": "name:eggsellent.ru",
+      "name": "eggsellent.ru",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:ketch up",
+      "name": "Ketch Up",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:pancho villa",
+      "name": "Pancho Villa",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:1554",
+      "name": "1554",
+      "branches": 3,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:хлеб насущный официальная страница",
+      "name": "Хлеб Насущный Официальная страница",
+      "branches": 36,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:ресторан экспромт",
+      "name": "Ресторан \"Экспромт\"",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:кафе пиццерия академия",
+      "name": "Кафе-Пиццерия Академия",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:kitchen",
+      "name": "Kitchen",
+      "branches": 9,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:corner grill blue grass",
+      "name": "Corner Grill - Blue Grass",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:ача чача",
+      "name": "Ача-Чача",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:хачапурия",
+      "name": "Хачапурия",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:soul in the bowl",
+      "name": "Soul in the Bowl",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:игровой центр втемноте",
+      "name": "Игровой центр Втемноте",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:phantom of the opera",
+      "name": "Phantom of the Opera",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:jeffrey's coffee",
+      "name": "Jeffrey's Coffee",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:cofix россия",
+      "name": "Cofix Россия",
+      "branches": 50,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:bocconcino",
+      "name": "Bocconcino",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:ерш сеть ресторанов",
+      "name": "ЁРШ - сеть ресторанов",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:темпл бар",
+      "name": "Темпл Бар",
+      "branches": 4,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z",
+      "directAttemptAt": "2026-11-24T20:21:57.003Z",
+      "categoryAttemptAt": "2026-11-25T06:09:15.057Z"
+    },
+    {
+      "key": "name:сеть кондитерских kuzina",
+      "name": "Сеть кондитерских Kuzina",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:пироговые линдфорс",
+      "name": "Пироговые «Линдфорс»",
+      "branches": 11,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:шашлыкоff москва",
+      "name": "ШашлыкоFF Москва",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:coffee moose",
+      "name": "Coffee MOOSE",
+      "branches": 16,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:playvr",
+      "name": "PlayVR",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "Q61949318",
+      "name": "Додо Пицца",
+      "branches": 14,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:10:22.917Z",
+      "source": "https://commons.wikimedia.org/wiki/File:Dodo_Pizza_Wordmark.svg"
+    },
+    {
+      "key": "name:сеть ресторанов грабли",
+      "name": "Сеть ресторанов \"Грабли\"",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:грузинские каникулы",
+      "name": "Грузинские Каникулы",
+      "branches": 10,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:dunkin'",
+      "name": "Dunkin'",
+      "branches": 5,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:10:40.659Z",
+      "source": "https://commons.wikimedia.org/wiki/File:Dunkin1.JPG"
+    },
+    {
+      "key": "name:extravirgin",
+      "name": "ExtraVirgin",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:нияма",
+      "name": "Нияма",
+      "branches": 9,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z",
+      "directAttemptAt": "2026-11-24T20:21:41.614Z"
+    },
+    {
+      "key": "name:dhaba",
+      "name": "Dhaba",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:ra'men.moscow",
+      "name": "RA'MEN.Moscow",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:jungle jump event & party rentals llc",
+      "name": "Jungle Jump Event & Party Rentals LLC",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:хинкальная city",
+      "name": "Хинкальная City",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:9_bar_coffee",
+      "name": "9_bar_coffee",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:песнь моряка",
+      "name": "Песнь Моряка",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:bulka",
+      "name": "Bulka",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:costa coffee",
+      "name": "Costa Coffee",
+      "branches": 3,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:syncope сoffee кофейня синкопа",
+      "name": "Syncope Сoffee - Кофейня Синкопа",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:noba coffee",
+      "name": "NOBA coffee",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:the fox inn",
+      "name": "The Fox Inn",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:al parco ristorante",
+      "name": "Al Parco ristorante",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:cernovar bar",
+      "name": "Cernovar BAR",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:burger heroes",
+      "name": "Burger Heroes",
+      "branches": 11,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:хлеб и в",
+      "name": "Хлеб и В",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:правда кофе",
+      "name": "Правда Кофе",
+      "branches": 4,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z",
+      "directAttemptAt": "2026-11-24T20:21:52.544Z"
+    },
+    {
+      "key": "name:скалка пироги и прочие вкусности",
+      "name": "Скалка - Пироги и прочие вкусности",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:мясоroob moscow",
+      "name": "МясоRoob Moscow",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:дорогая, я перезвоню ..,",
+      "name": "Дорогая, я перезвоню ..,",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:ryba international",
+      "name": "RYBA International",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:бургер & фрайс",
+      "name": "Бургер & Фрайс",
+      "branches": 19,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:il pizzaiolo bucuresti pizza napoletana",
+      "name": "Il Pizzaiolo Bucuresti pizza napoletana",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:хищnik стейкs & burgers",
+      "name": "Хищnik Стейкs & Burgers",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:пироговая скалка",
+      "name": "Пироговая \"СКАЛКА\"",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:urban cafe",
+      "name": "Urban Cafe",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z",
+      "directAttemptAt": "2026-11-24T20:22:41.003Z"
+    },
+    {
+      "key": "name:yes no milk coffee",
+      "name": "Yes No Milk Coffee",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:тапчан сеть ресторанов",
+      "name": "Тапчан - сеть ресторанов",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:zotman pizza",
+      "name": "Zotman Pizza",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:take and wake сеть кофеен",
+      "name": "Take and Wake Сеть кофеен",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:сеть кофеен one&double",
+      "name": "Сеть кофеен One&Double",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:chicko чико",
+      "name": "Chicko Чико",
+      "branches": 9,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:coffee boy glasgow",
+      "name": "Coffee Boy Glasgow",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:baan thai institut marrakech",
+      "name": "Baan Thai Institut Marrakech",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:one price coffee",
+      "name": "ONE PRICE COFFEE",
+      "branches": 8,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z",
+      "directAttemptAt": "2026-11-24T20:21:43.777Z",
+      "categoryAttemptAt": "2026-11-25T06:09:16.141Z"
+    },
+    {
+      "key": "name:wokker // воккер",
+      "name": "Wokker // Воккер",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:городской батон",
+      "name": "Городской батон",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:винный дом каудаль",
+      "name": "Винный дом \"Каудаль\"",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:coffee time",
+      "name": "Coffee Time",
+      "branches": 2,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:праймбиф бар",
+      "name": "Праймбиф Бар",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:costa coffee egypt",
+      "name": "Costa Coffee Egypt",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:papa johns honduras",
+      "name": "Papa Johns Honduras",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:ташир пицца москва",
+      "name": "Ташир Пицца Москва",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:7 сэндвичей",
+      "name": "7 Сэндвичей",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:coffeemania",
+      "name": "Coffeemania",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:ciao bella einkaufszentrum pep",
+      "name": "Ciao Bella Einkaufszentrum PEP",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:domino's azerbaijan",
+      "name": "Domino's Azerbaijan",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:kozlovna",
+      "name": "Kozlovna",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:фортутти",
+      "name": "ФорТутти",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:cvc китайская кухня",
+      "name": "CVC Китайская кухня",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:bb burger",
+      "name": "BB Burger",
+      "branches": 9,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:phobo",
+      "name": "PhoBo",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:центр киберспорта спб",
+      "name": "Центр Киберспорта СПБ",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:сладкая лавка",
+      "name": "Сладкая Лавка",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:domino's pizza",
+      "name": "Domino's Pizza",
+      "branches": 19,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:тажинерия",
+      "name": "Тажинерия",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:ichiban",
+      "name": "Ichiban",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:saizen",
+      "name": "Saizen",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z",
+      "directAttemptAt": "2026-11-24T20:22:38.767Z"
+    },
+    {
+      "key": "name:руккола",
+      "name": "Руккола",
+      "branches": 4,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:coffee buro",
+      "name": "Coffee Buro",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:picnic",
+      "name": "Picnic",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:bổ",
+      "name": "Bổ",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:rustic pizza",
+      "name": "Rustic Pizza",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:кофеман",
+      "name": "Кофеман",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:true burgers",
+      "name": "True Burgers",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:duckit",
+      "name": "Duckit",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:дядюшка хо",
+      "name": "Дядюшка Хо",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:il патио минск",
+      "name": "IL ПАТИО Минск",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:pizza cannoli",
+      "name": "Pizza Cannoli",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:coffee life",
+      "name": "Coffee Life",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:glowsubs",
+      "name": "GlowSubs",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:империя пиццы и суши",
+      "name": "Империя пиццы и суши",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:клуб чайная высота. дом чая и мороженого",
+      "name": "Клуб \"Чайная высота. Дом чая и мороженого\"",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:первый пенный омск",
+      "name": "Первый Пенный Омск",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:help!bar",
+      "name": "help!bar",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:bb&burgers",
+      "name": "BB&Burgers",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:шарлин",
+      "name": "Шарлин",
+      "branches": 4,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:meat_coin",
+      "name": "Meat_coin",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:nothing fancy",
+      "name": "Nothing Fancy",
+      "branches": 4,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:redbox_rest",
+      "name": "redbox_rest",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:angel cakes",
+      "name": "Angel Cakes",
+      "branches": 3,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z",
+      "directAttemptAt": "2026-11-24T20:21:59.178Z"
+    },
+    {
+      "key": "name:ocean basket",
+      "name": "Ocean Basket",
+      "branches": 2,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z",
+      "directAttemptAt": "2026-11-24T20:22:05.802Z"
+    },
+    {
+      "key": "name:lavazza",
+      "name": "Lavazza",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:tuna bar",
+      "name": "Tuna Bar",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:ракета",
+      "name": "Ракета",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:раковарня ивана раковара",
+      "name": "Раковарня Ивана Раковара",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:baggins coffee",
+      "name": "Baggins Coffee",
+      "branches": 64,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z",
+      "directAttemptAt": "2026-11-24T20:21:34.986Z"
+    },
+    {
+      "key": "name:ресторан kabuki (кабуки)",
+      "name": "ресторан Kabuki (Кабуки)",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:пан запекан",
+      "name": "Пан Запекан",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:magnolia bakery lebanon",
+      "name": "Magnolia Bakery Lebanon",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:hot dog bulldog",
+      "name": "Hot Dog Bulldog",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:self edge",
+      "name": "Self Edge",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:buffalo's",
+      "name": "Buffalo's",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:proftesto пельмень бар",
+      "name": "ProfTesto - пельмень-бар",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:el pimpi",
+      "name": "El Pimpi",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z",
+      "directAttemptAt": "2026-11-24T20:22:26.710Z",
+      "categoryAttemptAt": "2026-11-25T06:09:17.254Z"
+    },
+    {
+      "key": "name:il matto",
+      "name": "iL Matto",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:eclipse gaming",
+      "name": "Eclipse Gaming",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:додо пицца москва",
+      "name": "Додо Пицца Москва",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:трапеzа бизнес питание",
+      "name": "ТрапеZа Бизнес Питание",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:две палочки",
+      "name": "Две Палочки",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:ipho cafe",
+      "name": "Ipho cafe",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:fornetto cafe & pizzeria",
+      "name": "Fornetto Cafe & Pizzeria",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:charlie's bistro",
+      "name": "Charlie's Bistro",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:маки маки",
+      "name": "МАКИ МАКИ",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:кофейня черный",
+      "name": "Кофейня \"Чёрный\"",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:my gelato cafe",
+      "name": "My Gelato Cafe",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:obedbufet / обедбуфет",
+      "name": "ObedBufet / ОбедБуфет",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:сеть ресторанов бараshка",
+      "name": "Сеть ресторанов Бараshка",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:сoffeebrain",
+      "name": "Сoffeebrain",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:ки do",
+      "name": "КИ-DO",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:umami global bistro",
+      "name": "Umami Global Bistro",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:royal palace kirrwiller",
+      "name": "Royal Palace Kirrwiller",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:хатимаки",
+      "name": "Хатимаки",
+      "branches": 8,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:нотик coffee",
+      "name": "Нотик Coffee",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:caffè vergnano",
+      "name": "Caffè Vergnano",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z",
+      "directAttemptAt": "2026-11-24T20:22:23.448Z",
+      "categoryAttemptAt": "2026-11-25T06:09:18.344Z"
+    },
+    {
+      "key": "name:тоджиро tojiro",
+      "name": "Тоджиро - Tojiro",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:sbarro",
+      "name": "Sbarro",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:saperavi cafe",
+      "name": "Saperavi Cafe",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:panda express méxico",
+      "name": "Panda Express México",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:есть бургер",
+      "name": "Есть Бургер",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:manneken pis",
+      "name": "Manneken Pis",
+      "branches": 5,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:royal thai тайский массаж и спа",
+      "name": "ROYAL THAI - тайский массаж и спа",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:суши авеню",
+      "name": "Суши Авеню",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:рестораны il патио и планета суши московская область",
+      "name": "Рестораны IL Патио и Планета Суши Московская область",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:bklyn: brooklyn pizza pie",
+      "name": "Bklyn: Brooklyn Pizza pie",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:ronald mcdonald house charities (rmhc)",
+      "name": "Ronald McDonald House Charities (RMHC)",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:golden palace bien hoa",
+      "name": "Golden Palace Bien Hoa",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:mcdonald's",
+      "name": "McDonald's",
+      "branches": 43,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:sito",
+      "name": "SITO",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:crab and caviar",
+      "name": "Crab and Caviar",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:munchies eston",
+      "name": "Munchies Eston",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:brasserie",
+      "name": "Brasserie",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:poke house",
+      "name": "Poke House",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z",
+      "directAttemptAt": "2026-11-24T20:22:36.648Z"
+    },
+    {
+      "key": "name:auntie anne's korea 앤티앤스 프레즐 코리아",
+      "name": "Auntie Anne's Korea - 앤티앤스 프레즐 코리아",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:читайна",
+      "name": "Читайна",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:union jack",
+      "name": "Union Jack",
+      "branches": 3,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:хачапури грузинская кухня нижний новгород",
+      "name": "Хачапури - грузинская кухня - Нижний Новгород",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:таширпицца",
+      "name": "ТаширПицца",
+      "branches": 31,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:pizzeria napoli",
+      "name": "Pizzeria Napoli",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z",
+      "directAttemptAt": "2026-11-24T20:22:34.380Z"
+    },
+    {
+      "key": "name:сеть кофеен сладости и радости",
+      "name": "Сеть Кофеен Сладости и Радости",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:hamilton's pub",
+      "name": "Hamilton's Pub",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:славный сыровар",
+      "name": "Славный сыровар",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:кулинармаркет простая еда",
+      "name": "Кулинармаркет \"Простая еда\"",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:суши маркет",
+      "name": "Суши-Маркет",
+      "branches": 6,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z",
+      "directAttemptAt": "2026-11-24T20:21:48.207Z"
+    },
+    {
+      "key": "name:pepepizza сеть семейных кафе",
+      "name": "Pepepizza - сеть семейных кафе",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:аджикинежаль",
+      "name": "Аджикинежаль",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:япона хата",
+      "name": "Япона Хата",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:робуст",
+      "name": "Робуст",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:кофейня правильный кофе",
+      "name": "Кофейня \"Правильный Кофе\"",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:family cafe 840",
+      "name": "Family Cafe 840",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:папа джонс омск",
+      "name": "Папа Джонс Омск",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:киото суши",
+      "name": "Киото Суши",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:суши даром",
+      "name": "Суши Даром",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:сеть пиццерий сицилия",
+      "name": "Сеть Пиццерий \"Сицилия\"",
+      "branches": 26,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:bary",
+      "name": "BARY",
+      "branches": 9,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:круассан кафе",
+      "name": "Круассан Кафе",
+      "branches": 9,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:папаша беппе",
+      "name": "Папаша Беппе",
+      "branches": 11,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:tokyo sushi bar",
+      "name": "TOKYO sushi-bar",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:royal burger",
+      "name": "Royal Burger",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:holy cow entertainment",
+      "name": "Holy Cow Entertainment",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:sushi 'n roll",
+      "name": "Sushi 'n Roll",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:торговая сеть книжица",
+      "name": "Торговая сеть \"Книжица\"",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:maxi pizza сеть ресторанов быстрого питания",
+      "name": "MAXI PIZZA Сеть ресторанов быстрого питания",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:shop cheeseberry",
+      "name": "Shop-Cheeseberry",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:coppa caffe",
+      "name": "Coppa Caffe",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:basecoffee bamberg",
+      "name": "BASECOFFEE Bamberg",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:маффин",
+      "name": "Маффин",
+      "branches": 2,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z",
+      "directAttemptAt": "2026-11-24T20:22:12.381Z",
+      "categoryAttemptAt": "2026-11-25T06:09:21.641Z"
+    },
+    {
+      "key": "name:лунго",
+      "name": "Лунго",
+      "branches": 2,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z",
+      "directAttemptAt": "2026-11-24T20:42:54.909Z",
+      "categoryAttemptAt": "2026-11-25T06:09:22.745Z"
+    },
+    {
+      "key": "name:farfor доставка удовольствий",
+      "name": "Farfor - доставка удовольствий",
+      "branches": 10,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:питькофе, сеть кофеен",
+      "name": "Питькофе, сеть кофеен",
+      "branches": 14,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:sorry babushka",
+      "name": "Sorry babushka",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:шаурма хаус",
+      "name": "Шаурма Хаус",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:maria mia",
+      "name": "Maria Mia",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z",
+      "directAttemptAt": "2026-11-24T20:42:59.335Z",
+      "categoryAttemptAt": "2026-11-25T06:09:23.834Z"
+    },
+    {
+      "key": "name:колор студия",
+      "name": "Колор Студия",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:чикен хауз",
+      "name": "Чикен Хауз",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:дядя денер",
+      "name": "Дядя Дёнер",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z",
+      "directAttemptAt": "2026-11-24T20:22:45.392Z"
+    },
+    {
+      "key": "name:flat coffee",
+      "name": "FLAT coffee",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:итальянский дворик",
+      "name": "Итальянский дворик",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:alex pub",
+      "name": "Alex Pub",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:seven coffee roastery",
+      "name": "Seven Coffee Roastery",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:ташир пицца воронеж",
+      "name": "Ташир пицца Воронеж",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:craft pizza воронеж доставка пиццы",
+      "name": "Craft Pizza Воронеж Доставка Пиццы",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:tobacoffee",
+      "name": "Tobacoffee",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:чайхона 1 васильчуки краснодар",
+      "name": "Чайхона 1 Васильчуки Краснодар",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:ресторан трасса",
+      "name": "Ресторан Трасса",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:il caffé",
+      "name": "il Caffé",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:lalmalakma lakma",
+      "name": "Lalmalakma Lakma",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:surf coffee",
+      "name": "Surf Coffee",
+      "branches": 10,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:coffee like кофе лайк",
+      "name": "Coffee Like \"Кофе Лайк\"",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:ташир пицца ярославль",
+      "name": "Ташир Пицца Ярославль",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:русские блины",
+      "name": "Русские блины",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:павлония",
+      "name": "Павлония",
+      "branches": 3,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z",
+      "directAttemptAt": "2026-11-24T20:22:03.588Z",
+      "categoryAttemptAt": "2026-11-25T06:09:24.953Z"
+    },
+    {
+      "key": "name:vapiano",
+      "name": "Vapiano",
+      "branches": 1,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:11:18.052Z",
+      "source": "https://commons.wikimedia.org/wiki/File:160831_VAPIANO_Logo.png"
+    },
+    {
+      "key": "name:andcoffee",
+      "name": "Andcoffee",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:ground espresso bars",
+      "name": "Ground Espresso Bars",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:tutto bene",
+      "name": "Tutto Bene",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:пекарня кондитерская ели пели",
+      "name": "Пекарня-кондитерская «Ели-Пели»",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:сеть вкусных кофеен дон кофеоне",
+      "name": "Сеть вкусных кофеен - Дон Кофеоне",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:фудзияма уфа",
+      "name": "Фудзияма Уфа",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:доставка kannam chicken красноярск",
+      "name": "Доставка Kannam Chicken - Красноярск",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:trend ufa",
+      "name": "Trend Ufa",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:суши house",
+      "name": "Суши - House",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:суши смайл пицца",
+      "name": "Суши Смайл Пицца",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:la terrazza marina",
+      "name": "La Terrazza Marina",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:курорт газпром",
+      "name": "Курорт Газпром",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:кафе лечо",
+      "name": "Кафе «Лечо»",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:sun_coffee_sochi",
+      "name": "Sun_coffee_sochi",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:wineexpress.ru",
+      "name": "Wineexpress.ru",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:korea house",
+      "name": "KOREA HOUSE",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:зеленый остров",
+      "name": "Зеленый Остров",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z",
+      "directAttemptAt": "2026-11-24T20:22:47.580Z"
+    },
+    {
+      "key": "name:рестораны пхали хинкали во владивостоке",
+      "name": "Рестораны \"Пхали-Хинкали\" во Владивостоке",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:вспышка",
+      "name": "Вспышка",
+      "branches": 2,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:tooman delivery",
+      "name": "Tooman Delivery",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:кафе пена дней",
+      "name": "Кафе \"Пена Дней\"",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:сеть пиццерий oki doki",
+      "name": "«Сеть пиццерий \"Oki Doki\"»",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:валерия бондаревская",
+      "name": "Валерия Бондаревская",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:crust",
+      "name": "Crust",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:pizzaiolo the pizza maker's pizza",
+      "name": "Pizzaiolo - The Pizza Maker's Pizza",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:нихао городская лапшичная",
+      "name": "Нихао - городская лапшичная",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:хлебные истории",
+      "name": "Хлебные истории",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:т кафе",
+      "name": "Т-кафе",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:патрик&мари",
+      "name": "«Патрик&Мари»",
+      "branches": 14,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:ряженка",
+      "name": "Ряженка",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z",
+      "directAttemptAt": "2026-11-24T20:22:49.825Z",
+      "categoryAttemptAt": "2026-11-25T06:09:26.041Z"
+    },
+    {
+      "key": "name:petrushka",
+      "name": "PetrushkA",
+      "branches": 2,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:возьми dim coffee с собой",
+      "name": "Возьми DIM Coffee с собой",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:eattery",
+      "name": "Eattery",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:bodxi cafe",
+      "name": "Bodxi Cafe",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:monstercoffee",
+      "name": "MonsterCoffee",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:viva roma",
+      "name": "Viva Roma",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:глав кальян",
+      "name": "Глав Кальян",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:чайбург",
+      "name": "Чайбург",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:кофе крафт",
+      "name": "Кофе Крафт",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:hesburger",
+      "name": "Hesburger",
+      "branches": 2,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:10:56.133Z",
+      "source": "https://commons.wikimedia.org/wiki/File:Hesburger_logo.svg"
+    },
+    {
+      "key": "name:coffee inside",
+      "name": "Coffee Inside",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:cinnabon в новосибирске",
+      "name": "Cinnabon в Новосибирске",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:кофий room сеть кофеен",
+      "name": "Кофий Room - сеть кофеен",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:академия кофе",
+      "name": "Академия Кофе",
+      "branches": 11,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:детский бассейн дельфин непоседа",
+      "name": "Детский бассейн Дельфин Непоседа",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:аква зооцентр",
+      "name": "Аква Зооцентр",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:мятный карась, паназиатский бар",
+      "name": "Мятный Карась, паназиатский бар",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:пицца синица доставка пиццы",
+      "name": "Пицца Синица - доставка пиццы",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:new york pizza, сеть пиццерий",
+      "name": "New York Pizza, сеть пиццерий",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:pho",
+      "name": "Pho",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:la crème",
+      "name": "La Crème",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z",
+      "directAttemptAt": "2026-11-24T20:22:28.891Z"
+    },
+    {
+      "key": "name:wake cup",
+      "name": "Wake Cup",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z",
+      "directAttemptAt": "2026-11-24T20:22:43.190Z"
+    },
+    {
+      "key": "name:рестораны большого города китчен",
+      "name": "Рестораны Большого Города Китчен",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:сеть ресторанов грильница",
+      "name": "Сеть ресторанов \"Грильница\"",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:пиццерия пицца счастья в новосибирске",
+      "name": "Пиццерия Пицца Счастья в Новосибирске",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:cheese pizza leon",
+      "name": "Cheese Pizza Leon",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:смарт кафе",
+      "name": "Смарт Кафе",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:розовый ветер",
+      "name": "Розовый Ветер",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:ремесленная пекарня катин хлеб",
+      "name": "Ремесленная пекарня \"Катин Хлеб\"",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:rebro кемерово мясо & бургеры",
+      "name": "REBRO Кемерово - мясо & бургеры",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:beer king",
+      "name": "Beer King",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:brooklyn bowl",
+      "name": "Brooklyn Bowl",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:шоколадница тюмень",
+      "name": "Шоколадница Тюмень",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:roni pizza napoletana gross plaza",
+      "name": "Roni Pizza Napoletana - Gross Plaza",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:papa pies",
+      "name": "Papa Pies",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:сеть саун сибирский вариант",
+      "name": "СЕТЬ САУН Сибирский Вариант",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:baker_street_krsk",
+      "name": "baker_street_krsk",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:green green сеть кофеен",
+      "name": "GREEN GREEN - сеть кофеен",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:бургеркит, карла маркса 123",
+      "name": "БургерКит, Карла Маркса 123",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:вилби макбургерс в улан удэ",
+      "name": "Вилби Макбургерс в Улан-Удэ",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:burger star",
+      "name": "Burger Star",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:кофейня шоколадница астрахань",
+      "name": "Кофейня Шоколадница Астрахань",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:суши wok астрахань",
+      "name": "Суши Wok Астрахань",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:блинбери",
+      "name": "БлинБери",
+      "branches": 11,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:coffee shop",
+      "name": "Coffee Shop",
+      "branches": 2,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:red cup твой кофе с собой",
+      "name": "Red Cup - твой кофе с собой",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:рестораны перми тсуру халва casa mia",
+      "name": "Рестораны Перми Тсуру Халва Casa Mia",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:япона матрена",
+      "name": "Япона Матрёна",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:лавка 1",
+      "name": "Лавка 1",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:casa mia sarajevo",
+      "name": "CASA MIA Sarajevo",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:ритмика х урал",
+      "name": "Ритмика х Урал",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:vr house",
+      "name": "VR HOUSE",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:ждите вторник",
+      "name": "Ждите Вторник",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:roxy bar",
+      "name": "Roxy Bar",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:ресторан старый ереван",
+      "name": "Ресторан «Старый Ереван»",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:coffeelab",
+      "name": "CoffeeLab",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:hanami",
+      "name": "Hanami",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:сеть кофеен plantacia coffee",
+      "name": "Сеть кофеен «Plantacia Coffee»",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:сеть столовых ложка",
+      "name": "Сеть столовых «Ложка»",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:basilico",
+      "name": "Basilico",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:счастье есть",
+      "name": "Счастье Есть",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:brauhaus",
+      "name": "BrauHaus",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:сушивесла",
+      "name": "СушиВёсла",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:встречасто coffeebar",
+      "name": "Встречасто Coffeebar",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:дружба пицца и гриль",
+      "name": "Дружба пицца и гриль",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:спар аптека",
+      "name": "СПАР Аптека",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:pizza club nz",
+      "name": "Pizza Club NZ",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:andy's",
+      "name": "Andy's",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:el coffee",
+      "name": "El Coffee",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z",
+      "directAttemptAt": "2026-11-24T20:42:57.174Z",
+      "categoryAttemptAt": "2026-11-25T06:09:27.136Z"
+    },
+    {
+      "key": "name:чиполучо",
+      "name": "Чиполучо",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:детский бассейн акварель самара",
+      "name": "Детский бассейн Акварель Самара",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:мушмула",
+      "name": "Мушмула",
+      "branches": 2,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:music lab",
+      "name": "Music Lab",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:софи и аннабель",
+      "name": "Софи и Аннабель",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:perfecto group",
+      "name": "Perfecto Group",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:da luciano samara",
+      "name": "Da Luciano Samara",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:ресторан честных цен в самаре",
+      "name": "Ресторан Честных Цен в Самаре",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:прага_фуршетные боксы",
+      "name": "ПРАГА_Фуршетные боксы",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:ташир пицца самара",
+      "name": "Ташир Пицца Самара",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:smoke time",
+      "name": "Smoke Time",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:кофейня кофе и шоколад",
+      "name": "Кофейня \"Кофе и шоколад\"",
+      "branches": 9,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:perk coffee & doughnuts",
+      "name": "PERK Coffee & Doughnuts",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:portland coffee",
+      "name": "Portland Coffee",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:love sushi japanese restaurant",
+      "name": "Love sushi japanese restaurant",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:саюри автосуши",
+      "name": "Саюри Автосуши",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:mojo",
+      "name": "MOJO",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:пинта, сеть спорт баров",
+      "name": "Пинта, Сеть спорт-баров",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:more fish'ka. seafood bistro & market",
+      "name": "More Fish'ka. Seafood Bistro & Market",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:black fox coffee co",
+      "name": "Black Fox Coffee Co",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:pico pizza",
+      "name": "Pico Pizza",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:pronto group",
+      "name": "Pronto Group",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:хачапури тетушки марико санкт петербург",
+      "name": "Хачапури тетушки Марико - Санкт-Петербург",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:renoir coffee",
+      "name": "Renoir Coffee",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:sweeter",
+      "name": "Sweeter",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:freddo",
+      "name": "Freddo",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:кофейный мир",
+      "name": "Кофейный мир",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:urban coffee breakfast all day long and speciality coffee",
+      "name": "Urban Coffee - Breakfast All Day Long and Speciality Coffee",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:бодрый день ступино",
+      "name": "Бодрый День Ступино",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:nordic coffee roasters",
+      "name": "Nordic Coffee Roasters",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:смоленский хлебокомбинат",
+      "name": "Смоленский хлебокомбинат",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:donut bar",
+      "name": "DONUT BAR",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:пекарня каравай",
+      "name": "Пекарня Каравай",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:обои/ламинат/кафель/двери",
+      "name": "Обои/ламинат/кафель/двери",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:горячий пельмень",
+      "name": "Горячий пельмень",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:пинта",
+      "name": "ПИНТА",
+      "branches": 2,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:ронни бургер клуб",
+      "name": "РОННИ Бургер КЛУБ",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:пекарня мамин хлеб ижевск",
+      "name": "Пекарня МАМИН ХЛЕБ Ижевск",
+      "branches": 10,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:сеть кофеен palermo",
+      "name": "Сеть кофеен Palermo",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:британника",
+      "name": "Британника",
+      "branches": 3,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z",
+      "directAttemptAt": "2026-11-24T20:42:52.719Z",
+      "categoryAttemptAt": "2026-11-25T06:09:30.451Z"
+    },
+    {
+      "key": "name:мануфактуры макса пройса",
+      "name": "Мануфактуры Макса Пройса",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:konigsbacker kaliningrad",
+      "name": "Konigsbacker Kaliningrad",
+      "branches": 11,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:ростерхит",
+      "name": "Ростерхит",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:амели",
+      "name": "Амели",
+      "branches": 2,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:naked coffee",
+      "name": "Naked Coffee",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:digreco bakery",
+      "name": "DiGreco Bakery",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:make love pizza",
+      "name": "Make Love Pizza",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:ночной клуб черника",
+      "name": "Ночной клуб \"Черника\"",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:про крафт крафтовое пиво в томске",
+      "name": "ПРО КРАФТ - Крафтовое пиво в Томске",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:baba roma",
+      "name": "BABA ROMA",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:best •doner & shaurma• tomsk",
+      "name": "Best •DONER & SHAURMA• Tomsk",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:shokunin",
+      "name": "SHOKUNIN",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:coffee l",
+      "name": "Coffee L",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:суши мания",
+      "name": "Суши Мания",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:кафе мороженое 33 пингвина",
+      "name": "Кафе-мороженое \"33 Пингвина\"",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:сеть кондитерских яблонька",
+      "name": "Сеть кондитерских \"Яблонька\"",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:jazzve",
+      "name": "Jazzve",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:cinnabon в санкт петербурге",
+      "name": "Cinnabon в Санкт-Петербурге",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:аврора торговый дом русской книги",
+      "name": "Аврора торговый дом русской книги",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:pearl beach",
+      "name": "Pearl Beach",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:это у нас семейное",
+      "name": "Это У Нас Семейное",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:евразия",
+      "name": "Евразия",
+      "branches": 56,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:связной",
+      "name": "Связной",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:чайхана чабрец",
+      "name": "Чайхана \"Чабрец\"",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:пхалихинкали",
+      "name": "ПхалиХинкали",
+      "branches": 12,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:com.nata",
+      "name": "Com.nata",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:gran coffee",
+      "name": "Gran Coffee",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:студия мозаики сад гранат",
+      "name": "Студия мозаики \"Сад Гранат\"",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z"
+    },
+    {
+      "key": "name:mad espresso team",
+      "name": "Mad Espresso Team",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:контакт бар",
+      "name": "Контакт Бар",
+      "branches": 10,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:слой",
+      "name": "СЛОЙ",
+      "branches": 4,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:британские пекарни british bakery",
+      "name": "Британские пекарни - British Bakery",
+      "branches": 15,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:bona capona",
+      "name": "BONA CAPONA",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:гастрономический альянс гарсон",
+      "name": "Гастрономический Альянс Гарсон",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:jager restaurants",
+      "name": "Jager Restaurants",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:ferma cafe",
+      "name": "FERMA CAFE",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:пицца 22 сантиметра",
+      "name": "Пицца 22 сантиметра",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:кофейня 1",
+      "name": "Кофейня 1",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:цех85",
+      "name": "ЦЕХ85",
+      "branches": 70,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:43.043Z",
+      "directAttemptAt": "2026-11-24T20:21:32.777Z"
+    },
+    {
+      "key": "name:ресторан пряности и радости",
+      "name": "Ресторан «Пряности и Радости»",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:коворкинги level space",
+      "name": "Коворкинги LEVEL SPACE",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:romeo's restaurants & hotel",
+      "name": "Romeo's Restaurants & Hotel",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:буше",
+      "name": "буше",
+      "branches": 4,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:каха бар",
+      "name": "Каха бар",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:asiatiq_ramen",
+      "name": "ASIATIQ_ramen",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:toscana italian grill",
+      "name": "Toscana Italian Grill",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:blackwood. шотландский паб в сердце петербурга.",
+      "name": "BlackWood. Шотландский паб в сердце Петербурга.",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:bbq beer restaurant",
+      "name": "BBQ Beer Restaurant",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:the pub game store",
+      "name": "The Pub Game Store",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:сеть банкетных ресторанов юбилей group",
+      "name": "Сеть банкетных ресторанов «Юбилей Group»",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:теплого хлеба",
+      "name": "Тёплого хлеба",
+      "branches": 15,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:все дома сеть булочных спб",
+      "name": "ВСЕ ДОМА сеть булочных СПб",
+      "branches": 20,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:чайхана пахвала",
+      "name": "Чайхана Пахвала",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:миндаль / mindal cafe",
+      "name": "Миндаль / Mindal Cafe",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:civil coffee bar",
+      "name": "CIVIL Coffee bar",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:starbucks praga castle",
+      "name": "Starbucks Praga Castle",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:ситилинк",
+      "name": "Ситилинк",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z",
+      "directAttemptAt": "2026-11-24T20:22:51.928Z",
+      "categoryAttemptAt": "2026-11-25T06:09:31.555Z"
+    },
+    {
+      "key": "name:чебуреки и рюмочная у ларисы",
+      "name": "Чебуреки и Рюмочная у Ларисы",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:koreana light",
+      "name": "Koreana light",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:хачо и пури",
+      "name": "Хачо и Пури",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:53.802Z"
+    },
+    {
+      "key": "name:mickeyandmonkeys",
+      "name": "Mickeyandmonkeys",
+      "branches": 5,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:pancake house bacolod",
+      "name": "Pancake House Bacolod",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:leon tea & coffee",
+      "name": "LEON Tea & Coffee",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:филадельфия 24/7",
+      "name": "Филадельфия 24/7",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:пироговый дворик, кафе пекарни",
+      "name": "Пироговый Дворик, кафе-пекарни",
+      "branches": 14,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:46.618Z"
+    },
+    {
+      "key": "name:брассерия kriek",
+      "name": "Брассерия Kriek",
+      "branches": 7,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:53.497Z"
+    },
+    {
+      "key": "name:кофестория вкусный кофе в спб",
+      "name": "Кофестория - вкусный кофе в СПб",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:44.308Z"
+    },
+    {
+      "key": "name:slurp ramen bar",
+      "name": "Slurp Ramen Bar",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:ресторан баклажан",
+      "name": "Ресторан «Баклажан»",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:royal smoke",
+      "name": "Royal Smoke",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:48.327Z"
+    },
+    {
+      "key": "name:giacomo",
+      "name": "Giacomo",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:marketplace.me",
+      "name": "Marketplace.me",
+      "branches": 6,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:55.683Z"
+    },
+    {
+      "key": "name:koreana",
+      "name": "Koreana",
+      "branches": 2,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:mr.black coffee",
+      "name": "Mr.BLACK Coffee",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:vлаvаше",
+      "name": "Vлаvаше",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:городские пекарни",
+      "name": "Городские Пекарни",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:49.428Z"
+    },
+    {
+      "key": "name:bros burritos",
+      "name": "Bros Burritos",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:57.875Z"
+    },
+    {
+      "key": "name:рестораны нихао",
+      "name": "Рестораны \"Нихао\"",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:мясо&хлеб",
+      "name": "Мясо&Хлеб",
+      "branches": 8,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:49.609Z"
+    },
+    {
+      "key": "name:o'brien's music inc.",
+      "name": "O'Brien's Music Inc.",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:cats museum / музей кошки",
+      "name": "Cats museum / Музей кошки",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:кофе бон",
+      "name": "Кофе Бон",
+      "branches": 20,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:45.216Z"
+    },
+    {
+      "key": "name:кофейни точка вкуса",
+      "name": "Кофейни Точка Вкуса",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:59.461Z"
+    },
+    {
+      "key": "name:кофеварим",
+      "name": "Кофеварим",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:pho'n'roll",
+      "name": "PHO'n'ROLL",
+      "branches": 4,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:59.098Z"
+    },
+    {
+      "key": "name:fresh point",
+      "name": "Fresh Point",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:all seasons diner",
+      "name": "All Seasons Diner",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z"
+    },
+    {
+      "key": "name:ikigai.spb",
+      "name": "Ikigai.spb",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:55.001Z"
+    },
+    {
+      "key": "name:ресторан мamalыga",
+      "name": "Ресторан Мamalыga",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:peperoni",
+      "name": "Peperoni",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:altamarea",
+      "name": "Altamarea",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:02.151Z",
+      "directAttemptAt": "2026-11-24T20:22:16.807Z"
+    },
+    {
+      "key": "name:паруса #2",
+      "name": "Паруса #2",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:peperoni_ads",
+      "name": "Peperoni_ads",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:15.840Z"
+    },
+    {
+      "key": "name:ramen shifu roma",
+      "name": "Ramen Shifu Roma",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:сеть кофе баров my",
+      "name": "Сеть кофе-баров MY",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:31.797Z"
+    },
+    {
+      "key": "name:chili pizza",
+      "name": "Chili Pizza",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:46.103Z"
+    },
+    {
+      "key": "name:shambala",
+      "name": "Shambala",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:20.237Z"
+    },
+    {
+      "key": "name:oh, my dog",
+      "name": "Oh, my dog",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:peterbakery",
+      "name": "Peterbakery",
+      "branches": 9,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:caffè nero",
+      "name": "Caffè Nero",
+      "branches": 1,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:11:04.843Z",
+      "source": "https://commons.wikimedia.org/wiki/File:Caff%C3%A8_Nero_Logo.svg"
+    },
+    {
+      "key": "name:coffee racer",
+      "name": "Coffee RACER",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:café café",
+      "name": "Café Café",
+      "branches": 1,
+      "status": "no-verified-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z",
+      "directAttemptAt": "2026-11-24T20:22:21.211Z",
+      "categoryAttemptAt": "2026-11-25T06:09:32.666Z"
+    },
+    {
+      "key": "name:кондитерские ferma",
+      "name": "Кондитерские FermA",
+      "branches": 3,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:51.653Z"
+    },
+    {
+      "key": "name:bellini",
+      "name": "Bellini",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:06.702Z"
+    },
+    {
+      "key": "name:crispy pizza",
+      "name": "Crispy Pizza",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:08.901Z"
+    },
+    {
+      "key": "name:лиса пришла",
+      "name": "Лиса Пришла",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:квартирка и дачники",
+      "name": "Квартирка и Дачники",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:24.018Z"
+    },
+    {
+      "key": "name:ollis club",
+      "name": "Ollis Club",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:56.060Z"
+    },
+    {
+      "key": "name:momo chicken au",
+      "name": "Momo Chicken AU",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:maison rouge",
+      "name": "Maison rouge",
+      "branches": 1,
+      "status": "ambiguous-brand",
+      "lastAttemptAt": "2026-11-25T07:36:13.389Z"
+    },
+    {
+      "key": "name:ямм пицца",
+      "name": "ЯММ Пицца",
+      "branches": 11,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:48.507Z"
+    },
+    {
+      "key": "name:hood streetfood",
+      "name": "Hood streetfood",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:12.168Z"
+    },
+    {
+      "key": "name:uppetit",
+      "name": "UPPETIT",
+      "branches": 2,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:35:58.265Z"
+    },
+    {
+      "key": "name:бабушка приехала",
+      "name": "Бабушка Приехала",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:22.825Z"
+    },
+    {
+      "key": "name:pizza roma πιτσαρία εστιατόριο",
+      "name": "Pizza Roma Πιτσαρία-Εστιατόριο",
+      "branches": 1,
+      "status": "no-logo-claim",
+      "lastAttemptAt": "2026-11-25T07:36:18.029Z"
+    },
+    {
+      "key": "name:carl's jr.",
+      "name": "Carl's Jr.",
+      "branches": 1,
+      "status": "retained",
+      "lastAttemptAt": "2026-11-24T19:11:04.843Z",
+      "source": "https://commons.wikimedia.org/wiki/File:Carl's_Jr_logo.svg"
+    }
+  ],
+  "generatedAt": "2026-11-25T08:37:08.112Z"
+}

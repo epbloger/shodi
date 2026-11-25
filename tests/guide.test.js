@@ -131,3 +131,17 @@ test("active catalog excludes unverified historical fallback and closed statuses
     for (const place of places) assert.ok(["open", "unknown"].includes(place.status));
   }
 });
+
+test("verified overrides reach cards, filters, saved-place lookups and map links",()=>{
+  const krem=placeById("kzn-o5ff02a5244f4");
+  assert.equal(krem.lat,55.799453);
+  assert.equal(krem.lon,49.10646);
+  assert.equal(krem.descriptionKind,"editorial-place");
+  assert.equal(new URL(mapLink(krem)).searchParams.get("ll"),"49.10646,55.799453");
+  const baggins=placeById("spb-o20250f8ba7e2");
+  assert.equal(baggins.kind,"coffee");
+  assert.equal(baggins.brand.key,"name:baggins coffee");
+  assert.ok(findPlaces({cityId:"spb",category:"coffee",query:"Baggins Coffee"}).some(p=>p.id===baggins.id));
+  assert.ok(!findPlaces({cityId:"spb",category:"architecture",query:"Baggins Coffee"}).some(p=>p.id===baggins.id));
+  assert.equal(placeById("nn-o9c0838acd24a").kind,"architecture");
+});

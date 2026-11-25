@@ -12,6 +12,8 @@ Recorded 2026-11-25. These are actual prior incidents, not a checklist of hypoth
 | Excessive pending/cancelled Android builds | Multiple commits/reusable verification jobs compete for the same concurrency group | Prefer one integrated revision and one full APK verification; do not push intermediate code while final integration runs. Keep source branch and final artifact revision explicit. |
 | Incomplete descriptions despite green CI | Tests establish software correctness, not availability of place-specific facts | Report independently grounded place facts, brand facts, dated archival summaries and basic catalog summaries separately. Never count generic or location text as verified history. |
 | Unproductive scheduled runs | Previous connector used PR-only workflow listing, returned no relevant runs | Use GitHub REST fetch for branches/android-v2, actions/runs?branch=android-v2, actions/runs/{id}/jobs, then fetch_workflow_job_logs and fetch_workflow_run_artifacts. |
+| Integrated catalog could be overwritten during APK compilation | Catalog preparation restored an older baseline artifact even when newer validated manifests were committed | Bind committed catalog inputs to Git blob hashes, bypass remote enrichment/cache restoration for the pinned snapshot, and verify the hashes again after parallel artifact assembly. |
+| Slow full catalog audit | Repeated name normalization inside every nearby-place comparison | Normalize grid entries and the query name once; retain distance and identity conditions and run the existing regression suite. |
 
 ## Latest verified data integration
 - HEAD at recording: 94bb37b658da8d499049070e0e5316b4a75fa943.

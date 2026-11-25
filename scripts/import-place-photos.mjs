@@ -10,10 +10,12 @@ import {osmPhotoLink} from "../public/osm-photo-links.js";
 import {osmFactsForPlace,osmFactPhotoLink} from "../public/osm-place-facts.js";
 import {wikiSummaries} from "../public/data/wiki-summaries.js";
 import {validWikiSummary} from "../public/wiki-summary.js";
+import {effectiveRow,effectivePhotoIdentity} from "../public/catalog-corrections.js";
 const deadline=Date.now()+12*60000;
 const scope=JSON.parse(await readFile("docs/release-priority-scope.json","utf8"));
 const scopeIds=new Set(scope.cultural.map(p=>p.id));
 const newOnly=process.argv.includes("--new-identities-only");
+const correctedOnly=process.argv.includes("--corrected-identities-only");
 const newQids=newOnly?new Set(JSON.parse(await readFile("docs/priority-wiki-report.json","utf8")).newQids):null;
 const byteLimit=PHOTO_BYTES_LIMIT-Object.values(voyagePhotos).reduce((n,p)=>n+photoBytes(p),0);
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
@@ -42,19 +44,22 @@ async function get(url,json=true){
   if(type==="image/png"&&!b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))throw Error("Bad PNG");
   return {data:"data:"+type+";base64,"+b.toString("base64"),bytes:b.length};
 }
-const catalog = Object.values(currentPlaces).flat().filter(r => !r[6] || ["open","unknown"].includes(r[6]));
+const catalog = Object.values(currentPlaces).flat().map(effectiveRow).filter(r => !r[6] || ["open","unknown"].includes(r[6]));
 const filesByQid=new Map();
-const placeIds=catalog.map(([id,name,kind,,lat,lon])=>{
+const placeIds=catalog.map(row=>{
+ const [id,name,kind,,lat,lon]=row;
+ const corrected=effectivePhotoIdentity(row);
  const details=descriptionForPlace(name,lat,lon);
  const link=osmPhotoLink(id)??osmFactPhotoLink(osmFactsForPlace({id,name,kind,lat,lon}));
  const direct=wikiSummaries[id];
- const qid=details?.qid??link?.qid??(validWikiSummary(direct)?direct.qid:null);
+ const qid=corrected?.qid??details?.qid??link?.qid??(validWikiSummary(direct)?direct.qid:null);
+ if(corrected?.file)filesByQid.set(qid,corrected.file);
  if(qid&&link?.qid===qid&&link.files?.length&&!filesByQid.has(qid))filesByQid.set(qid,link.files[0]);
  return qid;
 });
 const cultural=new Set(["museum","gallery","architecture","theater","view","park","walk","live"]);
 const important=placeIds.filter((q,i)=>q&&cultural.has(catalog[i][2]));
-const qids = [...new Set(placeIds.filter((q,i)=>q&&scopeIds.has(catalog[i][0])&&(!newQids||newQids.has(q))))];
+const qids = [...new Set(placeIds.filter((q,i)=>q&&scopeIds.has(catalog[i][0])&&(!newQids||newQids.has(q))&&(!correctedOnly||effectivePhotoIdentity(catalog[i]))))];
 const out={};let bytes=0;
 for(const qid of [...new Set([...Object.keys(previous),...qids])]){
  const p=previous[qid],size=photoBytes(p);

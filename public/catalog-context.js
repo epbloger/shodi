@@ -17,13 +17,13 @@ export function createNearbyContext(rows){
   if(!r[1]||generic.test(r[1].trim())||r[1].length>80)continue;
   const k=cell(r).join(",");
   if(!grid.has(k))grid.set(k,[]);
-  grid.get(k).push(r);
+  grid.get(k).push({row:r,nameKey:keyName(r[1])});
  }
  return row=>{
   if(!Number.isFinite(row[4])||!Number.isFinite(row[5]))return null;
-  const [y,x]=cell(row);let best=null,bestScore=Infinity;
-  for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)for(const r of grid.get((y+dy)+","+(x+dx))||[]){
-   if(r[0]===row[0]||r[2]===row[2]||keyName(r[1])===keyName(row[1]))continue;
+  const [y,x]=cell(row),nameKey=keyName(row[1]);let best=null,bestScore=Infinity;
+  for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)for(const {row:r,nameKey:otherKey} of grid.get((y+dy)+","+(x+dx))||[]){
+   if(r[0]===row[0]||r[2]===row[2]||otherKey===nameKey)continue;
    const meters=straightDistance(row,r);
    if(meters<25||meters>1500)continue;
    const score=meters+(scenic.has(r[2])?0:350);
